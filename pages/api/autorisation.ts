@@ -1,15 +1,34 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import crypto from "crypto";
 import cookie from "cookie";
-import cookieParser from "cookie-parser";
+import mongoose from "mongoose";
+import { userService } from "@/services/user-service";
+import { env } from "process";
 
+/* const DB_URL =
+  "mongodb+srv://retrosexyal:OTgTPpOHEm2ClDfr@cluster0.kowcdvd.mongodb.net/test"; */
+const DB = env.DB_URL;
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(DB!);
+      console.log("bd ok");
+    }
     const data = req.body;
+    const userData = await userService.registration("email12222", "pass12222");
+    res.setHeader(
+      "Set-Cookie",
+      cookie.serialize("refreshToken", userData.refreshToken, {
+        maxAge: 86400,
+        path: "/",
+        httpOnly: true,
+      })
+    );
 
+    return res.json(userData);
     res.statusCode = 200;
     const csrfToken = generateCsrfToken();
     res.setHeader(

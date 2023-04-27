@@ -17,4 +17,13 @@ export default class AuthService {
   static async logout(): Promise<void> {
     return api.post("/api/logout");
   }
+  static async getStudents() {
+    return api.get("/api/getstudent");
+  }
+  static async addStudent(name: string, date: string, place: string) {
+    return api.post<AuthResponce>("/api/addstudent", { name, date, place });
+  }
+  static async deleteStudent(id: string) {
+    return api.post<AuthResponce>("/api/deletestudent", { id });
+  }
 }

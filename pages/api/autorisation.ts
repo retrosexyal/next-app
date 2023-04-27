@@ -5,15 +5,17 @@ import mongoose from "mongoose";
 import { userService } from "@/services/user-service";
 import { env } from "process";
 
-/* const DB_URL =
-  "mongodb+srv://retrosexyal:OTgTPpOHEm2ClDfr@cluster0.kowcdvd.mongodb.net/test"; */
 const DB = env.DB_URL;
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
+    console.log(mongoose.connection.readyState);
+    console.log(DB);
+    console.log(mongoose.connection.readyState !== 1);
     if (mongoose.connection.readyState !== 1) {
+      console.log(mongoose.connection.readyState);
       await mongoose.connect(DB!);
       console.log("bd ok");
     }

@@ -16,3 +16,8 @@ export const mailOptions = {
     from: NODEMAILER_EMAIL,
     to: NODEMAILER_EMAIL
 }
+
+export const mailOptionsBirthday = {
+    from: NODEMAILER_EMAIL,
+    to: "retrosexyal@gmail.com"
+}

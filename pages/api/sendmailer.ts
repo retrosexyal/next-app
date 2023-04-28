@@ -1,18 +1,18 @@
 import { mailOptionsBirthday, transporter } from "@/config/nodemailer";
 import { NextApiRequest, NextApiResponse } from "next";
 
-console.log("скрипт запущен");
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const now = new Date();
+  const options = { timeZone: "Europe/Minsk" };
+  const minskTime = now.toLocaleString("en-US", options);
   await transporter.sendMail({
     ...mailOptionsBirthday,
-    subject: "Анкета",
+    subject: "Дни рождения сегодня",
     text: "zzz",
-    html: `<h1>авто</h1><h2>авто</h2><h2>авто</h2>`,
+    html: `<h1>${minskTime}</h2>`,
   });
-  console.log("письмо отправлено");
   res.status(200).json({ message: "письмо отправлено" });
 }

@@ -2,10 +2,18 @@ import { IStudent } from "@/clientModels/IStudent";
 import AuthService from "@/clientServices/AuthService";
 import React, { useState } from "react";
 
+function formatDate(date: string) {
+  const parts = date.split("-");
+  const day = parts[2];
+  const month = parts[1];
+  const year = parts[0];
+  return `${day}.${month}.${year}`;
+}
+
 const Admin = () => {
   const [studentInfo, setStudentInfo] = useState({
     name: "",
-    date: "",
+    date: "-",
     place: "ДГ",
   });
   const [students, setStudents] = useState<IStudent[]>([]);
@@ -13,7 +21,7 @@ const Admin = () => {
   const { name, date, place } = studentInfo;
 
   const handleSubmit = () => {
-    AuthService.addStudent(name, date, place);
+    AuthService.addStudent(name, formatDate(date), place);
   };
 
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {

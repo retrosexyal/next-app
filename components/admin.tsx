@@ -1,6 +1,7 @@
 import { IStudent } from "@/clientModels/IStudent";
 import AuthService from "@/clientServices/AuthService";
 import React, { useState } from "react";
+import { arrayStudents } from "@/constants/constants";
 
 function formatDate(date: string) {
   const parts = date.split("-");
@@ -13,7 +14,7 @@ function formatDate(date: string) {
 const Admin = () => {
   const [studentInfo, setStudentInfo] = useState({
     name: "",
-    date: "-",
+    date: "",
     place: "ДГ",
   });
   const [students, setStudents] = useState<IStudent[]>([]);
@@ -42,10 +43,17 @@ const Admin = () => {
 
   const handleDeleteStudent = (e: React.MouseEvent) => {
     const id = (e.target as HTMLDivElement).getAttribute("data-id");
-    if (id) {
-      AuthService.deleteStudent(id!);
+    const isButton =
+      (e.target as HTMLDivElement).tagName.toUpperCase() === "BUTTON";
+    if (id && isButton) {
+      const conf2 = confirm("точно удалить?");
+      if (conf2) {
+        AuthService.deleteStudent(id!);
+      }
     }
   };
+
+  const handleTest = () => {};
 
   return (
     <div>
@@ -75,11 +83,13 @@ const Admin = () => {
         {students.map((e) => {
           return (
             <div key={e._id} data-id={e._id}>
-              {e.name}
+              {`${e.name}  ${e.date} ${e.place}`}
+              <button data-id={e._id}> удалить ученика</button>
             </div>
           );
         })}
       </div>
+      <button onClick={handleTest}>test</button>
     </div>
   );
 };

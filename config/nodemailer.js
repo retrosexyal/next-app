@@ -19,5 +19,5 @@ export const mailOptions = {
 
 export const mailOptionsBirthday = {
     from: NODEMAILER_EMAIL,
-    to: "retrosexyal@gmail.com"
+    to: "lizaveta.miheenko@mail.ru"
 }

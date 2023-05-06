@@ -5,6 +5,7 @@ const StudentSchema = new Schema({
   date: { type: String, required: true },
   mentor: { type: String },
   place: { type: String, required: true },
+  group: { type: String },
 });
 
 export default models.Student || model("Student", StudentSchema);

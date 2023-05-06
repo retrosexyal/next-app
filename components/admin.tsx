@@ -1,7 +1,6 @@
 import { IStudent } from "@/clientModels/IStudent";
 import AuthService from "@/clientServices/AuthService";
 import React, { useState } from "react";
-import { arrayStudents } from "@/constants/constants";
 
 function formatDate(date: string) {
   const parts = date.split("-");
@@ -38,7 +37,6 @@ const Admin = () => {
   const handleGetStudents = async () => {
     const students = await AuthService.getStudents();
     setStudents(students.data);
-    console.log(students);
   };
 
   const handleDeleteStudent = (e: React.MouseEvent) => {
@@ -53,7 +51,17 @@ const Admin = () => {
     }
   };
 
-  const handleTest = () => {};
+  const handleTest = () => {
+    AuthService.login("admin@admin", "123").then((res) => {
+      if (res.status === 200) {
+        console.log(res);
+        localStorage.setItem("token", res.data.accessToken);
+        alert("функция админа активирована");
+      } else if (res.status === 400) {
+        alert("нет доступа");
+      }
+    });
+  };
 
   return (
     <div>
@@ -83,7 +91,7 @@ const Admin = () => {
         {students.map((e) => {
           return (
             <div key={e._id} data-id={e._id}>
-              {`${e.name}  ${e.date} ${e.place}`}
+              {`${e.name}  ${e.date} ${e.place} ${e.group}`}
               <button data-id={e._id}> удалить ученика</button>
             </div>
           );

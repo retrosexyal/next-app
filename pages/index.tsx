@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Form from "@/components/form";
 import RegistrationForm from "@/components/registrationForm";
 import Admin from "@/components/admin";
+import Main from "@/components/main";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,6 +17,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
+        <Main />
         <Form />
         <RegistrationForm />
         <Admin />

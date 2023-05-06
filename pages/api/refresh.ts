@@ -17,6 +17,7 @@ export default async function handler(
         httpOnly: true,
       })
     );
+    return res.status(200).json(userData);
   } catch (error) {
     console.error(error);
     res.statusCode = 500;

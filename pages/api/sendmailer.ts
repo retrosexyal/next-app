@@ -34,7 +34,7 @@ export default async function handler(
     const day = splited[0];
     const month = splited[1];
     if (+day === +dayToday && +month === +monthToday) {
-      bithStudents += student.name + " ";
+      bithStudents += student.name + " " + student.place + " " + student.group + ";";
     }
   });
 
@@ -45,7 +45,7 @@ export default async function handler(
     html: `<h1>${
       bithStudents
         ? `нужно поздравить:${bithStudents}`
-        : "сегодня ниукого нет ДР"
+        : "сегодня ни у кого нет ДР"
     }</h2>`,
   });
   res.status(200).json({ message: "письмо отправлено" });

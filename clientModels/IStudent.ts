@@ -4,4 +4,5 @@ export interface IStudent {
   _id: string;
   mentor: string;
   place: string;
+  group: string;
 }

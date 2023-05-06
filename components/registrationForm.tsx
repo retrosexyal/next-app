@@ -9,6 +9,8 @@ const RegistrationForm = () => {
     e.preventDefault();
     AuthService.registration(email, password).then((res) => {
       if (res.status === 200) {
+        console.log(res);
+        localStorage.setItem("token", res.data.accessToken);
         alert("пользователь успешно зарегистрирован");
       } else if (res.status === 400) {
         alert("пользователь уже зарегистрирован");

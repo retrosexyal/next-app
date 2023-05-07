@@ -20,6 +20,9 @@ export default class AuthService {
   static async getStudents() {
     return api.get("/api/getstudent");
   }
+  static async refresh() {
+    return api.get<AuthResponce>("/api/refresh");
+  }
   static async addStudent(name: string, date: string, place: string) {
     return api.post<AuthResponce>("/api/addstudent", { name, date, place });
   }

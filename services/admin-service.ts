@@ -44,6 +44,14 @@ class AdminService {
     const students = await StudentModel.find();
     return students;
   }
+
+  async getStudent(id: string) {
+    const candidate = await StudentModel.findById(id);
+    if (!candidate) {
+      throw new Error(`Ребенок с именем ${id} не найден`);
+    }
+    return candidate;
+  }
   /* async login(email: string, password: string) {
     const user = await UserModel.findOne({ email });
     if (!user) {

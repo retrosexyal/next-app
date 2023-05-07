@@ -30,7 +30,7 @@ export default async function handler(
     return res.status(200).json(userData);
   } catch (error) {
     console.error(error);
-    res.statusCode = 500;
-    res.json({ message: "Internal Server Error" });
+    res.statusCode = 404;
+    res.json({ message: "Пользователь отсутствует" });
   }
 }

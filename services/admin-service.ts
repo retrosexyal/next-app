@@ -40,6 +40,27 @@ class AdminService {
     };
   }
 
+  async changeStudent(
+    id: string,
+    name: string,
+    place: string,
+    date: string,
+    group: string
+  ) {
+    const candidate = await StudentModel.findById(id);
+    if (!candidate) {
+      throw new Error(`Ребенок с именем ${id} не найден`);
+    }
+    candidate.name = name || candidate.name;
+    candidate.place = place || candidate.place;
+    candidate.date = date || candidate.date;
+    candidate.group = group || candidate.group;
+    candidate.save();
+    return {
+      candidate,
+    };
+  }
+
   async getAllStudents() {
     const students = await StudentModel.find();
     return students;
@@ -52,49 +73,6 @@ class AdminService {
     }
     return candidate;
   }
-  /* async login(email: string, password: string) {
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      throw new Error(`пользователь с почтовым ящиком ${email} не существует`);
-    }
-    const isPassEquals = await bcrypt.compare(password, user.password);
-    if (!isPassEquals) {
-      throw new Error(`пароль не верен`);
-    }
-    const userDto = new UserDto(user);
-    const tokens = tokenService.generateToken({ ...userDto });
-    await tokenService.saveToken(userDto.id, tokens.refreshToken);
-    return {
-      ...tokens,
-      user: userDto,
-    };
-  }
-
-  async logout(refreshToken: string) {
-    const token = await tokenService.removeToken(refreshToken);
-    return token;
-  }
-
-  async refresh(refreshToken: string) {
-    if (!refreshToken) {
-      throw new Error("ошибка обновления токена");
-    }
-    const userData = tokenService.validateRefreshToken(
-      refreshToken
-    ) as UserModel;
-    const tokenFromDb = tokenService.findToken(refreshToken);
-    if (!userData || !tokenFromDb) {
-      throw new Error("ошибка обновления токена");
-    }
-    const user = await UserModel.findById(userData.id);
-    const userDto = new UserDto(user);
-    const tokens = tokenService.generateToken({ ...userDto });
-    await tokenService.saveToken(userDto.id, tokens.refreshToken);
-    return {
-      ...tokens,
-      user: userDto,
-    };
-  } */
 }
 
 export const adminService = new AdminService();

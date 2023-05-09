@@ -10,9 +10,14 @@ export default class AuthService {
   }
   static async registration(
     email: string,
-    password: string
+    password: string,
+    name: string
   ): Promise<AxiosResponse<AuthResponce>> {
-    return api.post<AuthResponce>("/api/registration", { email, password });
+    return api.post<AuthResponce>("/api/registration", {
+      email,
+      password,
+      name,
+    });
   }
   static async logout(): Promise<void> {
     return api.post("/api/logout");
@@ -25,6 +30,21 @@ export default class AuthService {
   }
   static async addStudent(name: string, date: string, place: string) {
     return api.post<AuthResponce>("/api/addstudent", { name, date, place });
+  }
+  static async changeStudent(
+    id: string,
+    name: string,
+    place: string,
+    date: string,
+    group: string
+  ) {
+    return api.post<AuthResponce>("/api/changestudent", {
+      id,
+      name,
+      place,
+      date,
+      group,
+    });
   }
   static async deleteStudent(id: string) {
     return api.post<AuthResponce>("/api/deletestudent", { id });

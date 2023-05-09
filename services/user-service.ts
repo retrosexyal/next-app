@@ -11,7 +11,7 @@ interface UserModel {
 }
 
 class UserService {
-  async registration(email: string, password: string) {
+  async registration(email: string, password: string, name: string) {
     const canditate = await UserModel.findOne({ email });
     if (canditate) {
       throw new Error(`пользователь с почтовым ящиком ${email} существует`);
@@ -24,6 +24,7 @@ class UserService {
       email,
       password: hashPassword,
       activationLink,
+      name,
     });
     const userDto = new UserDto(user);
     const tokens = tokenService.generateToken({ ...userDto });

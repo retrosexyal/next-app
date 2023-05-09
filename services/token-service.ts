@@ -6,6 +6,7 @@ interface UserModel {
   email: string;
   id: string;
   isActivated: boolean;
+  name: string;
 }
 
 const accessKey = env.ACCESS_TOKEN_KEY || "123";

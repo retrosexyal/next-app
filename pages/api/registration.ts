@@ -15,7 +15,11 @@ export default async function handler(
       console.log("bd ok");
     }
     const data = req.body;
-    const userData = await userService.registration(data.email, data.password);
+    const userData = await userService.registration(
+      data.email,
+      data.password,
+      data.name
+    );
     res.setHeader(
       "Set-Cookie",
       cookie.serialize("refreshToken", userData.refreshToken, {

@@ -19,8 +19,13 @@ export default async function handler(
     );
     return res.status(200).json(userData);
   } catch (error) {
-    console.error(error);
-    res.statusCode = 500;
-    res.json({ message: "Internal Server Error" });
+    console.log(error);
+    if ((error as Error).message === "ошибка обновления токена") {
+      res.statusCode = 404;
+      res.json({ message: "пользователь не найден" });
+    } else {
+      res.statusCode = 500;
+      res.json({ message: "Internal Server Error" });
+    }
   }
 }

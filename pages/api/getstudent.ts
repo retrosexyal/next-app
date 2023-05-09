@@ -18,7 +18,6 @@ export default async function handler(
     const accessToken = req.headers["authorization"]?.split(" ")[1];
     if (accessToken) {
       const data = tokenService.validateAccessToken(accessToken!) as IUser;
-      console.log(data);
       if (data?.email === "admin@admin") {
         const students = await adminService.getAllStudents();
         return res.status(200).json(students);

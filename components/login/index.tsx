@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./login.module.scss";
 import Button from "../button";
 import AuthService from "@/clientServices/AuthService";
+import Students from "../students";
 
 interface IProps {
   handleLogin: (event: React.MouseEvent) => void;
@@ -11,11 +12,13 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   const [auth, setAuth] = useState({
     email: "",
     password: "",
+    name: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState("");
+  const [isShow, setIsShow] = useState(false);
 
-  const { email, password } = auth;
+  const { email, password, name } = auth;
 
   const handleLog = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).getAttribute("data-id") === "close") {
@@ -24,28 +27,30 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   };
 
   const sendLogin = () => {
-    AuthService.login(email, password).then((res) => {
-      if (res.status === 200) {
-        console.log(res);
-        localStorage.setItem("token", res.data.accessToken);
-        setUser(res.data.user.email);
-        setAuth({ email: "", password: "" });
-        setIsLoading(false);
-      } else if (res.status === 404) {
-        setIsLoading(false);
-        alert("пользователь отсутствует");
-      }
-    });
+    AuthService.login(email, password)
+      .then((res) => {
+        if (res.status === 200) {
+          localStorage.setItem("token", res.data.accessToken);
+          setUser(res.data.user.name);
+          setAuth({ email: "", password: "", name: "" });
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (err.response.status === 404) {
+          setIsLoading(false);
+          alert("пользователь отсутствует");
+        }
+      });
   };
 
   useEffect(() => {
     AuthService.refresh()
       .then(({ data }) => {
-        setUser(data.user.email);
+        setUser(data.user.name);
         setIsLoading(false);
       })
       .catch((err) => {
-        console.log("use effect " + err);
         setIsLoading(false);
       });
   }, []);
@@ -56,13 +61,42 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAuth({ ...auth, password: e.target.value });
   };
+  const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAuth({ ...auth, name: e.target.value });
+  };
+  const handleLogout = () => {
+    AuthService.logout();
+    setUser("");
+    setAuth({ name: "", email: "", password: "" });
+  };
+  const handleRegistr = () => {
+    setIsShow(true);
+    if (email && password && name) {
+      AuthService.registration(email, password, name)
+        .then(({ data }) => {
+          setUser(data.user.name);
+          setIsLoading(false);
+          setIsShow(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setIsLoading(false);
+          setIsShow(true);
+          alert("такой пользователь существует");
+        });
+    }
+  };
 
   return (
     <div className={styles.wrapper} onClick={handleLog} data-id="close">
       <div className={styles.content}>
         {isLoading && <h2>Загрузка...</h2>}
         {user && (
-          <h2>{`Пользователь с почтовым ящиком ${user} авторизирован`}</h2>
+          <>
+            <h2>{`Добро пожаловать ${user}`}</h2>
+            <Students />
+            <Button text="выйти" onClick={handleLogout} />
+          </>
         )}
         {!isLoading && !user && (
           <>
@@ -86,9 +120,21 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
                 onChange={handlePassword}
               />
             </label>
+            {isShow && (
+              <label htmlFor="name_login" className={styles.label}>
+                введите ваше имя
+                <input
+                  type="text"
+                  id="name_login"
+                  placeholder="Ваше имя"
+                  value={name}
+                  onChange={handleName}
+                />
+              </label>
+            )}
             <div>
-              <Button text="Войти" onClick={sendLogin} />
-              <Button text="Зарегистироваться" />
+              {!isShow && <Button text="Войти" onClick={sendLogin} />}
+              <Button text="Зарегистироваться" onClick={handleRegistr} />
             </div>
           </>
         )}

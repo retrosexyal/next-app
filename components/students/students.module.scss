@@ -1,0 +1,52 @@
+.wrapper {
+  overflow-y: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.student {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
+  width: 90%;
+}
+.name {
+  width: 30%;
+}
+
+.date,
+.place {
+  width: 15%;
+  word-wrap: break-word;
+}
+.group {
+  width: 15%;
+  word-wrap: break-word;
+}
+.button {
+  width: 5%;
+  word-wrap: break-word;
+}
+@media (max-width: 600px) {
+  .student {
+    flex-wrap: wrap; /* Изменено свойство flex-wrap */
+  }
+  .date,
+  .group,
+  .place {
+    font-size: 12px;
+  }
+
+  .button {
+    width: 100%; /* Кнопка занимает всю ширину в мобильном виде */
+    order: 2; /* Кнопка будет на отдельной строке */
+  }
+}

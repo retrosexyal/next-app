@@ -20,17 +20,18 @@ export default async function handler(
       console.log("bd ok");
     }
     const data = req.body;
-    const userData = await userService.registration("email12222", "pass12222");
-    res.setHeader(
+    /*    const userData = await userService.registration("email12222", "pass12222"); */
+    /*     res.setHeader(
       "Set-Cookie",
       cookie.serialize("refreshToken", userData.refreshToken, {
         maxAge: 86400,
         path: "/",
         httpOnly: true,
       })
-    );
+    ); */
 
-    return res.json(userData);
+    /* return res.json(userData); */
+    return res.json({ message: "dsds" });
     res.statusCode = 200;
     const csrfToken = generateCsrfToken();
     res.setHeader(

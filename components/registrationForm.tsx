@@ -5,9 +5,9 @@ const RegistrationForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  /* const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    AuthService.registration(email, password).then((res) => {
+    AuthService.registration(email, password, name).then((res) => {
       if (res.status === 200) {
         console.log(res);
         localStorage.setItem("token", res.data.accessToken);
@@ -16,7 +16,7 @@ const RegistrationForm = () => {
         alert("пользователь уже зарегистрирован");
       }
     });
-  };
+  }; */
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
@@ -24,7 +24,7 @@ const RegistrationForm = () => {
     setPassword(e.target.value);
   };
   return (
-    <form onSubmit={handleSubmit}>
+    <form /* onSubmit={handleSubmit} */>
       registrationForm
       <input type="email" value={email} onChange={handleEmail} />
       <input type="password" value={password} onChange={handlePassword} />

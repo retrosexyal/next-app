@@ -36,17 +36,28 @@
   word-wrap: break-word;
 }
 @media (max-width: 600px) {
+  .select {
+    width: 30%;
+  }
+  .find {
+    width: 60%;
+  }
   .student {
-    flex-wrap: wrap; /* Изменено свойство flex-wrap */
+    flex-wrap: wrap;
+    margin-top: 10px;
   }
   .date,
   .group,
   .place {
-    font-size: 12px;
+    font-size: 14px;
+    width: 32%;
+  }
+  .name {
+    width: 100%;
   }
 
   .button {
-    width: 100%; /* Кнопка занимает всю ширину в мобильном виде */
-    order: 2; /* Кнопка будет на отдельной строке */
+    width: 100%;
+    order: 2;
   }
 }

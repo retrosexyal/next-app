@@ -69,12 +69,21 @@ const Students = () => {
   return (
     <>
       <div className={styles.nav}>
-        <select defaultValue="name" onChange={handleSort}>
+        <select
+          defaultValue="name"
+          onChange={handleSort}
+          className={styles.select}
+        >
           <option value="name">по имени</option>
           <option value="group">по группе</option>
           <option value="place">по месту</option>
         </select>
-        <input type="text" placeholder="найти" onChange={handleFind} />
+        <input
+          type="text"
+          placeholder="найти"
+          onChange={handleFind}
+          className={styles.find}
+        />
       </div>
       <div className={styles.wrapper} onClick={handleChange}>
         {[...students]

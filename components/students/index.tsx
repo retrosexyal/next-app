@@ -2,11 +2,14 @@ import { IStudent } from "@/clientModels/IStudent";
 import AuthService from "@/clientServices/AuthService";
 import React, { useEffect, useState } from "react";
 import styles from "./students.module.scss";
+import Popup from "../popup";
+import AddStudent from "../addstudent";
 
 const Students = () => {
   const [students, setStudents] = useState<IStudent[]>([]);
   const [find, setFind] = useState("");
   const [sort, setSort] = useState("");
+  const [isShowPopup, setIsShowPopup] = useState(false);
   const [studChange, setStudChange] = useState({
     id: "",
     name: "",
@@ -42,6 +45,20 @@ const Students = () => {
       });
       setIsChange(!isChange);
     }
+
+    if ((e.target as HTMLElement).getAttribute("data-del")) {
+      const key = prompt(
+        `вы хотите удалить ${(e.target as HTMLElement).getAttribute(
+          "data-name"
+        )}?\n
+        напишите "удалить" для подтверждения`
+      );
+      if (key === "удалить") {
+        AuthService.deleteStudent(
+          (e.target as HTMLElement).getAttribute("data-del")!
+        );
+      }
+    }
   };
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStudChange({ ...studChange, name: e.target.value });
@@ -66,6 +83,22 @@ const Students = () => {
     setIsChange(false);
   };
 
+  const showPopUp = () => {
+    setIsShowPopup(!isShowPopup);
+  };
+
+  const handleRefresh = () => {
+    const fetchData = async () => {
+      try {
+        const students = await AuthService.getStudents();
+        setStudents(students.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  };
+
   return (
     <>
       <div className={styles.nav}>
@@ -85,6 +118,15 @@ const Students = () => {
           className={styles.find}
         />
       </div>
+      <button onClick={showPopUp}>Добавить малыша</button>
+      <button type="button" onClick={handleRefresh}>
+        Обновить
+      </button>
+      {isShowPopup && (
+        <Popup onClick={showPopUp}>
+          <AddStudent />
+        </Popup>
+      )}
       <div className={styles.wrapper} onClick={handleChange}>
         {[...students]
           .filter((stud) => {
@@ -106,7 +148,11 @@ const Students = () => {
                     <div className={styles.date}>{e.date}</div>
                     <div className={styles.place}>{e.place}</div>
                     <div className={styles.group}>{e.group}</div>
-                    <button className={styles.button} data-del={e._id}>
+                    <button
+                      className={styles.button}
+                      data-del={e._id}
+                      data-name={e.name}
+                    >
                       уд.
                     </button>
                     <button className={styles.button} data-change={`${e._id}`}>

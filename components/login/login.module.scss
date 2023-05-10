@@ -31,3 +31,14 @@
   align-items: center;
   gap: 10px;
 }
+
+.link {
+  padding: 15px 10px;
+  background-color: rgba($color: black, $alpha: 0.2);
+  box-shadow: 1 1 1 black;
+  border-radius: 20px;
+}
+
+.link:hover {
+  background-color: rgba($color: rgb(213, 77, 77), $alpha: 0.4);
+}

@@ -11,7 +11,7 @@ interface UserModel {
 }
 
 class AdminService {
-  async addStudent(name: string, date: string, place: string, mentor?: string) {
+  async addStudent(name: string, date: string, place: string, group: string) {
     const canditate = await StudentModel.findOne({
       name: { $regex: new RegExp(`^${name}$`, "i") },
     });
@@ -23,7 +23,7 @@ class AdminService {
       name,
       date,
       place,
-      mentor,
+      group,
     });
 
     return {

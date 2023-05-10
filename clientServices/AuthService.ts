@@ -28,8 +28,18 @@ export default class AuthService {
   static async refresh() {
     return api.get<AuthResponce>("/api/refresh");
   }
-  static async addStudent(name: string, date: string, place: string) {
-    return api.post<AuthResponce>("/api/addstudent", { name, date, place });
+  static async addStudent(
+    name: string,
+    date: string,
+    place: string,
+    group: string
+  ) {
+    return api.post<AuthResponce>("/api/addstudent", {
+      name,
+      date,
+      place,
+      group,
+    });
   }
   static async changeStudent(
     id: string,

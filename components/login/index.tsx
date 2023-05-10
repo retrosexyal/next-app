@@ -3,6 +3,7 @@ import styles from "./login.module.scss";
 import Button from "../button";
 import AuthService from "@/clientServices/AuthService";
 import Students from "../students";
+import Link from "next/link";
 
 interface IProps {
   handleLogin: (event: React.MouseEvent) => void;
@@ -94,7 +95,9 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
         {user && (
           <>
             <h2>{`Добро пожаловать ${user}`}</h2>
-            <Students />
+            <Link className={styles.link} href="/settings">
+              Перейти в личный кабинет
+            </Link>
             <Button text="выйти" onClick={handleLogout} />
           </>
         )}

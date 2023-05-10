@@ -20,9 +20,9 @@ const Admin = () => {
 
   const { name, date, place } = studentInfo;
 
-  const handleSubmit = () => {
+  /* const handleSubmit = () => {
     AuthService.addStudent(name, formatDate(date), place);
-  };
+  }; */
 
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStudentInfo({ ...studentInfo, name: e.target.value });
@@ -81,9 +81,9 @@ const Admin = () => {
           <option value="ФОК Орловского">ФОК Орловского</option>
         </select>
       </label>
-      <button type="button" onClick={handleSubmit}>
+      {/*      <button type="button" onClick={handleSubmit}>
         Добавить
-      </button>
+      </button> */}
       <button type="button" onClick={handleGetStudents}>
         получить список студентов
       </button>

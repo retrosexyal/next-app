@@ -24,7 +24,7 @@ export default async function handler(
           data.name,
           data.date,
           data.place,
-          data?.mentor
+          data.group
         );
         return res.status(200).json(studentData);
       } else res.status(401).json({ message: "you are not admin" });

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./header.module.scss";
 import Login from "../login";
+import Button from "../button";
 
 interface IProps {
   className: string;
@@ -22,8 +23,7 @@ const Header: React.FC<IProps> = ({ className }) => {
           <ul>
             <li>Home</li>
             <li>About</li>
-            <li onClick={handleLogin}>Login</li>
-            <li>Logout</li>
+            <button onClick={handleLogin}>Login</button>
           </ul>
         </nav>
       </div>

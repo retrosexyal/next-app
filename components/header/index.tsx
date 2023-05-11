@@ -18,7 +18,7 @@ const Header: React.FC<IProps> = ({ className }) => {
   return (
     <div className={`wrapper ${className}`}>
       <div className={styles.content_wrapper}>
-        <h1 className={styles.title}>ЛиМи</h1>
+        <h2 className={styles.title}>ЛиМи</h2>
         <nav>
           <ul>
             <li>Home</li>

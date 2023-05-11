@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./students.module.scss";
 import Popup from "../popup";
 import AddStudent from "../addstudent";
+import Student from "../student";
 
 const Students = () => {
   const [students, setStudents] = useState<IStudent[]>([]);
@@ -142,24 +143,7 @@ const Students = () => {
           .map((e) => {
             return (
               <React.Fragment key={e._id}>
-                {!isChange && (
-                  <div className={styles.student} data-id={e._id}>
-                    <div className={styles.name}>{e.name}</div>
-                    <div className={styles.date}>{e.date}</div>
-                    <div className={styles.place}>{e.place}</div>
-                    <div className={styles.group}>{e.group}</div>
-                    <button
-                      className={styles.button}
-                      data-del={e._id}
-                      data-name={e.name}
-                    >
-                      уд.
-                    </button>
-                    <button className={styles.button} data-change={`${e._id}`}>
-                      ред.
-                    </button>
-                  </div>
-                )}
+                {!isChange && <Student info={e} />}
                 {isChange && e._id === studChange.id && (
                   <div className={styles.student} key={e._id} data-id={e._id}>
                     <input
@@ -168,6 +152,7 @@ const Students = () => {
                       onChange={handleName}
                     />
                     <input
+                      type="date"
                       className={styles.date}
                       value={studChange.date || e.date}
                       onChange={handleDate}

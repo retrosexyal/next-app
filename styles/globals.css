@@ -79,4 +79,12 @@ a {
 .wrapper {
   max-width: 1200px;
   padding: 0 50px;
+  margin: 0 auto;
+  position: relative;
+  width: inherit;
+  height: inherit;
+}
+
+.main {
+  width: 100vw;
 }

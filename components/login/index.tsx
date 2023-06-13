@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import styles from "./login.module.scss";
 import Button from "../button";
 import AuthService from "@/clientServices/AuthService";
-import Students from "../students";
 import Link from "next/link";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { setUser as setUserApp } from "@/store/slices/userSlice";
 
 interface IProps {
   handleLogin: (event: React.MouseEvent) => void;
@@ -18,6 +19,10 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState("");
   const [isShow, setIsShow] = useState(false);
+
+  const { user: userApp } = useAppSelector((state) => state.user);
+
+  const dispatch = useAppDispatch();
 
   const { email, password, name } = auth;
 
@@ -35,6 +40,8 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
           setUser(res.data.user.name);
           setAuth({ email: "", password: "", name: "" });
           setIsLoading(false);
+          const userData = res.data.user;
+          dispatch(setUserApp(userData));
         }
       })
       .catch((err) => {
@@ -50,6 +57,8 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
       .then(({ data }) => {
         setUser(data.user.name);
         setIsLoading(false);
+        const userData = data.user;
+        dispatch(setUserApp(userData));
       })
       .catch((err) => {
         setIsLoading(false);
@@ -78,6 +87,8 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
           setUser(data.user.name);
           setIsLoading(false);
           setIsShow(false);
+          const userData = data.user;
+          dispatch(setUserApp(userData));
         })
         .catch((err) => {
           console.log(err);
@@ -95,12 +106,21 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
         {user && (
           <>
             <h2>{`Добро пожаловать ${user}`}</h2>
-            <Link className={styles.link} href="/settings">
-              Перейти в личный кабинет
-            </Link>
+            {userApp.isActivated && (
+              <Link className={styles.link} href="/settings">
+                Перейти в личный кабинет
+              </Link>
+            )}
+            {!userApp.isActivated && (
+              <div>
+                необходимо активировать учетную запись, посетите почтовый ящик и
+                пройдите по ссылке
+              </div>
+            )}
             <Button text="выйти" onClick={handleLogout} />
           </>
         )}
+
         {!isLoading && !user && (
           <>
             <label htmlFor="email_login" className={styles.label}>

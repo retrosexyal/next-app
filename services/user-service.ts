@@ -3,6 +3,10 @@ import bcrypt from "bcrypt";
 import { v4 } from "uuid";
 import { tokenService } from "./token-service";
 import UserDto from "@/dtos/user-dto";
+import { mailOptionsRegist, transporter } from "@/config/nodemailer";
+import { env } from "process";
+
+const URL = env.URL;
 
 interface UserModel {
   email: string;
@@ -25,11 +29,17 @@ class UserService {
       password: hashPassword,
       activationLink,
       name,
+      isActivated: false,
     });
     const userDto = new UserDto(user);
     const tokens = tokenService.generateToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
-    // сделать отправку письма на почту
+    await transporter.sendMail({
+      ...mailOptionsRegist(email),
+      subject: "Активация аккаунта ЛиМи",
+      text: "_",
+      html: `<h1> для активации пройдите по <a href='${URL}api/activate/${activationLink}'>ссылке</a></h2>`,
+    });
     return {
       ...tokens,
       user: userDto,

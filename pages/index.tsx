@@ -4,10 +4,30 @@ import Form from "@/components/form";
 import RegistrationForm from "@/components/registrationForm";
 import Admin from "@/components/admin";
 import Main from "@/components/main";
+import { useEffect, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = (e: WheelEvent) => {
+      console.log(e.deltaY);
+      if (e.deltaY > 0) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener("wheel", handleScroll);
+
+    return () => {
+      window.removeEventListener("wheel", handleScroll);
+    };
+  }, []);
+
   return (
     <>
       <Head>
@@ -18,9 +38,19 @@ export default function Home() {
       </Head>
       <main className="main">
         <Main />
+        {/* <div onWheel={handleWeel}>
+          <h1>Первый компонент</h1>
+
+          {isVisible && (
+            <div className="second-component">
+              <h1>Второй компонент</h1>
+              <p>Этот компонент появится при прокрутке вниз</p>
+            </div>
+          )}
+        </div>
         <Form />
         <RegistrationForm />
-        <Admin />
+        <Admin /> */}
       </main>
     </>
   );

@@ -1,0 +1,17 @@
+.center {
+  text-align: center;
+  font-weight: 800;
+}
+.flex {
+  display: flex;
+  justify-content: space-between;
+}
+.wrapper {
+  max-width: 800px;
+  padding: 20px;
+  max-height: 98%;
+  overflow-y: auto;
+}
+.redP {
+  text-indent: 20px;
+}

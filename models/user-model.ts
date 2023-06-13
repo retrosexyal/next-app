@@ -6,6 +6,7 @@ const UserSchema = new Schema({
   name: { type: String, required: true },
   isActivated: { type: Boolean, defaul: false },
   activationLink: { type: String },
+  status: { type: String },
 });
 
 export default models.User || model("User", UserSchema);

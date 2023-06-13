@@ -3,4 +3,5 @@ export interface IUser {
   isActivated: boolean;
   id: string;
   name: string;
+  status?: string;
 }

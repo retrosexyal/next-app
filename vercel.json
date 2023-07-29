@@ -8,6 +8,7 @@
   "build": {
     "env": {
       "TZ": "Europe/Minsk"
-    }
+    },
+    "command": "npm run build"
   }
 }

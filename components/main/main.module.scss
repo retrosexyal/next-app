@@ -26,12 +26,20 @@
   font-size: 48px;
   line-height: 53px;
   letter-spacing: -0.035em;
-  color: #22356f;
+  color: #ffffff;
+  text-align: center;
+  @media (max-width: 600px) {
+    font-size: 28px;
+  }
 }
 .sub_text {
   font-size: 24px;
   line-height: 42px;
-  color: #22356f;
+  color: #ffffff;
+  text-align: center;
+  @media (max-width: 600px) {
+    font-size: 18px;
+  }
 }
 
 .header {
@@ -55,4 +63,14 @@
 
 .btn {
   background-color: #d01f1f !important;
+  width: 200px;
+  margin: 5px;
+}
+
+.content_background {
+  background-color: rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

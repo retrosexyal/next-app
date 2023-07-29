@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import styles from "./popup.module.scss";
+import CloseIcon from "@mui/icons-material/Close";
 interface IProps {
   children: ReactNode;
   onClick: () => void;
@@ -14,7 +15,7 @@ const Popup: React.FC<IProps> = ({ children, onClick }) => {
     <div className={styles.wrapper} onClick={handleClick} data-close="close">
       <div className={styles.content}>
         <div className={styles.close} onClick={onClick}>
-          X
+          {<CloseIcon /> || "X"}
         </div>
         {children}
       </div>

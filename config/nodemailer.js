@@ -28,3 +28,8 @@ export const mailOptionsRegist = (email) => {
     to: email,
   };
 };
+
+export const test = {
+  from: NODEMAILER_EMAIL,
+  to: "retrosexyal@gmail.com",
+};

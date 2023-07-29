@@ -89,6 +89,14 @@ class UserService {
       user: userDto,
     };
   }
+
+  async getUser(id: string) {
+    const user = await UserModel.findOne({ _id: id });
+    if (!user) {
+      throw new Error(`пользователь не существует`);
+    }
+    return user;
+  }
 }
 
 export const userService = new UserService();

@@ -12,14 +12,16 @@ import {
 } from "@mui/material";
 import { ContractList } from "../contract-list";
 import Popup from "../popup";
+import { IInfo } from "@/interface/iContact";
 
 export const Contract = () => {
-  const [info, setInfo] = useState({
+  const [info, setInfo] = useState<IInfo>({
     FIOP: "",
     FIOC: "",
     dateB: "",
+    desiases: "отсутствуют",
     place: "",
-    placeDate: "",
+
     KB: "",
     datePass: "",
     whoPass: "",
@@ -27,19 +29,29 @@ export const Contract = () => {
   });
   const [showList, setShowList] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
-  const { FIOP, FIOC, dateB, place, placeDate, KB, datePass, whoPass, phone } =
-    info;
+  const {
+    FIOP,
+    FIOC,
+    dateB,
+    place,
+
+    KB,
+    datePass,
+    whoPass,
+    phone,
+    desiases,
+  } = info;
   useEffect(() => {
     if (
       FIOP &&
       FIOC &&
       dateB &&
       place &&
-      placeDate &&
       KB &&
       datePass &&
       whoPass &&
-      phone
+      phone &&
+      desiases
     ) {
       setIsDisabled(false);
     } else {
@@ -63,22 +75,7 @@ export const Contract = () => {
           value={info.FIOP}
           onChange={(e) => setInfo({ ...info, FIOP: e.target.value })}
         />
-        <TextField
-          id="outlined-basic"
-          label="Ф.И.О. ребёнка"
-          variant="outlined"
-          value={info.FIOC}
-          onChange={(e) => setInfo({ ...info, FIOC: e.target.value })}
-        />
-        <TextField
-          id="outlined-basic"
-          label="Дата рождения ребёнка"
-          variant="outlined"
-          value={info.dateB}
-          onChange={(e) => setInfo({ ...info, dateB: e.target.value })}
-          type="date"
-          InputLabelProps={{ shrink: true }}
-        />
+
         <FormControl fullWidth>
           <InputLabel id="demo-simple-select-label">
             Зал где вы занимаетесь
@@ -90,25 +87,9 @@ export const Contract = () => {
             label="Зал где вы занимаетесь"
             onChange={(e) => setInfo({ ...info, place: e.target.value })}
           >
-            <MenuItem value={"ФОКОр"}>ФОК Орловского</MenuItem>
-            <MenuItem value={"ФОКЗл"}>ФОК Златоустовкого</MenuItem>
-            <MenuItem value={"ДГ"}>Дворец гимнастики</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">
-            Рассписание занятий
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={info.placeDate}
-            label="Зал где вы занимаетесь"
-            onChange={(e) => setInfo({ ...info, placeDate: e.target.value })}
-          >
-            <MenuItem value={"чтв"}>чтв пятница</MenuItem>
-            <MenuItem value={"пят"}>пят</MenuItem>
-            <MenuItem value={"вскр"}>вскр</MenuItem>
+            <MenuItem value={"ФОК Орловского"}>ФОК Орловского</MenuItem>
+            <MenuItem value={"ФОК Златоустовкого"}>ФОК Златоустовкого</MenuItem>
+            <MenuItem value={"Дворец гимнастики"}>Дворец гимнастики</MenuItem>
           </Select>
         </FormControl>
         <TextField
@@ -139,8 +120,31 @@ export const Contract = () => {
           value={info.phone}
           onChange={(e) => setInfo({ ...info, phone: e.target.value })}
         />
+        <TextField
+          id="outlined-basic"
+          label="Ф.И.О. ребёнка"
+          variant="outlined"
+          value={info.FIOC}
+          onChange={(e) => setInfo({ ...info, FIOC: e.target.value })}
+        />
+        <TextField
+          id="outlined-basic"
+          label="Дата рождения ребёнка"
+          variant="outlined"
+          value={info.dateB}
+          onChange={(e) => setInfo({ ...info, dateB: e.target.value })}
+          type="date"
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          id="outlined-basic"
+          label="Хронические заболевания ребёнка"
+          variant="outlined"
+          value={info.desiases}
+          onChange={(e) => setInfo({ ...info, desiases: e.target.value })}
+        />
         <Button variant="outlined" disabled={isDisabled} onClick={handleSubmit}>
-          Отправить
+          Предварительный просмотр
         </Button>
       </form>
 

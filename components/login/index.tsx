@@ -47,10 +47,22 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
       .catch((err) => {
         if (err.response.status === 404) {
           setIsLoading(false);
-          alert("пользователь отсутствует");
+          alert("пользователь отсутствует либо неверный пароль");
         }
       });
   };
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
 
   useEffect(() => {
     AuthService.refresh()
@@ -155,7 +167,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
                 />
               </label>
             )}
-            <div>
+            <div className={styles.btn_container}>
               {!isShow && <Button text="Войти" onClick={sendLogin} />}
               <Button text="Зарегистироваться" onClick={handleRegistr} />
             </div>

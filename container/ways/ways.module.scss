@@ -1,0 +1,11 @@
+.wrapper {
+  width: 100vw;
+  background-color: rgba($color: #f6e5e5, $alpha: 0.9);
+}
+.content {
+  display: flex;
+  @media (max-width: 700px) {
+    flex-direction: column;
+    align-items: center;
+  }
+}

@@ -5,28 +5,62 @@ import RegistrationForm from "@/components/registrationForm";
 import Admin from "@/components/admin";
 import Main from "@/components/main";
 import { useEffect, useState } from "react";
+import { About } from "@/container/about";
+import { scroller, Element } from "react-scroll";
+import { Ways } from "@/container/ways";
+import { Photo } from "@/container/photo";
+import { Questions } from "@/container/questions";
+import { Reviews } from "@/container/reviews";
+import { Footer } from "@/container/footer";
+import { Contact } from "@/container/contact";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const [isVisible, setIsVisible] = useState(false);
+  // const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = (e: WheelEvent) => {
-      console.log(e.deltaY);
-      if (e.deltaY > 0) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-    };
+  // let isScrollEnabled = true;
+  // let currentIndex = 1;
+  // useEffect(() => {
+  //   const handleScroll = (e: WheelEvent) => {
+  //     console.log(isScrollEnabled);
+  //     if (!isScrollEnabled) return;
+  //     /* console.log(e.deltaY); */
+  //     if (e.deltaY > 0) {
+  //       scroller.scrollTo("component2", {
+  //         duration: 800,
+  //         smooth: true,
+  //       });
 
-    window.addEventListener("wheel", handleScroll);
+  //       // scrollToNextComponent();
+  //     } else {
+  //       scroller.scrollTo("component1", {
+  //         duration: 800,
+  //         smooth: true,
+  //       });
+  //     }
+  //   };
 
-    return () => {
-      window.removeEventListener("wheel", handleScroll);
-    };
-  }, []);
+  //   window.addEventListener("wheel", handleScroll);
+
+  //   return () => {
+  //     window.removeEventListener("wheel", handleScroll);
+  //   };
+  // }, []);
+  // const scrollToNextComponent = () => {
+  //   isScrollEnabled = false;
+  //   setTimeout(() => {
+  //     isScrollEnabled = true;
+  //   }, 1000);
+  //   if (currentIndex === 2) return;
+  //   currentIndex++;
+  //   const nextComponentName = `component${currentIndex}`;
+  //   console.log(nextComponentName);
+  //   scroller.scrollTo(nextComponentName, {
+  //     duration: 800,
+  //     smooth: true,
+  //   });
+  // };
 
   return (
     <>
@@ -37,20 +71,20 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="main">
-        <Main />
-        {/* <div onWheel={handleWeel}>
-          <h1>Первый компонент</h1>
-
-          {isVisible && (
-            <div className="second-component">
-              <h1>Второй компонент</h1>
-              <p>Этот компонент появится при прокрутке вниз</p>
-            </div>
-          )}
-        </div>
-        <Form />
-        <RegistrationForm />
-        <Admin /> */}
+        <Element name="component1">
+          <Main />
+        </Element>
+        <Element name="component2">
+          <About />
+        </Element>
+        <Element name="component3">
+          <Ways />
+        </Element>
+        <Photo />
+        <Questions />
+        <Reviews />
+        <Contact />
+        <Footer />
       </main>
     </>
   );

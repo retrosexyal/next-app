@@ -6,6 +6,7 @@ import { tokenService } from "@/services/token-service";
 import { IUser } from "@/clientModels/IUser";
 import StudentModel from "@/models/student-model";
 import userModel from "@/models/user-model";
+import shablonModel from "@/models/shablon-model";
 
 const DB = env.DB_URL;
 export default async function handler(
@@ -17,12 +18,12 @@ export default async function handler(
       await mongoose.connect(DB!);
       console.log("bd ok");
     }
-    const user = await userModel.findOne({ email: "admin@admin" });
-    console.log(user);
-    user.name = "Елизавета";
-    await user.save();
-    res.status(200).json({ message: "студенты обновлены" });
-    const data = req.body;
+    /* const user = await userModel.findOne({ email: "admin@admin" }); */
+    /* await shablonModel.create({ number: 1 }); */
+    /* console.log(user);
+    user.isActivated = true;
+    await user.save(); */
+    res.status(200).json({ message: "обновлено" });
   } catch (error) {
     console.error(error);
     res.statusCode = 400;

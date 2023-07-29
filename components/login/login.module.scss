@@ -21,6 +21,8 @@
   align-items: center;
   justify-content: center;
   gap: 30px;
+  color: black;
+  text-align: center;
 }
 
 .label {
@@ -41,4 +43,7 @@
 
 .link:hover {
   background-color: rgba($color: rgb(213, 77, 77), $alpha: 0.4);
+}
+.btn_container {
+  text-align: center;
 }

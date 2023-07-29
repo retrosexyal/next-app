@@ -1,0 +1,27 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.title {
+  margin-bottom: 10px;
+  font-size: 48px;
+  color: #000000;
+  font-weight: 300;
+  text-align: center;
+}
+.subtitle {
+  font-size: 13px;
+  color: #2d3033;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+.btn {
+  background-color: #d01f1f !important;
+  width: 200px;
+  margin: 5px;
+}

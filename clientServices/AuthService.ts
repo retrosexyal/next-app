@@ -1,5 +1,6 @@
 import { AuthResponce } from "@/clientModels/responce/AuthResponce";
 import api from "@/http";
+import { IInfo } from "@/interface/iContact";
 import { AxiosResponse } from "axios";
 export default class AuthService {
   static async login(
@@ -58,5 +59,8 @@ export default class AuthService {
   }
   static async deleteStudent(id: string) {
     return api.post<AuthResponce>("/api/deletestudent", { id });
+  }
+  static async registerForm(info: IInfo) {
+    return api.post("/api/registermail", { info });
   }
 }

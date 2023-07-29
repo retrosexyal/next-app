@@ -1,0 +1,18 @@
+.container {
+  width: 100vw;
+  padding-top: 70px;
+  text-align: center;
+}
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  @media (max-width: 700px) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
+.title {
+  font-size: 40px;
+  color: #b91125;
+}

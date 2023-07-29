@@ -3,6 +3,7 @@
   justify-content: space-between;
   align-items: center;
   color: #ffffff;
+  height: 100%;
 }
 
 .title {
@@ -10,4 +11,36 @@
   line-height: 27px;
   letter-spacing: -0.035em;
   color: #ffffff;
+}
+.title :hover {
+  cursor: pointer;
+  opacity: 0.9;
+  box-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.content {
+  background-color: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 70px;
+  width: 100vw;
+  z-index: 10;
+}
+
+.list {
+  display: flex;
+  gap: 20px;
+  @media (max-width: 850px) {
+    display: none;
+  }
+}
+
+.list_item {
+  list-style-type: none;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.9;
+    box-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+  }
 }

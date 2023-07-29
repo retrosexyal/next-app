@@ -1,22 +1,36 @@
 import Students from "@/components/students";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./settings.module.scss";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { Contract } from "@/components/contract";
 import AuthService from "@/clientServices/AuthService";
 import { setUser } from "@/store/slices/userSlice";
+import ContractService from "@/clientServices/ContractService";
+import { IContract } from "@/interface/iContact";
 
 const Settings = () => {
-  const { isActivated, email, name } = useAppSelector(
+  const { isActivated, email, name, id } = useAppSelector(
     (state) => state.user.user
   );
+  const [data, setData] = useState<IContract | null>(null);
   const dispatch = useAppDispatch();
   useEffect(() => {
     AuthService.refresh()
       .then(({ data }) => {
         const userData = data.user;
         dispatch(setUser(userData));
+      })
+      .then(() => {
+        if (id) {
+          ContractService.getContract(id)
+            .then(({ data }) => {
+              setData(data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -26,10 +40,65 @@ const Settings = () => {
   return (
     <div className={`wrapper ${styles.wrapper}`}>
       <Link className={styles.link} href="/">
-        Home
+        Вернуться на главную страницу
       </Link>
-      {email === "admin@admin" && <Students />}
-      {isActivated && <Contract />}
+      {email === "admin@admin" && (
+        <>
+          <Link className={styles.link} href="/admin">
+            Согласование договоров
+          </Link>
+          <Students />
+        </>
+      )}
+      {isActivated && email !== "admin@admin" && !data && <Contract />}
+      {data?.isDone && email !== "admin@admin" && (
+        <div className={styles.content_wrapper}>
+          <h2>Информация внесённая в договор</h2>
+          <div className={styles.content_wrapper}>
+            <div className={styles.flex_wrapper}>
+              <div className={styles.title}>ФИО родителя: </div>
+              <div className={styles.content}>{data.parentName}</div>
+            </div>
+            <div className={styles.flex_wrapper}>
+              <div className={styles.title}>Серия паспорта: </div>
+              <div className={styles.content}>{data.KB}</div>
+            </div>
+            <div className={styles.flex_wrapper}>
+              <div className={styles.title}>Когда выдан паспорта: </div>
+              <div className={styles.content}>{data.pasportDate}</div>
+            </div>
+            <div className={styles.flex_wrapper}>
+              <div className={styles.title}>Кем выдан паспорт: </div>
+              <div className={styles.content}>{data.pasportPlace}</div>
+            </div>
+            <div className={styles.flex_wrapper}>
+              <div className={styles.title}>Контактный телефон: </div>
+              <div className={styles.content}>{data.phone}</div>
+            </div>
+            <div className={styles.flex_wrapper}>
+              <div className={styles.title}>Место занятий: </div>
+              <div className={styles.content}>{data.place}</div>
+            </div>
+            <div className={styles.flex_wrapper}>
+              <div className={styles.title}>ФИО ребёнка: </div>
+              <div className={styles.content}>{data.childrenName}</div>
+            </div>
+            <div className={styles.flex_wrapper}>
+              <div className={styles.title}>Дата рождения ребёнка: </div>
+              <div className={styles.content}>{data.birthday}</div>
+            </div>
+            <div className={styles.flex_wrapper}>
+              <div className={styles.title}>
+                Хронические заболевания ребёнка:{" "}
+              </div>
+              <div className={styles.content}>{data.diseases}</div>
+            </div>
+          </div>
+        </div>
+      )}
+      {!data?.isDone && email !== "admin@admin" && (
+        <h2>Ваш договор находится на согласовании у руководителя студии</h2>
+      )}
     </div>
   );
 };

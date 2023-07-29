@@ -6,10 +6,10 @@ import "swiper/css/pagination";
 import styles from "./slider.module.scss";
 
 export const Slider = () => {
-  /* c */ /* onst [showComponent, setShowComponent] = useState(false);
+  const [showComponent, setShowComponent] = useState(false);
   const [showComponent1, setShowComponent1] = useState(false);
 
-  const handleSlideChange = (swiper) => {
+  const handleSlideChange = (swiper: any) => {
     const activeIndex = swiper.activeIndex;
     if (activeIndex >= 1) {
       setTimeout(() => {
@@ -20,12 +20,12 @@ export const Slider = () => {
       setShowComponent(false); // Скрываем .component
     }
   };
-  const handleWheel = (e) => {
+  const handleWheel = (e: any) => {
     console.log(showComponent);
-  }; */
+  };
   return (
     <div style={{ height: "100vh" }}>
-      {/*  <Swiper
+      <Swiper
         spaceBetween={50}
         slidesPerView={1}
         onSlideChange={handleSlideChange}
@@ -66,7 +66,7 @@ export const Slider = () => {
           </Swiper>
         </SwiperSlide>
         <SwiperSlide>Slide 4</SwiperSlide>
-      </Swiper> */}
+      </Swiper>
     </div>
   );
 };

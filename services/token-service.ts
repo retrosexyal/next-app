@@ -9,13 +9,13 @@ interface UserModel {
   name: string;
 }
 
-const accessKey = env.ACCESS_TOKEN_KEY || "123";
-const refreshKey = env.REFRESH_TOKEN_KEY || "1234";
+const accessKey = env.ACCESS_TOKEN_KEY;
+const refreshKey = env.REFRESH_TOKEN_KEY;
 
 class TokenService {
   generateToken(payload: UserModel) {
-    const accessToken = jwt.sign(payload, accessKey, { expiresIn: "15m" });
-    const refreshToken = jwt.sign(payload, refreshKey, { expiresIn: "30d" });
+    const accessToken = jwt.sign(payload, accessKey!, { expiresIn: "15m" });
+    const refreshToken = jwt.sign(payload, refreshKey!, { expiresIn: "30d" });
     return {
       accessToken,
       refreshToken,
@@ -24,7 +24,7 @@ class TokenService {
 
   validateAccessToken(token: string) {
     try {
-      const userData = jwt.verify(token, accessKey);
+      const userData = jwt.verify(token, accessKey!);
       return userData;
     } catch (error) {
       return null;
@@ -32,7 +32,7 @@ class TokenService {
   }
   validateRefreshToken(token: string) {
     try {
-      const userData = jwt.verify(token, refreshKey);
+      const userData = jwt.verify(token, refreshKey!);
       return userData;
     } catch (error) {
       return null;

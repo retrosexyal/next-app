@@ -8,11 +8,11 @@ export const Photo = () => {
   return (
     <div id="photo" className={style.wrapper}>
       <Title text="Каждое занятие - это особое событие" />
-      <PhotoContainer arrOfSrcs={content.first} />
+      <PhotoContainer arrOfSrcs="1" />
       <Title text="Наши выступления" />
-      <PhotoContainer arrOfSrcs={content.second} />
+      <PhotoContainer arrOfSrcs="2" />
       <Title text="Наши праздники" />
-      <PhotoContainer arrOfSrcs={content.third} />
+      <PhotoContainer arrOfSrcs="3" />
     </div>
   );
 };

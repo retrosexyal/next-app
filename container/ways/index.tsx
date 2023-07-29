@@ -3,7 +3,6 @@ import React from "react";
 import { content } from "./constants";
 import { Title } from "@/components/UI/title";
 import styles from "./ways.module.scss";
-import { MyCard } from "@/components/UI/card";
 
 export const Ways = () => {
   return (

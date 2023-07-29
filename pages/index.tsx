@@ -71,15 +71,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="main">
-        <Element name="component1">
-          <Main />
-        </Element>
-        <Element name="component2">
-          <About />
-        </Element>
-        <Element name="component3">
-          <Ways />
-        </Element>
+        <Main />
+        <About />
+        <Ways />
         <Photo />
         <Questions />
         <Reviews />

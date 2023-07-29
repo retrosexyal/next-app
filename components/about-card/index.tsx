@@ -17,13 +17,16 @@ export const AboutCard: React.FC<IProps> = ({
   wayTitle,
   isStyled,
 }) => {
+  const imgSrc = `/imgs/${src}`;
   return (
     <div className={styles.container}>
       <div className={styles.img_wrapper}>
         <Image
           className={isStyled ? styles.img : ""}
-          src={require(`/public/imgs/${src}`)}
+          src={imgSrc}
           alt="number of title"
+          width={`${isStyled ? "400" : "50"}`}
+          height={`${isStyled ? "400" : "50"}`}
         />
       </div>
       <div className={styles.title}>{title}</div>

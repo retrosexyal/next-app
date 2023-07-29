@@ -62,7 +62,7 @@ export const Svg: React.FC<IProps> = ({ type, width, height, fill }) => {
             gradientUnits="userSpaceOnUse"
           >
             <stop offset="0" stop-color="#4168c9" />
-            <stop offset=".999" stop-color="#4168c9" stop-opacity="0" />
+            <stop offset=".999" stop-color="#4168c9" stopOpacity="0" />
           </radialGradient>
           <path
             fill="url(#yOrnnhliCrdS2gy~4tD8mb)"

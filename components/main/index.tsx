@@ -17,7 +17,7 @@ const Main = () => {
         userAgent
       );
     if (isMobile) {
-      return (window.location.href = "tel:+375291234567");
+      return (window.location.href = "tel:+375291999231");
     } else {
       setIsPressed(true);
     }

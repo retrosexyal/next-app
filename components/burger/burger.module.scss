@@ -1,18 +1,17 @@
 .burger {
-  display: block;
   height: 26px;
   width: 32px;
-  position: absolute;
+  position: absolute !important;
   top: 17px;
   right: 20px;
   z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-width: 26px;
-  padding: 0;
+  min-width: 26px !important;
+  padding: 0 !important;
   @media (min-width: 850px) {
-    display: none;
+    display: none !important;
   }
 }
 .line {

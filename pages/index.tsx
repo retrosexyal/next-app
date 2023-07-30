@@ -1,12 +1,7 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
-import Form from "@/components/form";
-import RegistrationForm from "@/components/registrationForm";
-import Admin from "@/components/admin";
 import Main from "@/components/main";
-import { useEffect, useState } from "react";
 import { About } from "@/container/about";
-import { scroller, Element } from "react-scroll";
 import { Ways } from "@/container/ways";
 import { Photo } from "@/container/photo";
 import { Questions } from "@/container/questions";
@@ -17,51 +12,6 @@ import { Contact } from "@/container/contact";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  // const [isVisible, setIsVisible] = useState(false);
-
-  // let isScrollEnabled = true;
-  // let currentIndex = 1;
-  // useEffect(() => {
-  //   const handleScroll = (e: WheelEvent) => {
-  //     console.log(isScrollEnabled);
-  //     if (!isScrollEnabled) return;
-  //     /* console.log(e.deltaY); */
-  //     if (e.deltaY > 0) {
-  //       scroller.scrollTo("component2", {
-  //         duration: 800,
-  //         smooth: true,
-  //       });
-
-  //       // scrollToNextComponent();
-  //     } else {
-  //       scroller.scrollTo("component1", {
-  //         duration: 800,
-  //         smooth: true,
-  //       });
-  //     }
-  //   };
-
-  //   window.addEventListener("wheel", handleScroll);
-
-  //   return () => {
-  //     window.removeEventListener("wheel", handleScroll);
-  //   };
-  // }, []);
-  // const scrollToNextComponent = () => {
-  //   isScrollEnabled = false;
-  //   setTimeout(() => {
-  //     isScrollEnabled = true;
-  //   }, 1000);
-  //   if (currentIndex === 2) return;
-  //   currentIndex++;
-  //   const nextComponentName = `component${currentIndex}`;
-  //   console.log(nextComponentName);
-  //   scroller.scrollTo(nextComponentName, {
-  //     duration: 800,
-  //     smooth: true,
-  //   });
-  // };
-
   return (
     <>
       <Head>
@@ -79,6 +29,27 @@ export default function Home() {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+        <meta name="msapplication-TileColor" content="#da532c" />
+        <meta name="theme-color" content="#ffffff" />
       </Head>
       <main className="main">
         <Main />

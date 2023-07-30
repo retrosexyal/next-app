@@ -166,9 +166,17 @@ export const Contract = () => {
         >
           <button
             onClick={handleClose}
-            style={{ position: "absolute", top: 0, right: 0 }}
+            style={{
+              position: "absolute",
+              top: 0,
+              right: "5px",
+              backgroundColor: "#d01f1f",
+              color: "white",
+              padding: "2px",
+              borderRadius: "10px",
+            }}
           >
-            close
+            редактировать
           </button>
           <ContractList info={info} />
         </Box>

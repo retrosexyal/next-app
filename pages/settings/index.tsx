@@ -10,7 +10,7 @@ import ContractService from "@/clientServices/ContractService";
 import { IContract } from "@/interface/iContact";
 
 const Settings = () => {
-  const { isActivated, email, name, id } = useAppSelector(
+  const { isActivated, email, name, id, status } = useAppSelector(
     (state) => state.user.user
   );
   const [data, setData] = useState<IContract | null>(null);
@@ -50,7 +50,9 @@ const Settings = () => {
           <Students />
         </>
       )}
-      {isActivated && email !== "admin@admin" && !data && <Contract />}
+      <div>
+        {isActivated && email !== "admin@admin" && !status && <Contract />}
+      </div>
       {data?.isDone && email !== "admin@admin" && (
         <div className={styles.content_wrapper}>
           <h2>Информация внесённая в договор</h2>
@@ -96,9 +98,11 @@ const Settings = () => {
           </div>
         </div>
       )}
-      {!data?.isDone && email !== "admin@admin" && (
-        <h2>Ваш договор находится на согласовании у руководителя студии</h2>
-      )}
+      <div>
+        {data && !data.isDone && email !== "admin@admin" && status && (
+          <h2>Ваш договор находится на согласовании у руководителя студии</h2>
+        )}
+      </div>
     </div>
   );
 };

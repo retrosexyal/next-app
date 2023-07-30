@@ -1,11 +1,12 @@
 import { IContract, IInfo } from "@/interface/iContact";
 import contractModel from "@/models/contract-model";
 import shablonModel from "@/models/shablon-model";
+import userModel from "@/models/user-model";
 
 class ContractService {
   async createContract(userId: string, info: IInfo) {
     const test = await contractModel.findOne({ user: userId });
-    console.log(userId);
+
     if (test) {
       throw new Error(`договор у ${userId} уже существует`, { cause: test });
     }
@@ -21,6 +22,9 @@ class ContractService {
       pasportPlace: info.whoPass,
       phone: info.phone,
     });
+    const user = await userModel.findOne({ id: userId });
+    user.status = "send";
+    await user.save();
     return contract;
   }
   async getContract(userId: string) {

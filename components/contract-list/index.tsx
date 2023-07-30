@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./contract-list.module.scss";
 import ContractService from "@/clientServices/ContractService";
+import { Button } from "@mui/material";
 import { IInfo } from "@/interface/iContact";
 
 export const ContractList = ({ info }: { info: IInfo }) => {
@@ -10,6 +11,10 @@ export const ContractList = ({ info }: { info: IInfo }) => {
     } catch (e) {
       console.log(e);
     }
+  };
+  const [isChecked, setIsChecked] = useState(false);
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChecked(event.target.checked);
   };
   return (
     <div className={styles.wrapper}>
@@ -141,7 +146,23 @@ export const ContractList = ({ info }: { info: IInfo }) => {
           <div>{`Тел.моб.: ${info.phone}`}</div>
         </p>
       </div>
-      <button onClick={handleSubmit}>отправить на подпись</button>
+      <div className={styles.btn_container}>
+        <label>
+          <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={handleCheckboxChange}
+          />
+          Я прочитал(а) условия договора и согласен(на) его подписать
+        </label>
+        <Button
+          onClick={handleSubmit}
+          className={`${styles.btn} ${!isChecked ? styles.btn_check : ""}`}
+          disabled={!isChecked}
+        >
+          отправить на подпись
+        </Button>
+      </div>
     </div>
   );
 };

@@ -1,12 +1,16 @@
 import { IUser } from "@/clientModels/IUser";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+interface UserState {
+  user: IUser;
+}
 
-const initialState = {
+const initialState: UserState = {
   user: {
     email: "",
     name: "",
     isActivated: false,
     id: "",
+    status: "",
   },
 };
 

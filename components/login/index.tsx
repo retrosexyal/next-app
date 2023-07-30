@@ -5,7 +5,13 @@ import AuthService from "@/clientServices/AuthService";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setUser as setUserApp } from "@/store/slices/userSlice";
-import { Backdrop, CircularProgress } from "@mui/material";
+import {
+  Backdrop,
+  Box,
+  CircularProgress,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 
 interface IProps {
   handleLogin: (event: React.MouseEvent) => void;
@@ -21,6 +27,8 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState("");
   const [isShow, setIsShow] = useState(false);
+  const [isValidPass, setIsValidPass] = useState(false);
+  const [isValidCheckPass, setIsValidCheckPass] = useState(false);
 
   const { user: userApp } = useAppSelector((state) => state.user);
 
@@ -84,9 +92,19 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   };
   const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAuth({ ...auth, password: e.target.value });
+    if (password.length < 7) {
+      setIsValidPass(false);
+    } else {
+      setIsValidPass(true);
+    }
   };
   const handleCheckPass = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCheckPass(e.target.value);
+    if (password === checkPass) {
+      setIsValidCheckPass(true);
+    } else {
+      setIsValidCheckPass(false);
+    }
   };
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAuth({ ...auth, name: e.target.value });
@@ -99,6 +117,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   const handleRegistr = () => {
     setIsShow(true);
     if (email && password && name && password === checkPass) {
+      setIsLoading(true);
       AuthService.registration(email, password, name)
         .then(({ data }) => {
           setUser(data.user.name);
@@ -122,6 +141,21 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
     }
   };
 
+  const handlePassBlur = () => {
+    if (password.length < 8) {
+      setIsValidPass(false);
+    } else {
+      setIsValidPass(true);
+    }
+  };
+  const handleCheckPassBlur = () => {
+    if (password === checkPass) {
+      setIsValidCheckPass(true);
+    } else {
+      setIsValidCheckPass(false);
+    }
+  };
+
   return (
     <div className={styles.wrapper} onClick={handleLog} data-id="close">
       <div className={styles.content}>
@@ -140,56 +174,54 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
                 пройдите по ссылке
               </div>
             )}
-            <Button text="выйти" onClick={handleLogout} />
+            <Button text="выйти из учётной записи" onClick={handleLogout} />
           </>
         )}
 
         {!isLoading && !user && (
           <>
-            <label htmlFor="email_login" className={styles.label}>
-              введите адрес электронной почты
-              <input
-                type="email"
-                id="email_login"
-                placeholder="email"
-                value={email}
-                onChange={handleEmail}
-              />
-            </label>
-            <label htmlFor="pass_login" className={styles.label}>
-              введите пароль
-              <input
-                type="password"
-                id="pass_login"
-                placeholder="password"
-                value={password}
-                onChange={handlePassword}
-                minLength={8}
-              />
-            </label>
+            <TextField
+              required
+              label="Адрес электронной почты"
+              defaultValue=""
+              type="email"
+              value={email}
+              onChange={handleEmail}
+            />
+
+            <TextField
+              error={!isValidPass}
+              required
+              label="введите пароль"
+              defaultValue=""
+              type="password"
+              value={password}
+              onChange={handlePassword}
+              onBlur={handlePassBlur}
+              helperText={!isValidPass ? "Минимум 8 символов" : ""}
+            />
 
             {isShow && (
               <>
-                <label htmlFor="pass_check" className={styles.label}>
-                  повторите пароль
-                  <input
-                    type="password"
-                    id="pass_check"
-                    placeholder="password"
-                    value={checkPass}
-                    onChange={handleCheckPass}
-                  />
-                </label>
-                <label htmlFor="name_login" className={styles.label}>
-                  введите ваше имя
-                  <input
-                    type="text"
-                    id="name_login"
-                    placeholder="Ваше имя"
-                    value={name}
-                    onChange={handleName}
-                  />
-                </label>
+                <TextField
+                  error={!isValidCheckPass}
+                  required
+                  label="повторите пароль"
+                  defaultValue=""
+                  type="password"
+                  value={checkPass}
+                  onChange={handleCheckPass}
+                  onBlur={handleCheckPassBlur}
+                  helperText={!isValidCheckPass ? "Пароли не совпадают" : ""}
+                />
+                <TextField
+                  required
+                  label="Введите имя"
+                  defaultValue=""
+                  type="text"
+                  value={name}
+                  onChange={handleName}
+                />
               </>
             )}
             <div className={styles.btn_container}>
@@ -199,14 +231,14 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
           </>
         )}
       </div>
-      {/* {isShow && (
+      {isLoading && (
         <Backdrop
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={isShow}
+          open={isLoading}
         >
           <CircularProgress color="inherit" />
         </Backdrop>
-      )} */}
+      )}
     </div>
   );
 };

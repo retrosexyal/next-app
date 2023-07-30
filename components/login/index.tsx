@@ -5,6 +5,7 @@ import AuthService from "@/clientServices/AuthService";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setUser as setUserApp } from "@/store/slices/userSlice";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 interface IProps {
   handleLogin: (event: React.MouseEvent) => void;
@@ -16,6 +17,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
     password: "",
     name: "",
   });
+  const [checkPass, setCheckPass] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState("");
   const [isShow, setIsShow] = useState(false);
@@ -83,6 +85,9 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAuth({ ...auth, password: e.target.value });
   };
+  const handleCheckPass = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCheckPass(e.target.value);
+  };
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAuth({ ...auth, name: e.target.value });
   };
@@ -93,7 +98,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   };
   const handleRegistr = () => {
     setIsShow(true);
-    if (email && password && name) {
+    if (email && password && name && password === checkPass) {
       AuthService.registration(email, password, name)
         .then(({ data }) => {
           setUser(data.user.name);
@@ -108,6 +113,12 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
           setIsShow(true);
           alert("такой пользователь существует");
         });
+    } else if (checkPass) {
+      if (checkPass.length < 8) {
+        alert("пароль меньше 8 символов");
+      } else {
+        alert("пароли не совпадают");
+      }
     }
   };
 
@@ -153,19 +164,33 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
                 placeholder="password"
                 value={password}
                 onChange={handlePassword}
+                minLength={8}
               />
             </label>
+
             {isShow && (
-              <label htmlFor="name_login" className={styles.label}>
-                введите ваше имя
-                <input
-                  type="text"
-                  id="name_login"
-                  placeholder="Ваше имя"
-                  value={name}
-                  onChange={handleName}
-                />
-              </label>
+              <>
+                <label htmlFor="pass_check" className={styles.label}>
+                  повторите пароль
+                  <input
+                    type="password"
+                    id="pass_check"
+                    placeholder="password"
+                    value={checkPass}
+                    onChange={handleCheckPass}
+                  />
+                </label>
+                <label htmlFor="name_login" className={styles.label}>
+                  введите ваше имя
+                  <input
+                    type="text"
+                    id="name_login"
+                    placeholder="Ваше имя"
+                    value={name}
+                    onChange={handleName}
+                  />
+                </label>
+              </>
             )}
             <div className={styles.btn_container}>
               {!isShow && <Button text="Войти" onClick={sendLogin} />}
@@ -174,6 +199,14 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
           </>
         )}
       </div>
+      {/* {isShow && (
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isShow}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )} */}
     </div>
   );
 };

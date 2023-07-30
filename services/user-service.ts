@@ -30,6 +30,7 @@ class UserService {
       activationLink,
       name,
       isActivated: false,
+      status: "",
     });
     const userDto = new UserDto(user);
     const tokens = tokenService.generateToken({ ...userDto });

@@ -22,9 +22,14 @@ class ContractService {
       pasportPlace: info.whoPass,
       phone: info.phone,
     });
-    const user = await userModel.findOne({ id: userId });
-    user.status = "send";
-    await user.save();
+    try {
+      const user = await userModel.findById(userId);
+      console.log(user);
+      user.status = "send";
+      await user.save();
+    } catch (e) {
+      console.log(e);
+    }
     return contract;
   }
   async getContract(userId: string) {

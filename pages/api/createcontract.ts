@@ -22,13 +22,13 @@ export default async function handler(
     const accessToken = req.headers["authorization"]?.split(" ")[1];
 
     const token = tokenService.validateAccessToken(accessToken!) as IUser;
-    console.log(token);
     if (token.isActivated) {
       const contract = await contractService.createContract(
         token.id,
         data.info
       );
-      return res.status(200).json(contract);
+      console.log(token);
+      return res.status(200).json({ message: "договор отправлен" });
     } else {
       return res.status(400).json({ message: "пользователь не авторизирован" });
     }

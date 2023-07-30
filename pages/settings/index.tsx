@@ -35,7 +35,7 @@ const Settings = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [status]);
 
   return (
     <div className={`wrapper ${styles.wrapper}`}>
@@ -100,7 +100,14 @@ const Settings = () => {
       )}
       <div>
         {data && !data.isDone && email !== "admin@admin" && status && (
-          <h2>Ваш договор находится на согласовании у руководителя студии</h2>
+          <div className={styles.content_wrapper}>
+            <h2 style={{ textAlign: "center" }}>
+              Ваш договор находится на согласовании у руководителя студии
+            </h2>
+            <h3 style={{ textAlign: "center" }}>
+              После подписания он будет направлен Вам в почту
+            </h3>
+          </div>
         )}
       </div>
     </div>

@@ -1,15 +1,26 @@
 import React, { useState } from "react";
 import styles from "./contract-list.module.scss";
 import ContractService from "@/clientServices/ContractService";
-import { Button } from "@mui/material";
+import { Backdrop, Button, CircularProgress } from "@mui/material";
 import { IInfo } from "@/interface/iContact";
+import Link from "next/link";
 
 export const ContractList = ({ info }: { info: IInfo }) => {
-  const handleSubmit = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [redirect, setRedirect] = useState(false);
+  const handleSubmit = async () => {
+    setIsLoading(true);
     try {
-      ContractService.addContract(info);
+      const data = await ContractService.addContract(info);
+      if (data.data.message === "договор отправлен") {
+        console.log(data.data);
+        setIsLoading(false);
+        setRedirect(true);
+      }
     } catch (e) {
       console.log(e);
+      setIsLoading(false);
+      alert("ошибка создания договора");
     }
   };
   const [isChecked, setIsChecked] = useState(false);
@@ -163,6 +174,30 @@ export const ContractList = ({ info }: { info: IInfo }) => {
           отправить на подпись
         </Button>
       </div>
+      {isLoading && (
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isLoading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )}
+      {redirect && (
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={redirect}
+        >
+          <div className={styles.backdrop_wrapper}>
+            <div>
+              После согласования договор будет направлен Вам по электронной
+              почте
+            </div>
+            <Button className={`${styles.btn}}`}>
+              <Link href={"/"}>Вернуть на главную</Link>
+            </Button>
+          </div>
+        </Backdrop>
+      )}
     </div>
   );
 };

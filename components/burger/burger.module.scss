@@ -5,9 +5,9 @@
   top: 17px;
   right: 20px;
   z-index: 2;
-  display: flex;
+  display: flex !important;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-between !important;
   min-width: 26px !important;
   padding: 0 !important;
   @media (min-width: 850px) {

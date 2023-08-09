@@ -47,6 +47,9 @@ const Change = () => {
         alert("пароли не совпадают");
       }
     } catch (e) {
+      alert(
+        "что-то пошло не так, попробуйте позже либо обратитесь к своему хореографу за помощью"
+      );
       console.log(e);
     } finally {
       setIsLoading(false);

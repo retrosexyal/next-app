@@ -23,6 +23,7 @@
   gap: 30px;
   color: black;
   text-align: center;
+  position: relative;
 }
 
 .label {
@@ -46,4 +47,11 @@
 }
 .btn_container {
   text-align: center;
+}
+.link_forgot_pass {
+  font-size: 12px;
+  color: #385898;
+  &:hover {
+    text-decoration: underline;
+  }
 }

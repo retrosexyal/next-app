@@ -19,7 +19,6 @@ export const Questions = () => {
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls={e.title}
-                id={e.title}
               >
                 <Typography>{e.title}</Typography>
               </AccordionSummary>

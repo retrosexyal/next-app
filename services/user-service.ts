@@ -46,6 +46,26 @@ class UserService {
       user: userDto,
     };
   }
+  async forgotPassword(email: string) {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      throw new Error(`пользователь с почтовым ящиком ${email} не существует`);
+    }
+
+    await transporter.sendMail({
+      ...mailOptionsRegist(email),
+      subject: "Восстановление пароля",
+      text: "_",
+      html: `
+      <h3> для сброса пароля пройдите по <a href='${URL}api/forgotpass/refresh/${
+        user.activationLink
+      }'>ссылке</a></h3>
+      <h2>после прохождение по ссылке временный пароль будет <span style="color:red;font-size:30px;"> ${
+        user.activationLink.split("-")[0]
+      } </span></h2>`,
+    });
+    return { message: "сообщение отправлено" };
+  }
 
   async login(email: string, password: string) {
     const user = await UserModel.findOne({ email });
@@ -56,6 +76,27 @@ class UserService {
     if (!isPassEquals) {
       throw new Error(`пароль не верен`);
     }
+    const userDto = new UserDto(user);
+    const tokens = tokenService.generateToken({ ...userDto });
+    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    return {
+      ...tokens,
+      user: userDto,
+    };
+  }
+
+  async changePass(email: string, password: string, newPassword: string) {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      throw new Error(`пользователь с почтовым ящиком ${email} не существует`);
+    }
+    const isPassEquals = await bcrypt.compare(password, user.password);
+    if (!isPassEquals) {
+      throw new Error(`пароль не верен`);
+    }
+    const newPass = await bcrypt.hash(newPassword, 7);
+    user.password = newPass;
+    await user.save();
     const userDto = new UserDto(user);
     const tokens = tokenService.generateToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);

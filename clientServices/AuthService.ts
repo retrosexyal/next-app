@@ -23,6 +23,22 @@ export default class AuthService {
   static async logout(): Promise<void> {
     return api.post("/api/logout");
   }
+  static async forgot(email: string): Promise<void> {
+    return api.post("/api/forgotpass/sendmail", {
+      email,
+    });
+  }
+  static async change(
+    email: string,
+    password: string,
+    newPassword: string
+  ): Promise<void> {
+    return api.post("/api/forgotpass/change", {
+      email,
+      password,
+      newPassword,
+    });
+  }
   static async getStudents() {
     return api.get("/api/getstudent");
   }

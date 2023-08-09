@@ -9,9 +9,13 @@ import {
   Backdrop,
   Box,
   CircularProgress,
+  IconButton,
+  InputAdornment,
   TextField,
   Tooltip,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 interface IProps {
   handleLogin: (event: React.MouseEvent) => void;
@@ -29,6 +33,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   const [isShow, setIsShow] = useState(false);
   const [isValidPass, setIsValidPass] = useState(false);
   const [isValidCheckPass, setIsValidCheckPass] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { user: userApp } = useAppSelector((state) => state.user);
 
@@ -43,6 +48,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   };
 
   const sendLogin = () => {
+    setIsLoading(true);
     AuthService.login(email, password)
       .then((res) => {
         if (res.status === 200) {
@@ -75,16 +81,21 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   }, []);
 
   useEffect(() => {
-    AuthService.refresh()
-      .then(({ data }) => {
-        setUser(data.user.name);
-        setIsLoading(false);
-        const userData = data.user;
-        dispatch(setUserApp(userData));
-      })
-      .catch((err) => {
-        setIsLoading(false);
-      });
+    const token = localStorage.getItem("token");
+    if (token) {
+      AuthService.refresh()
+        .then(({ data }) => {
+          setUser(data.user.name);
+          setIsLoading(false);
+          const userData = data.user;
+          dispatch(setUserApp(userData));
+        })
+        .catch((err) => {
+          setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,6 +121,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
     setAuth({ ...auth, name: e.target.value });
   };
   const handleLogout = () => {
+    localStorage.setItem("token", "");
     AuthService.logout();
     setUser("");
     setAuth({ name: "", email: "", password: "" });
@@ -156,9 +168,24 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
     }
   };
 
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
   return (
     <div className={styles.wrapper} onClick={handleLog} data-id="close">
       <div className={styles.content}>
+        <IconButton
+          aria-label="close"
+          data-id="close"
+          onClick={handleLogin}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon data-id="close" />
+        </IconButton>
         {isLoading && <h2>Загрузка...</h2>}
         {user && (
           <>
@@ -187,6 +214,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
               type="email"
               value={email}
               onChange={handleEmail}
+              sx={{ width: "100%", maxWidth: "400px" }}
             />
 
             <TextField
@@ -194,27 +222,56 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
               required
               label="введите пароль"
               defaultValue=""
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={handlePassword}
+              sx={{ width: "100%", maxWidth: "400px" }}
               onBlur={handlePassBlur}
               helperText={!isValidPass ? "Минимум 8 символов" : ""}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             {isShow && (
               <>
                 <TextField
+                  sx={{ width: "100%", maxWidth: "400px" }}
                   error={!isValidCheckPass}
                   required
                   label="повторите пароль"
                   defaultValue=""
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={checkPass}
                   onChange={handleCheckPass}
                   onBlur={handleCheckPassBlur}
                   helperText={!isValidCheckPass ? "Пароли не совпадают" : ""}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
+                  sx={{ width: "100%", maxWidth: "400px" }}
                   required
                   label="Введите имя"
                   defaultValue=""
@@ -227,6 +284,9 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
             <div className={styles.btn_container}>
               {!isShow && <Button text="Войти" onClick={sendLogin} />}
               <Button text="Зарегистироваться" onClick={handleRegistr} />
+              <Link href="/password" className={styles.link_forgot_pass}>
+                Забыли пароль?
+              </Link>
             </div>
           </>
         )}

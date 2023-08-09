@@ -8,6 +8,7 @@ import AuthService from "@/clientServices/AuthService";
 import { setUser } from "@/store/slices/userSlice";
 import ContractService from "@/clientServices/ContractService";
 import { IContract } from "@/interface/iContact";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 const Settings = () => {
   const { isActivated, email, name, id, status } = useAppSelector(
@@ -15,11 +16,13 @@ const Settings = () => {
   );
   const [data, setData] = useState<IContract | null>(null);
   const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     AuthService.refresh()
       .then(({ data }) => {
         const userData = data.user;
         dispatch(setUser(userData));
+        setIsLoading(false);
       })
       .then(() => {
         if (id) {
@@ -34,6 +37,7 @@ const Settings = () => {
       })
       .catch((err) => {
         console.log(err);
+        setIsLoading(false);
       });
   }, [status]);
 
@@ -41,6 +45,9 @@ const Settings = () => {
     <div className={`wrapper ${styles.wrapper}`}>
       <Link className={styles.link} href="/">
         Вернуться на главную страницу
+      </Link>
+      <Link className={styles.link} href="/password/change">
+        Изменить пароль
       </Link>
       {email === "admin@admin" && (
         <>
@@ -110,6 +117,14 @@ const Settings = () => {
           </div>
         )}
       </div>
+      {isLoading && (
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isLoading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )}
     </div>
   );
 };

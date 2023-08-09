@@ -6,7 +6,7 @@ import { data } from "./constants";
 import { Burger } from "../burger";
 
 interface IProps {
-  className: string;
+  className?: string;
 }
 
 const Header: React.FC<IProps> = ({ className }) => {

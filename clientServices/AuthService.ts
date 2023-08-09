@@ -33,7 +33,7 @@ export default class AuthService {
     password: string,
     newPassword: string
   ): Promise<void> {
-    return api.post("/api/forgotpass/change1", {
+    return api.post("/api/forgotpass/change", {
       email,
       password,
       newPassword,

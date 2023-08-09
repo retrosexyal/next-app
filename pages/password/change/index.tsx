@@ -40,9 +40,13 @@ const Change = () => {
     setIsLoading(true);
     try {
       if (newPass === repitPass) {
-        AuthService.change(email, password, newPass).then(() =>
-          setIsModalOpen(true)
-        );
+        AuthService.change(email, password, newPass)
+          .then(() => setIsModalOpen(true))
+          .catch((_) =>
+            alert(
+              "что-то пошло не так, попробуйте позже либо обратитесь к своему хореографу за помощью"
+            )
+          );
       } else {
         alert("пароли не совпадают");
       }

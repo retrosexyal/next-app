@@ -33,7 +33,7 @@ export default async function handler(
     } catch (e) {
       console.log(e);
     }
-    return res.status(200).redirect("/");
+    return res.status(200).json({ message: "готово" });
   } catch (error) {
     console.error(error);
     res.statusCode = 400;

@@ -41,19 +41,21 @@ const Change = () => {
     try {
       if (newPass === repitPass) {
         AuthService.change(email, password, newPass)
-          .then(() => setIsModalOpen(true))
-          .catch((_) =>
+          .then((data) => {
+            setIsModalOpen(true);
+            console.log(data);
+          })
+          .catch((e) => {
+            console.log(e);
             alert(
               "что-то пошло не так, попробуйте позже либо обратитесь к своему хореографу за помощью"
-            )
-          );
+            );
+          });
       } else {
         alert("пароли не совпадают");
       }
     } catch (e) {
-      alert(
-        "что-то пошло не так, попробуйте позже либо обратитесь к своему хореографу за помощью"
-      );
+      alert("что-то пошло не так");
       console.log(e);
     } finally {
       setIsLoading(false);

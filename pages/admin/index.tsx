@@ -7,14 +7,25 @@ import { IContract } from "@/interface/iContact";
 import styles from "./admin.module.scss";
 import { Button } from "@mui/material";
 import Link from "next/link";
+import { Backdrop, CircularProgress } from "@mui/material";
+
+function formatDate(date: string) {
+  const parts = date.split("-");
+  const day = parts[2];
+  const month = parts[1];
+  const year = parts[0];
+  return `${day}.${month}.${year}`;
+}
 
 const Admin = () => {
   const { email } = useAppSelector((state) => state.user.user);
+  const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<IContract[] | null>(null);
   const dispatch = useAppDispatch();
   const [isHiden, setIsHiden] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
     AuthService.refresh()
       .then(({ data }) => {
         const userData = data.user;
@@ -22,16 +33,57 @@ const Admin = () => {
       })
       .catch((err) => {
         console.log(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
     ContractService.getAllContract()
       .then(({ data }) => setData(data))
-      .catch((e) => console.error(e));
+      .catch((e) => console.error(e))
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
+  useEffect(() => {
+    ContractService.getAllContract()
+      .then(({ data }) => setData(data))
+      .catch((e) => console.error(e))
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [isLoading]);
 
   const handleCreate = (e: React.MouseEvent) => {
     const id = (e.target as HTMLDivElement).getAttribute("data-id");
-    console.log(id);
-    ContractService.createContract(id!);
+    setIsLoading(true);
+    if (id) {
+      try {
+        ContractService.createContract(id)
+          .then(() => {
+            setIsLoading(false);
+          })
+          .catch((e) => {
+            console.log("ошибка первая " + e);
+            setIsLoading(false);
+          });
+      } catch (e) {
+        alert("ошибка");
+        console.log(e);
+      }
+      try {
+        const contract = data?.find((obj) => obj.user === id);
+        if (contract) {
+          AuthService.addStudent(
+            contract.childrenName,
+            formatDate(contract.birthday),
+            contract.place,
+            contract.place
+          );
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
   };
   const handleContract = () => {
     setIsHiden(!isHiden);
@@ -101,6 +153,15 @@ const Admin = () => {
           </div>
         )}
       </div>
+
+      {isLoading && (
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isLoading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )}
     </div>
   );
 };

@@ -108,7 +108,7 @@ export default async function handler(
       // Сохранить обновленный документ в новый файл
       try {
         fs.writeFileSync(
-          `D:/ARTEM/trash/${user.email}-dogovor.docx`,
+          `D:/ЛИЗА/ЛиМи/документы/договора/${user.email}-dogovor.docx`,
           generatedDoc
         );
       } catch (e) {
@@ -124,6 +124,7 @@ export default async function handler(
           ],
         });
       }
+      console.log(user.email);
       await transporter.sendMail({
         ...mailOptionsRegist(user.email),
         subject: "Договор",

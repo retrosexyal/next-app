@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./contract-list.module.scss";
 import ContractService from "@/clientServices/ContractService";
 import { Backdrop, Button, CircularProgress } from "@mui/material";
@@ -11,9 +11,9 @@ export const ContractList = ({ info }: { info: IInfo }) => {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
+      console.log(info);
       const data = await ContractService.addContract(info);
       if (data.data.message === "договор отправлен") {
-        console.log(data.data);
         setIsLoading(false);
         setRedirect(true);
       }
@@ -23,6 +23,7 @@ export const ContractList = ({ info }: { info: IInfo }) => {
       alert("ошибка создания договора");
     }
   };
+
   const [isChecked, setIsChecked] = useState(false);
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked);

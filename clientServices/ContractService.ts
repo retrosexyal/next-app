@@ -12,6 +12,11 @@ export default class ContractService {
       id,
     });
   }
+  static async deleteContract(id: string) {
+    return api.post("/api/returncontract", {
+      id,
+    });
+  }
   static async getAllContract() {
     return api.get("/api/getallcontract");
   }

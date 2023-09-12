@@ -85,6 +85,25 @@ const Admin = () => {
       }
     }
   };
+  const handleDelete = (e: React.MouseEvent) => {
+    const id = (e.target as HTMLDivElement).getAttribute("data-id");
+    setIsLoading(true);
+    if (id) {
+      try {
+        ContractService.deleteContract(id)
+          .then(() => {
+            setIsLoading(false);
+          })
+          .catch((e) => {
+            console.log("ошибка первая " + e);
+            setIsLoading(false);
+          });
+      } catch (e) {
+        alert("ошибка");
+        console.log(e);
+      }
+    }
+  };
   const handleContract = () => {
     setIsHiden(!isHiden);
   };
@@ -120,6 +139,12 @@ const Admin = () => {
                             data-id={`${contract.user}`}
                           >
                             Создать договор
+                          </Button>
+                          <Button
+                            onClick={handleDelete}
+                            data-id={`${contract.user}`}
+                          >
+                            Удалить договор
                           </Button>
                         </div>
                       )}

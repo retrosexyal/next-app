@@ -67,9 +67,9 @@ export const Contract = () => {
   };
   return (
     <div>
-      <form className={styles.form_wrapper}>
+      <form className={styles.form_wrapper} id="form-for-contract">
         <TextField
-          id="outlined-basic"
+          id="outlined-basic1"
           label="Ф.И.О. родителя"
           variant="outlined"
           value={info.FIOP}
@@ -93,42 +93,42 @@ export const Contract = () => {
           </Select>
         </FormControl>
         <TextField
-          id="outlined-basic"
+          id="outlined-basic2"
           label="Серия паспорта"
           variant="outlined"
           value={info.KB}
           onChange={(e) => setInfo({ ...info, KB: e.target.value })}
         />
         <TextField
-          id="outlined-basic"
+          id="outlined-basic3"
           label="Когда выдан"
           variant="outlined"
           value={info.datePass}
           onChange={(e) => setInfo({ ...info, datePass: e.target.value })}
         />
         <TextField
-          id="outlined-basic"
+          id="outlined-basic4"
           label="Кем выдан"
           variant="outlined"
           value={info.whoPass}
           onChange={(e) => setInfo({ ...info, whoPass: e.target.value })}
         />
         <TextField
-          id="outlined-basic"
+          id="outlined-basic5"
           label="Телефон"
           variant="outlined"
           value={info.phone}
           onChange={(e) => setInfo({ ...info, phone: e.target.value })}
         />
         <TextField
-          id="outlined-basic"
+          id="outlined-basic6"
           label="Ф.И.О. ребёнка"
           variant="outlined"
           value={info.FIOC}
           onChange={(e) => setInfo({ ...info, FIOC: e.target.value })}
         />
         <TextField
-          id="outlined-basic"
+          id="outlined-basic7"
           label="Дата рождения ребёнка"
           variant="outlined"
           value={info.dateB}
@@ -137,7 +137,7 @@ export const Contract = () => {
           InputLabelProps={{ shrink: true }}
         />
         <TextField
-          id="outlined-basic"
+          id="outlined-basic8"
           label="Хронические заболевания ребёнка"
           variant="outlined"
           value={info.desiases}

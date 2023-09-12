@@ -14,7 +14,7 @@ const refreshKey = env.REFRESH_TOKEN_KEY;
 
 class TokenService {
   generateToken(payload: UserModel) {
-    const accessToken = jwt.sign(payload, accessKey!, { expiresIn: "15m" });
+    const accessToken = jwt.sign(payload, accessKey!, { expiresIn: "120m" });
     const refreshToken = jwt.sign(payload, refreshKey!, { expiresIn: "30d" });
     return {
       accessToken,

@@ -26,6 +26,10 @@ export default async function handler(
     /* user.password = hashPassword; */
     /* user.isActivated = true; */
     /* await user.save(); */
+    /*  const user = await userModel.findOne({ email: "retrosexyal@gmail.com" });
+    user.status = "";
+    await user.save();
+    console.log(user); */
     /* res.status(200).json({ message: "обновлено" }); */
   } catch (error) {
     console.error(error);
@@ -33,5 +37,3 @@ export default async function handler(
     res.json({ message: "ошибка добавления студента" });
   }
 }
-//$2b$07$VibPkEYNTs0q0LeV1JfmceX7.G2HLI96bG19b/mg2TWIu6XoucST2
-//

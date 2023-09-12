@@ -6,6 +6,14 @@ import Popup from "../popup";
 import AddStudent from "../addstudent";
 import Student from "../student";
 
+function formatDate(date: string) {
+  const parts = date.split("-");
+  const day = parts[2];
+  const month = parts[1];
+  const year = parts[0];
+  return `${day}.${month}.${year}`;
+}
+
 const Students = () => {
   const [students, setStudents] = useState<IStudent[]>([]);
   const [find, setFind] = useState("");
@@ -78,7 +86,7 @@ const Students = () => {
       studChange.id,
       studChange.name,
       studChange.place,
-      studChange.date,
+      formatDate(studChange.date),
       studChange.group
     ).catch((err) => console.log(err));
     setIsChange(false);

@@ -88,7 +88,11 @@ const Admin = () => {
   const handleDelete = (e: React.MouseEvent) => {
     const id = (e.target as HTMLDivElement).getAttribute("data-id");
     setIsLoading(true);
-    if (id) {
+    const key = prompt(
+      `вы хотите вернуть договор?\n
+      напишите "удалить" для подтверждения`
+    );
+    if (id && key === "удалить") {
       try {
         ContractService.deleteContract(id)
           .then(() => {

@@ -11,18 +11,18 @@ import { IContract } from "@/interface/iContact";
 import { Backdrop, CircularProgress } from "@mui/material";
 
 const Settings = () => {
-  const { isActivated, email, name, id, status } = useAppSelector(
+  const { isActivated, email, id, status } = useAppSelector(
     (state) => state.user.user
   );
   const [data, setData] = useState<IContract | null>(null);
   const dispatch = useAppDispatch();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
+    setIsLoading(true);
     AuthService.refresh()
       .then(({ data }) => {
         const userData = data.user;
         dispatch(setUser(userData));
-        setIsLoading(false);
       })
       .then(() => {
         if (id) {
@@ -37,9 +37,11 @@ const Settings = () => {
       })
       .catch((err) => {
         console.log(err);
+      })
+      .finally(() => {
         setIsLoading(false);
       });
-  }, [status]);
+  }, [dispatch, id]);
 
   return (
     <div className={`wrapper ${styles.wrapper}`}>

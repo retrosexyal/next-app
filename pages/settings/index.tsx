@@ -8,7 +8,7 @@ import AuthService from "@/clientServices/AuthService";
 import { setUser } from "@/store/slices/userSlice";
 import ContractService from "@/clientServices/ContractService";
 import { IContract } from "@/interface/iContact";
-import { Backdrop, CircularProgress } from "@mui/material";
+import { Loader } from "@/components/loader";
 
 const Settings = () => {
   const { isActivated, email, id, status } = useAppSelector(
@@ -119,14 +119,7 @@ const Settings = () => {
           </div>
         )}
       </div>
-      {isLoading && (
-        <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={isLoading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
-      )}
+      {isLoading && <Loader />}
     </div>
   );
 };

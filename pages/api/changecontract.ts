@@ -22,13 +22,13 @@ export default async function handler(
       const token = tokenService.validateAccessToken(accessToken!) as IUser;
       if (token.email === "admin@admin") {
         const contract = await contractService.getContract(data.info.user);
-        console.log(contract);
         contract.parentName = data.info.parentName;
         contract.childrenName = data.info.childrenName;
         contract.birthday = data.info.birthday;
         contract.place = data.info.place;
         contract.KB = data.info.KB;
         contract.pasportDate = data.info.pasportDate;
+        contract.pasportPlace = data.info.pasportPlace;
         contract.phone = data.info.phone;
         await contract.save();
         return res.status(200).json(contract);

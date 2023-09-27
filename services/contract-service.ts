@@ -24,7 +24,6 @@ class ContractService {
     });
     try {
       const user = await userModel.findById(userId);
-      console.log(user);
       user.status = "send";
       await user.save();
     } catch (e) {

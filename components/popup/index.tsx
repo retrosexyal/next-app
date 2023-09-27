@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import styles from "./popup.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
+import { IContract } from "@/interface/iContact";
 interface IProps {
   children: ReactNode;
   onClick: () => void;

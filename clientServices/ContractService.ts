@@ -1,9 +1,14 @@
 import api from "@/http";
-import { IInfo } from "@/interface/iContact";
+import { IContract, IInfo } from "@/interface/iContact";
 
 export default class ContractService {
   static async addContract(info: IInfo) {
     return api.post("/api/createcontract", {
+      info,
+    });
+  }
+  static async changeContract(info: IContract) {
+    return api.post("/api/changecontract", {
       info,
     });
   }

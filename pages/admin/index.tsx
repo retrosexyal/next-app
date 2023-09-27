@@ -8,6 +8,8 @@ import styles from "./admin.module.scss";
 import { Button } from "@mui/material";
 import Link from "next/link";
 import { Backdrop, CircularProgress } from "@mui/material";
+import Popup from "@/components/popup";
+import { ContractChange } from "@/components/contract-change";
 
 function formatDate(date: string) {
   const parts = date.split("-");
@@ -23,6 +25,8 @@ const Admin = () => {
   const [data, setData] = useState<IContract[] | null>(null);
   const dispatch = useAppDispatch();
   const [isHiden, setIsHiden] = useState(true);
+  const [isShowChange, setIsShowChange] = useState(false);
+  const [dataToChange, setDataToChange] = useState<IContract | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -111,6 +115,10 @@ const Admin = () => {
   const handleContract = () => {
     setIsHiden(!isHiden);
   };
+  const handleShowChange = (data: IContract) => {
+    setIsShowChange(!isShowChange);
+    setDataToChange(data);
+  };
   return (
     <div className="wrapper">
       <div className={styles.wrapper}>
@@ -149,6 +157,12 @@ const Admin = () => {
                             data-id={`${contract.user}`}
                           >
                             Удалить договор
+                          </Button>
+                          <Button
+                            onClick={() => handleShowChange(contract)}
+                            data-id={`${contract.user}`}
+                          >
+                            Изменить договор
                           </Button>
                         </div>
                       )}
@@ -190,6 +204,11 @@ const Admin = () => {
         >
           <CircularProgress color="inherit" />
         </Backdrop>
+      )}
+      {isShowChange && (
+        <Popup onClick={() => setIsShowChange(!isShowChange)}>
+          {dataToChange && <ContractChange contract={dataToChange} />}
+        </Popup>
       )}
     </div>
   );

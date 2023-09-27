@@ -1,5 +1,5 @@
 import { IContract } from "@/interface/iContact";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import ContractService from "@/clientServices/ContractService";
 import { Loader } from "../loader";
@@ -14,6 +14,9 @@ export const ContractChange = ({ contract }: { contract: IContract }) => {
       .catch((e) => alert("Ошибка"))
       .finally(() => setIsLoading(false));
   };
+  useEffect(() => {
+    console.log(contractInfo);
+  }, [contractInfo]);
   return (
     <div>
       <div>

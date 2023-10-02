@@ -262,3 +262,7 @@ a {
 .nav-container input[type="checkbox"]:checked ~ .logo {
   display: none;
 }
+html,
+body {
+  background-color: #ffffff;
+}

@@ -1,19 +1,27 @@
 .center {
   text-align: center;
   font-weight: 800;
+  color: black;
+  background-color: white;
 }
 .flex {
   display: flex;
   justify-content: space-between;
+  color: black;
+  background-color: white;
 }
 .wrapper {
   max-width: 800px;
   padding: 20px;
   max-height: 97%;
   overflow-y: auto;
+  background-color: white;
+  color: black;
 }
 .redP {
   text-indent: 20px;
+  color: black;
+  background-color: white;
 }
 .btn_container {
   width: 100%;
@@ -21,6 +29,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  color: black;
 }
 .btn {
   background-color: #2e651b !important;

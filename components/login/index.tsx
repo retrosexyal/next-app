@@ -191,7 +191,11 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
           <>
             <h2>{`Добро пожаловать ${user}`}</h2>
             {userApp.isActivated && (
-              <Link className={styles.link} href="/settings">
+              <Link
+                className={styles.link}
+                href="/settings"
+                onClick={() => setIsLoading(true)}
+              >
                 Перейти в личный кабинет
               </Link>
             )}

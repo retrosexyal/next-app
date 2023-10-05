@@ -9,6 +9,7 @@ import { setUser } from "@/store/slices/userSlice";
 import ContractService from "@/clientServices/ContractService";
 import { IContract } from "@/interface/iContact";
 import { Loader } from "@/components/loader";
+import { ContractInfo } from "@/components/contract-info";
 
 const Settings = () => {
   const { isActivated, email, id, status } = useAppSelector(
@@ -62,51 +63,7 @@ const Settings = () => {
       <div>
         {isActivated && email !== "admin@admin" && !status && <Contract />}
       </div>
-      {data?.isDone && email !== "admin@admin" && (
-        <div className={styles.content_wrapper}>
-          <h2>Информация внесённая в договор</h2>
-          <div className={styles.content_wrapper}>
-            <div className={styles.flex_wrapper}>
-              <div className={styles.title}>ФИО родителя: </div>
-              <div className={styles.content}>{data.parentName}</div>
-            </div>
-            <div className={styles.flex_wrapper}>
-              <div className={styles.title}>Серия паспорта: </div>
-              <div className={styles.content}>{data.KB}</div>
-            </div>
-            <div className={styles.flex_wrapper}>
-              <div className={styles.title}>Когда выдан паспорта: </div>
-              <div className={styles.content}>{data.pasportDate}</div>
-            </div>
-            <div className={styles.flex_wrapper}>
-              <div className={styles.title}>Кем выдан паспорт: </div>
-              <div className={styles.content}>{data.pasportPlace}</div>
-            </div>
-            <div className={styles.flex_wrapper}>
-              <div className={styles.title}>Контактный телефон: </div>
-              <div className={styles.content}>{data.phone}</div>
-            </div>
-            <div className={styles.flex_wrapper}>
-              <div className={styles.title}>Место занятий: </div>
-              <div className={styles.content}>{data.place}</div>
-            </div>
-            <div className={styles.flex_wrapper}>
-              <div className={styles.title}>ФИО ребёнка: </div>
-              <div className={styles.content}>{data.childrenName}</div>
-            </div>
-            <div className={styles.flex_wrapper}>
-              <div className={styles.title}>Дата рождения ребёнка: </div>
-              <div className={styles.content}>{data.birthday}</div>
-            </div>
-            <div className={styles.flex_wrapper}>
-              <div className={styles.title}>
-                Хронические заболевания ребёнка:{" "}
-              </div>
-              <div className={styles.content}>{data.diseases}</div>
-            </div>
-          </div>
-        </div>
-      )}
+      {data?.isDone && email !== "admin@admin" && <ContractInfo data={data} />}
       <div>
         {data && !data.isDone && email !== "admin@admin" && status && (
           <div className={styles.content_wrapper}>

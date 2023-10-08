@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { v4 } from "uuid";
 import { tokenService } from "./token-service";
 import UserDto from "@/dtos/user-dto";
+import messageModel from "@/models/message-model";
 
 interface UserModel {
   email: string;
@@ -72,6 +73,19 @@ class AdminService {
       throw new Error(`Ребенок с именем ${id} не найден`);
     }
     return candidate;
+  }
+  async sendMessage(id: string, message: string) {
+    const user = await messageModel.findOne({ user: id });
+    if (!user) {
+      const createdMessage = await messageModel.create({
+        user: id,
+        message: message,
+      });
+      return createdMessage;
+    }
+    user.message = message;
+    await user.save();
+    return user;
   }
 }
 

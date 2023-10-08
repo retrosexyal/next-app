@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Backdrop, CircularProgress } from "@mui/material";
 import Popup from "@/components/popup";
 import { ContractChange } from "@/components/contract-change";
+import { MessageToUser } from "@/components/message-to-user";
 
 function formatDate(date: string) {
   const parts = date.split("-");
@@ -26,6 +27,8 @@ const Admin = () => {
   const dispatch = useAppDispatch();
   const [isHiden, setIsHiden] = useState(true);
   const [isShowChange, setIsShowChange] = useState(false);
+  const [isShowSendMessage, setIsShowSendMessage] = useState(false);
+  const [idToMessage, setidToMessage] = useState("");
   const [dataToChange, setDataToChange] = useState<IContract | null>(null);
 
   useEffect(() => {
@@ -119,6 +122,11 @@ const Admin = () => {
     setIsShowChange(!isShowChange);
     setDataToChange(data);
   };
+
+  const handleSendMessage = (id: string) => {
+    setIsShowSendMessage(true);
+    setidToMessage(id);
+  };
   return (
     <div className="wrapper">
       <div className={styles.wrapper}>
@@ -159,6 +167,11 @@ const Admin = () => {
                             Удалить договор
                           </Button>
                           <Button
+                            onClick={() => handleSendMessage(contract.user)}
+                          >
+                            Написать сообщение
+                          </Button>
+                          <Button
                             onClick={() => handleShowChange(contract)}
                             data-id={`${contract.user}`}
                           >
@@ -187,6 +200,12 @@ const Admin = () => {
                           <div>Кем выдан паспорт: {contract.pasportPlace}</div>
                           <div>Телефон: {contract.phone}</div>
                           <div>Место проведения: {contract.place}</div>
+                          <Button
+                            onClick={handleDelete}
+                            data-id={`${contract.user}`}
+                          >
+                            Удалить договор
+                          </Button>
                         </div>
                       }
                     </React.Fragment>
@@ -208,6 +227,11 @@ const Admin = () => {
       {isShowChange && (
         <Popup onClick={() => setIsShowChange(!isShowChange)}>
           {dataToChange && <ContractChange contract={dataToChange} />}
+        </Popup>
+      )}
+      {isShowSendMessage && (
+        <Popup onClick={() => setIsShowSendMessage(false)}>
+          {idToMessage && <MessageToUser id={idToMessage} />}
         </Popup>
       )}
     </div>

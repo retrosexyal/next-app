@@ -2,34 +2,61 @@ import { IContract, IInfo } from "@/interface/iContact";
 import contractModel from "@/models/contract-model";
 import shablonModel from "@/models/shablon-model";
 import userModel from "@/models/user-model";
+import { status } from "@/constants/constants";
 
 class ContractService {
   async createContract(userId: string, info: IInfo) {
     const test = await contractModel.findOne({ user: userId });
 
     if (test) {
-      throw new Error(`договор у ${userId} уже существует`, { cause: test });
+      test.parentName = info.FIOP;
+      test.childrenName = info.FIOC;
+      test.diseases = info.desiases;
+      test.birthday = info.dateB;
+      test.place = info.place;
+      test.KB = info.KB;
+      test.pasportDate = info.datePass;
+      test.pasportPlace = info.whoPass;
+      test.phone = info.phone;
+      await test.save();
+      /* throw new Error(`договор у ${userId} уже существует`, { cause: test }); */
+      try {
+        const user = await userModel.findById(userId);
+        user.status = status.SEND;
+        await user.save();
+      } catch (e) {
+        console.log(e);
+      }
+      return test;
+    } else {
+      const contract = await contractModel.create({
+        user: userId,
+        parentName: info.FIOP,
+        childrenName: info.FIOC,
+        diseases: info.desiases,
+        birthday: info.dateB,
+        place: info.place,
+        KB: info.KB,
+        pasportDate: info.datePass,
+        pasportPlace: info.whoPass,
+        phone: info.phone,
+      });
+      try {
+        const user = await userModel.findById(userId);
+        user.status = status.SEND;
+        await user.save();
+      } catch (e) {
+        console.log(e);
+      }
+      return contract;
     }
-    const contract = await contractModel.create({
-      user: userId,
-      parentName: info.FIOP,
-      childrenName: info.FIOC,
-      diseases: info.desiases,
-      birthday: info.dateB,
-      place: info.place,
-      KB: info.KB,
-      pasportDate: info.datePass,
-      pasportPlace: info.whoPass,
-      phone: info.phone,
-    });
-    try {
+    /* try {
       const user = await userModel.findById(userId);
       user.status = "send";
       await user.save();
     } catch (e) {
       console.log(e);
-    }
-    return contract;
+    } */
   }
   async getContract(userId: string) {
     const contract = await contractModel.findOne({ user: userId });
@@ -46,11 +73,12 @@ class ContractService {
     return { message: "информацию отсутствует" };
   }
   async deleteContract(userId: string) {
-    const contractData = await contractModel.deleteOne({ user: userId });
+    //const contractData = await contractModel.deleteOne({ user: userId });
+    const contractData = await contractModel.findOne({ user: userId });
     try {
       const user = await userModel.findById(userId);
       console.log(user);
-      user.status = "";
+      user.status = status.RETURNED;
       await user.save();
     } catch (e) {
       console.log(e);

@@ -9,3 +9,9 @@ const handleTest = () => {
     return { name: nameStud, date: date, place: group };
   });
 };
+
+export const status = {
+  SEND: "send",
+  RETURNED: "returned",
+  NONE: "",
+};

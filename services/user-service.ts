@@ -5,6 +5,7 @@ import { tokenService } from "./token-service";
 import UserDto from "@/dtos/user-dto";
 import { mailOptionsRegist, transporter } from "@/config/nodemailer";
 import { env } from "process";
+import messageModel from "@/models/message-model";
 
 const URL = env.URL;
 
@@ -138,6 +139,10 @@ class UserService {
       throw new Error(`пользователь не существует`);
     }
     return user;
+  }
+  async getMessage(id: string) {
+    const message = await messageModel.findOne({ user: id });
+    return message || "";
   }
 }
 

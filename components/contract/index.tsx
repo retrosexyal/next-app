@@ -11,8 +11,10 @@ import {
   TextField,
 } from "@mui/material";
 import { ContractList } from "../contract-list";
+import ContractService from "@/clientServices/ContractService";
 
 import { IInfo } from "@/interface/iContact";
+import { useAppSelector } from "@/store";
 
 export const Contract = () => {
   const [info, setInfo] = useState<IInfo>({
@@ -42,6 +44,9 @@ export const Contract = () => {
     phone,
     desiases,
   } = info;
+
+  const { id } = useAppSelector((state) => state.user.user);
+
   useEffect(() => {
     if (
       FIOP &&
@@ -64,6 +69,28 @@ export const Contract = () => {
     setTimeout(() => {
       setIsStyled(true);
     }, 500);
+
+    const fetchData = async () => {
+      try {
+        const response = await ContractService.getContract(id);
+        const data = response.data;
+        setInfo({
+          FIOP: data.parentName,
+          place: data.place,
+          KB: data.KB,
+          datePass: data.pasportDate,
+          whoPass: data.pasportPlace,
+          phone: data.phone,
+          FIOC: data.childrenName,
+          dateB: data.birthday,
+          desiases: data.diseases,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleSubmit = () => {

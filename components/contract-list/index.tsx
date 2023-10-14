@@ -11,7 +11,6 @@ export const ContractList = ({ info }: { info: IInfo }) => {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      console.log(info);
       const data = await ContractService.addContract(info);
       if (data.data.message === "договор отправлен") {
         setIsLoading(false);

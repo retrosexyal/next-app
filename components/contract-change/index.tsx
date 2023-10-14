@@ -14,9 +14,6 @@ export const ContractChange = ({ contract }: { contract: IContract }) => {
       .catch((e) => alert("Ошибка"))
       .finally(() => setIsLoading(false));
   };
-  useEffect(() => {
-    console.log(contractInfo);
-  }, [contractInfo]);
   return (
     <div>
       <div>

@@ -14,7 +14,6 @@ export default async function handler(
       console.log("bd ok");
     }
     const data = req.body;
-    console.log(data);
     const studentData = await adminService.deleteStudent(data.id);
     return res.status(200).json(studentData);
   } catch (error) {

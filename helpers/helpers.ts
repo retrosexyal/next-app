@@ -7,7 +7,6 @@ export const checkAdmin = (req: NextApiRequest) => {
   if (accessToken) {
     const token = tokenService.validateAccessToken(accessToken!) as IUser;
     if (token.email === "admin@admin") {
-      console.log(token);
       return true;
     }
     return false;

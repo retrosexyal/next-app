@@ -73,3 +73,26 @@
   align-items: center;
   justify-content: center;
 }
+.promo {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 3s, transform 3s;
+  position: fixed;
+  width: 0;
+  height: 0;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.promo_show {
+  opacity: 1;
+  transform: translateY(0);
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  position: fixed;
+  transition: opacity 3s, transform 3s;
+  z-index: 100;
+}

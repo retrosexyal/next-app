@@ -27,7 +27,6 @@ export default async function handler(
         token.id,
         data.info
       );
-      console.log(token);
       return res.status(200).json({ message: "договор отправлен" });
     } else {
       return res.status(400).json({ message: "пользователь не авторизирован" });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import styles from "./main.module.scss";
 import mainImg from "/public/imgs/background_main1.webp";
@@ -6,10 +6,13 @@ import Header from "../header";
 import { Button } from "@mui/material";
 import Popup from "../popup";
 import { FormSend } from "../form-send";
+import { Promo } from "@/container/promo";
 
 const Main = () => {
   const [isPressed, setIsPressed] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [showPromo, setShowPromo] = useState(false);
+  const [showAnim, setShowAnim] = useState(false);
   const makeCall = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     const isMobile =
@@ -25,6 +28,21 @@ const Main = () => {
   const openForm = () => {
     setIsFormOpen(!isFormOpen);
   };
+  const openPromo = () => {
+    setShowPromo(!showPromo);
+  };
+  useEffect(() => {
+    setShowPromo(true);
+    setTimeout(() => {
+      setShowAnim(true);
+    }, 1000);
+  }, []);
+  useEffect(() => {
+    if (!showPromo) {
+      setShowAnim(false);
+    }
+  }, [showPromo]);
+
   return (
     <>
       <div className={styles.wrapper} id="main">
@@ -63,6 +81,9 @@ const Main = () => {
             </Popup>
           )}
         </>
+        <div className={showAnim ? styles.promo_show : styles.promo}>
+          {showPromo && <Promo closePromo={openPromo} />}
+        </div>
       </div>
     </>
   );

@@ -18,7 +18,6 @@ export default async function handler(
     const activateLink = currentUrl?.split("/");
     const link = activateLink![activateLink!.length - 1];
     const canditate = await UserModel.findOne({ activationLink: link });
-    console.log(canditate);
     canditate.isActivated = true;
     canditate.save();
     return res.status(200).redirect("/");

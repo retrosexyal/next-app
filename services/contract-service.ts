@@ -77,7 +77,6 @@ class ContractService {
     const contractData = await contractModel.findOne({ user: userId });
     try {
       const user = await userModel.findById(userId);
-      console.log(user);
       user.status = status.RETURNED;
       await user.save();
     } catch (e) {

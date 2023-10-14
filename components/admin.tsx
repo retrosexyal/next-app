@@ -54,7 +54,6 @@ const Admin = () => {
   const handleTest = () => {
     AuthService.login("admin@admin", "123").then((res) => {
       if (res.status === 200) {
-        console.log(res);
         localStorage.setItem("token", res.data.accessToken);
         alert("функция админа активирована");
       } else if (res.status === 400) {

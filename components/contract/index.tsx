@@ -21,7 +21,7 @@ export const Contract = () => {
     FIOP: "",
     FIOC: "",
     dateB: "",
-    desiases: "отсутствуют",
+    desiases: "",
     place: "",
 
     KB: "",
@@ -66,10 +66,6 @@ export const Contract = () => {
   }, [info]);
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsStyled(true);
-    }, 500);
-
     const fetchData = async () => {
       try {
         const response = await ContractService.getContract(id);
@@ -89,8 +85,10 @@ export const Contract = () => {
         console.error(error);
       }
     };
-
-    fetchData();
+    setTimeout(() => {
+      setIsStyled(true);
+      fetchData();
+    }, 500);
   }, []);
 
   const handleSubmit = () => {
@@ -142,7 +140,7 @@ export const Contract = () => {
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={info.place}
+            value={info.place || ""}
             label="Зал где вы занимаетесь"
             onChange={(e) => setInfo({ ...info, place: e.target.value })}
             sx={{

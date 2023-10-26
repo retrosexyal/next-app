@@ -81,9 +81,9 @@ const Main = () => {
             </Popup>
           )}
         </>
-        <div className={showAnim ? styles.promo_show : styles.promo}>
+        {/*  <div className={showAnim ? styles.promo_show : styles.promo}>
           {showPromo && <Promo closePromo={openPromo} />}
-        </div>
+        </div> */}
       </div>
     </>
   );

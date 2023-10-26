@@ -166,7 +166,7 @@ export const Contract = () => {
         </FormControl>
         <TextField
           id="outlined-basic2"
-          label="Серия паспорта"
+          label="Номер паспорта(в формате KB111111111)"
           variant="outlined"
           value={info.KB}
           onChange={(e) => setInfo({ ...info, KB: e.target.value })}
@@ -413,7 +413,7 @@ export const Contract = () => {
             style={{
               position: "absolute",
               top: 0,
-              right: "5px",
+              right: "15px",
               backgroundColor: "#d01f1f",
               color: "white",
               padding: "2px",

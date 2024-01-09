@@ -15,21 +15,21 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      await mongoose.connect(DB!);
-      console.log("bd ok");
-    }
-    const db = mongoose.connection.db;
-    const bucket = new GridFSBucket(db);
-    const readStream = fs.createReadStream("D:/ARTEM/trash/dogovor.docx");
-    const uploadStream = bucket.openUploadStream("dogovor.docx");
+    // if (mongoose.connection.readyState !== 1) {
+    //   await mongoose.connect(DB!);
+    //   console.log("bd ok");
+    // }
+    // const db = mongoose.connection.db;
+    // const bucket = new GridFSBucket(db);
+    // const readStream = fs.createReadStream("D:/ARTEM/trash/dogovor.docx");
+    // const uploadStream = bucket.openUploadStream("dogovor.docx");
 
-    readStream.pipe(uploadStream);
+    // readStream.pipe(uploadStream);
 
-    uploadStream.on("finish", () => {
-      console.log(`File saved to MongoDB with id:`);
-    });
-
+    // uploadStream.on("finish", () => {
+    //   console.log(`File saved to MongoDB with id:`);
+    // });
+/* раскоментить всё сверху для добавления в БД файла */
     /* const gfs = gridfs(mongoose.connection.db, mongoose.mongo); */
 
     //const data = req.body;

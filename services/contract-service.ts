@@ -73,7 +73,7 @@ class ContractService {
     return { message: "информацию отсутствует" };
   }
   async deleteContract(userId: string) {
-    //const contractData = await contractModel.deleteOne({ user: userId });
+    /* const contractData = await contractModel.deleteOne({ user: userId }); */
     const contractData = await contractModel.findOne({ user: userId });
     try {
       const user = await userModel.findById(userId);

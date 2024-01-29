@@ -65,13 +65,13 @@ const Main = () => {
             >
               {!isPressed ? "ПОЗВОНИТЬ" : "+375(29)199-92-31"}
             </Button>
-            <Button
+            {/* <Button
               variant="contained"
               className={styles.btn}
               onClick={openForm}
             >
               ОСТАВИТЬ ЗАЯВКУ
-            </Button>
+            </Button> */}
           </div>
         </div>
         <>

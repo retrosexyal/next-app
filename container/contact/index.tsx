@@ -32,9 +32,9 @@ export const Contact = () => {
         <Button variant="contained" className={style.btn} onClick={makeCall}>
           {!isPressed ? "ПОЗВОНИТЬ" : "+375(29)199-92-31"}
         </Button>
-        <Button variant="contained" className={style.btn} onClick={openForm}>
+        {/* <Button variant="contained" className={style.btn} onClick={openForm}>
           ОСТАВИТЬ ЗАЯВКУ
-        </Button>
+        </Button> */}
         <>
           {isFormOpen && (
             <Popup onClick={openForm}>

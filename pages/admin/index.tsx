@@ -127,12 +127,30 @@ const Admin = () => {
     setIsShowSendMessage(true);
     setidToMessage(id);
   };
+
+  const handleBirthday = () => {
+    try {
+      ContractService.checkBirthday()
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((e) => {
+          console.log("ошибка первая " + e);
+          setIsLoading(false);
+        });
+    } catch (e) {
+      alert("ошибка");
+      console.log(e);
+    }
+  }
+
   return (
     <div className="wrapper">
       <div className={styles.wrapper}>
         <Link className={styles.link} href="/">
           Вернуться на главную страницу
         </Link>
+        {email === "admin@admin" && <Button onClick={handleBirthday}>Проверить дни рождения</Button>}
         <Button onClick={handleContract}>Получить все договоры</Button>
         {email === "admin@admin" && (
           <div>

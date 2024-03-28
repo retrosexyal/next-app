@@ -30,4 +30,7 @@ export default class ContractService {
       id,
     });
   }
+  static async checkBirthday() {
+    return api.get("/api/sendmailer");
+  }
 }

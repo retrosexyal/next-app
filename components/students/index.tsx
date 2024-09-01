@@ -143,7 +143,7 @@ const Students = () => {
               .toUpperCase()
               .includes(find.toLocaleUpperCase());
           })
-          .sort((a, b) => {
+          ?.sort((a, b) => {
             return a[sort as keyof typeof a] > b[sort as keyof typeof b]
               ? 1
               : -1;

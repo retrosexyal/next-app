@@ -15,3 +15,5 @@ export const status = {
   RETURNED: "returned",
   NONE: "",
 };
+
+export const ADMIN_EMAIL = "admin@admin";

@@ -58,12 +58,9 @@ body {
   overflow-x: hidden;
 }
 
-/* body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-} */
+.header-title .MuiDataGrid-columnHeaderTitle {
+  font-size: 8px;
+}
 
 a {
   color: inherit;
@@ -265,4 +262,20 @@ a {
 html,
 body {
   background-color: #ffffff;
+}
+
+.MuiDataGrid-cell::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.MuiDataGrid-cell::-webkit-scrollbar-thumb {
+  background-color: #282828;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.MuiDataGrid-cell::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+  border-radius: 8px;
 }

@@ -6,6 +6,7 @@ const StudentSchema = new Schema({
   mentor: { type: String },
   place: { type: String, required: true },
   group: { type: String },
+  isHaveContract: { type: Boolean, default: false },
 });
 
 export default models.Student || model("Student", StudentSchema);

@@ -5,4 +5,5 @@ export interface IStudent {
   mentor: string;
   place: string;
   group: string;
+  isHaveContract?: boolean;
 }

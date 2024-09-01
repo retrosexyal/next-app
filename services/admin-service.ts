@@ -1,15 +1,7 @@
 import StudentModel from "@/models/student-model";
-import bcrypt from "bcrypt";
-import { v4 } from "uuid";
-import { tokenService } from "./token-service";
-import UserDto from "@/dtos/user-dto";
 import messageModel from "@/models/message-model";
-
-interface UserModel {
-  email: string;
-  id: string;
-  isActivated: boolean;
-}
+import { IGroup } from "@/clientModels/IGroup";
+import GroupModels from "@/models/group-models";
 
 class AdminService {
   async addStudent(name: string, date: string, place: string, group: string) {
@@ -29,6 +21,24 @@ class AdminService {
 
     return {
       student,
+    };
+  }
+
+  async createGroup({ name, students }: IGroup) {
+    const candidate = await GroupModels.findOne({
+      name: { $regex: new RegExp(`^${name}$`, "i") },
+    });
+    if (candidate) {
+      throw new Error(`группа уже имеется`);
+    }
+
+    const group = await GroupModels.create({
+      name,
+      students
+    });
+
+    return {
+      group,
     };
   }
   async deleteStudent(id: string) {

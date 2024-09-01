@@ -10,6 +10,7 @@ export interface IContract {
   phone: string;
   user: string;
   isDone: boolean;
+  isOldContract?: boolean;
 }
 export interface IInfo {
   FIOP: string;

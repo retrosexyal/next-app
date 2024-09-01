@@ -118,6 +118,21 @@ const Admin = () => {
   const handleContract = () => {
     setIsHiden(!isHiden);
   };
+/* если необходимо что-то обновить  const handleUpdateContracts = () => {
+    try {
+      ContractService.unsetContract()
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((e) => {
+          console.log("ошибка первая " + e);
+        });
+    } catch (e) {
+      alert("ошибка");
+      console.log(e);
+    }
+  }; */
+
   const handleShowChange = (data: IContract) => {
     setIsShowChange(!isShowChange);
     setDataToChange(data);
@@ -142,6 +157,10 @@ const Admin = () => {
       alert("ошибка");
       console.log(e);
     }
+  };
+
+  if (email !== "admin@admin") {
+    return <div>необходимо перелогиниться, ИЛИ НЕТ ДОСТУПА</div>;
   }
 
   return (
@@ -150,8 +169,11 @@ const Admin = () => {
         <Link className={styles.link} href="/">
           Вернуться на главную страницу
         </Link>
-        {email === "admin@admin" && <Button onClick={handleBirthday}>Проверить дни рождения</Button>}
+        {email === "admin@admin" && (
+          <Button onClick={handleBirthday}>Проверить дни рождения</Button>
+        )}
         <Button onClick={handleContract}>Получить все договоры</Button>
+        {/* если необходимо что-то обновить <Button onClick={handleUpdateContracts}>Обновить договора</Button> */}
         {email === "admin@admin" && (
           <div>
             <div>
@@ -159,7 +181,7 @@ const Admin = () => {
                 data.map((contract) => {
                   return (
                     <React.Fragment key={contract.user}>
-                      {!contract.isDone && (
+                      {!contract.isDone && !contract.isOldContract &&  (
                         <div className={styles.container}>
                           <div>Имя родителя: {contract.parentName}</div>
                           <div>Серия паспорта: {contract.KB}</div>
@@ -236,7 +258,11 @@ const Admin = () => {
 
       {isLoading && (
         <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          sx={{
+            color: "#fff",
+            zIndex: (theme: { zIndex: { drawer: number } }) =>
+              theme.zIndex.drawer + 1,
+          }}
           open={isLoading}
         >
           <CircularProgress color="inherit" />

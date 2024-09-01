@@ -25,6 +25,9 @@ export default class ContractService {
   static async getAllContract() {
     return api.get("/api/getallcontract");
   }
+  static async unsetContract() {
+    return api.post("/api/getallcontract");
+  }
   static async createContract(id: string) {
     return api.post("/api/doc/saveonbd", {
       id,

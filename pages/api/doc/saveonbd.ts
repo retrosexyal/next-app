@@ -74,7 +74,7 @@ export default async function handler(
       chunks.push(chunk);
     });
     readStream.on("end", async () => {
-      const content = Buffer.concat(chunks);
+      const content = Buffer.concat(chunks as unknown[] as Uint8Array[]);
 
       // Создать объект PizZip на основе содержимого файла
       const zip = new PizZip(content);

@@ -14,11 +14,24 @@ export default async function handler(
     if (mongoose.connection.readyState !== 1) {
       await mongoose.connect(DB!);
       console.log("bd ok");
+    } 
+
+    if (!checkAdmin(req)) {
+      return res.status(403).json({ message: "нет доступа" });
     }
-    if (checkAdmin(req)) {
+
+    const { method } = req;
+
+    if (method === "GET") {
       const contracts = await contractService.getAllContract();
       return res.status(200).json(contracts);
     }
+
+/* если необходимо что-то обновить    if (method === "POST") {
+      const contracts = await contractService.changeContract();
+      return res.status(200).json(contracts);
+    } */
+
   } catch (error) {
     console.error(error);
     res.statusCode = 401;

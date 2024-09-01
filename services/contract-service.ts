@@ -18,6 +18,7 @@ class ContractService {
       test.pasportDate = info.datePass;
       test.pasportPlace = info.whoPass;
       test.phone = info.phone;
+      test.isOldContract = false;
       await test.save();
       /* throw new Error(`договор у ${userId} уже существует`, { cause: test }); */
       try {
@@ -93,6 +94,16 @@ class ContractService {
       return contract;
     }
     return { message: "информацию отсутствует" };
+  }
+  async changeContract() {
+    const result = await contractModel.updateMany({}, { isOldContract: true });
+
+    if (result) {
+      console.log(result);
+
+      return { message: "Информация обновлена" };
+    }
+    return { message: "Информация отсутствует" };
   }
   async getNumberContract() {
     const number = await shablonModel.findOne({ name: "Dogovor" });

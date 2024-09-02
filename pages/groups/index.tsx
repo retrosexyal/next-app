@@ -3,7 +3,6 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import { Button, Container, FormControl, Stack } from "@mui/material";
-import { groups } from "./constants";
 import { useAppSelector } from "@/store";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { CustomCheckbox } from "@/components/GroupComponents/CustomCheckbox";
@@ -13,6 +12,10 @@ import { MarkProps, StudentGroupType } from "@/clientModels/IGroup";
 
 function Groups() {
   const { email } = useAppSelector((state) => state.user.user);
+  const groups = [
+    {value: '1', label: 'Вторник, Четверг'},
+    {value: '2', label: 'Понедельник, Пятница'}
+]
 
   const [group, setGroup] = useState(groups[0].value);
   const [students, setStudents] = useState<StudentGroupType[]>([]);

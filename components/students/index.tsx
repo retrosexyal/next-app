@@ -143,11 +143,13 @@ const Students = () => {
               .toUpperCase()
               .includes(find.toLocaleUpperCase());
           })
-          ?.sort((a, b) => {
-            return a[sort as keyof typeof a] > b[sort as keyof typeof b]
-              ? 1
-              : -1;
-          })
+          /* ?.sort((a, b) => {
+            if (a && b) {
+              return a?.[sort as keyof typeof a] > b?.[sort as keyof typeof b]
+                ? 1
+                : -1;
+            }
+          }) */
           .map((e) => {
             return (
               <React.Fragment key={e._id}>

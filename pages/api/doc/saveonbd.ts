@@ -105,8 +105,24 @@ export default async function handler(
       // Получить буфер с обновленным содержимым документа
       const generatedDoc = await doc.getZip().generate({ type: "nodebuffer" });
 
-      // Сохранить обновленный документ в новый файл
       try {
+        await transporter.sendMail({
+          ...mailOptionsBirthday,
+          subject: "Договор",
+          text: "Копия договора во вложении",
+          attachments: [
+            {
+              filename: `${user.email}договор.docx`,
+              content: generatedDoc,
+            },
+          ],
+        });
+      } catch (e) {
+        res.status(500).json("ошибка отправки договора админу");
+      }
+
+      // Сохранить обновленный документ в новый файл
+      /* try {
         fs.writeFileSync(
           `D:/ЛИЗА/ЛиМи/документы/договора/${user.email}-dogovor.docx`,
           generatedDoc
@@ -124,21 +140,34 @@ export default async function handler(
           ],
         });
       }
-      console.log(user.email);
-      await transporter.sendMail({
-        ...mailOptionsRegist(user.email),
-        subject: "Договор",
-        text: "Копия договора во вложении",
-        attachments: [
-          {
-            filename: `договор.docx`,
-            content: generatedDoc,
-          },
-        ],
-      });
+      console.log(user.email); */
+      try {
+        await transporter.sendMail({
+          ...mailOptionsRegist(user.email),
+          subject: "Договор",
+          text: "Копия договора во вложении",
+          attachments: [
+            {
+              filename: `договор.docx`,
+              content: generatedDoc,
+            },
+          ],
+        });
+      } catch (e) {
+        res.status(500).json("ошибка отправки договора пользователю");
+      }
     });
-    await contractService.updateContract(data.id);
-    await contractService.setNumberContract();
+
+    try {
+      await contractService.updateContract(data.id);
+    } catch (e) {
+      res.status(500).json("ошибко обновления контракта");
+    }
+    try {
+      await contractService.setNumberContract();
+    } catch (e) {
+      res.status(500).json("Ошибка установки номера контракта");
+    }
     res.status(200).json("договор успешно сохранен");
   } catch (error) {
     console.error(error);

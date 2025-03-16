@@ -26,7 +26,6 @@ export default async function handler(
   try {
     if (mongoose.connection.readyState !== 1) {
       await mongoose.connect(DB!);
-      console.log("bd ok");
     }
     const data = req.body;
     const db = mongoose.connection.db;
@@ -64,6 +63,8 @@ export default async function handler(
     // Найти файл в базе данных и получить поток данных
     const file = await bucket.find({ filename: fileName }).toArray();
     if (file.length === 0) {
+      res.status(500).json("не нашёл файл");
+
       throw new Error(`Файл ${fileName} не найден в базе данных`);
     }
     const readStream = bucket.openDownloadStreamByName(fileName);

@@ -46,3 +46,10 @@
     align-items: center;
   }
 }
+
+.img_wrapper {
+  & img {
+    width: 80%;
+    height: 80%;
+  }
+}

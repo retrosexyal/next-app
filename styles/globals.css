@@ -261,6 +261,8 @@ a {
 }
 html,
 body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   background-color: #ffffff;
 }
 
@@ -278,4 +280,8 @@ body {
 .MuiDataGrid-cell::-webkit-scrollbar-track {
   background-color: #f0f0f0;
   border-radius: 8px;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }

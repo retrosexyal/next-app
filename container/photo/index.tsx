@@ -8,7 +8,7 @@ import { Gallery } from "@/components/Gallery";
 export const Photo = () => {
   return (
     <div id="photo" className={style.wrapper}>
-      <Title text="Каждое занятие - это особое событие" />
+      <Title text="Наши выступления" />
       <Gallery
         images={[
           "/imgs/concert/1.jpg",
@@ -21,7 +21,7 @@ export const Photo = () => {
         ]}
       />
       {/*       <PhotoContainer arrOfSrcs="1" /> */}
-      <Title text="Наши выступления" />
+      <Title text="Каждое занятие - это особое событие" />
       <Gallery
         images={[
           "/imgs/lesson/1.jpg",
@@ -43,9 +43,10 @@ export const Photo = () => {
         images={[
           "/imgs/holyday/1.jpg",
           "/imgs/holyday/2.jpg",
-          "/imgs/holyday/3.jpg",
-          "/imgs/holyday/4.jpg",
-          "/imgs/holyday/5.jpg",
+          "/imgs/holyday/3.JPG",
+          "/imgs/holyday/4.JPG",
+          "/imgs/holyday/5.JPG",
+          "/imgs/holyday/6.JPG",
         ]}
       />
     </div>

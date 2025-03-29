@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import style from "./gallery.module.scss";
+import Image, { StaticImageData } from "next/image";
 
 interface ImageGalleryProps {
   images: string[];
@@ -8,6 +9,7 @@ interface ImageGalleryProps {
 export const Gallery: React.FC<ImageGalleryProps> = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imagesPerView, setImagesPerView] = useState(3);
+  const [currentImg, setCurrentImg] = useState<string | null>(null);
 
   useEffect(() => {
     const updateImagesPerView = () => {
@@ -57,7 +59,11 @@ export const Gallery: React.FC<ImageGalleryProps> = ({ images }) => {
           style={{ transform: `translateX(${offset}%)` }}
         >
           {images.map((img, index) => (
-            <div key={index} className={style["image-item"]}>
+            <div
+              key={index}
+              className={style["image-item"]}
+              onClick={() => setCurrentImg(img)}
+            >
               <img src={img} alt={`Image ${index + 1}`} />
             </div>
           ))}
@@ -71,6 +77,27 @@ export const Gallery: React.FC<ImageGalleryProps> = ({ images }) => {
         >
           ➡
         </button>
+      )}
+      {currentImg && (
+        <div
+          className={style.img_wrapper}
+          style={{
+            position: "fixed",
+            width: "100dvw",
+            height: "100dvh",
+            background: "rgba(0,0,0,0.5)",
+            top: 0,
+            left: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => {
+            setCurrentImg(null);
+          }}
+        >
+          <img src={currentImg} alt="photo" style={{ objectFit: "contain" }} />
+        </div>
       )}
     </div>
   );

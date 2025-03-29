@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import style from "./gallery.module.scss";
-import Image, { StaticImageData } from "next/image";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 interface ImageGalleryProps {
   images: string[];
@@ -50,7 +50,7 @@ export const Gallery: React.FC<ImageGalleryProps> = ({ images }) => {
           className={`${style["nav-button"]} ${style.left}`}
           onClick={goPrev}
         >
-          ⬅
+          <NavigateNextIcon />
         </button>
       )}
       <div className={style["image-wrapper"]}>
@@ -75,7 +75,7 @@ export const Gallery: React.FC<ImageGalleryProps> = ({ images }) => {
           className={`${style["nav-button"]} ${style.right}`}
           onClick={goNext}
         >
-          ➡
+          <NavigateNextIcon />
         </button>
       )}
       {currentImg && (
@@ -91,6 +91,7 @@ export const Gallery: React.FC<ImageGalleryProps> = ({ images }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            zIndex: 1000,
           }}
           onClick={() => {
             setCurrentImg(null);

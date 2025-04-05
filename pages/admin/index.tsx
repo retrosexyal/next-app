@@ -159,7 +159,7 @@ const Admin = () => {
     }
   };
 
-    if (email !== "admin@admin") {
+  if (email !== "admin@admin") {
     return <div>необходимо перелогиниться, ИЛИ НЕТ ДОСТУПА</div>;
   }
 
@@ -200,19 +200,6 @@ const Admin = () => {
         alert("ошибка");
         console.log(e);
       }
-      try {
-        const contract = data?.find((obj) => obj.user === id);
-        if (contract) {
-          AuthService.addStudent(
-            contract.childrenName,
-            formatDate(contract.birthday),
-            contract.place,
-            contract.place
-          );
-        }
-      } catch (e) {
-        console.log(e);
-      }
     }
   };
 
@@ -247,23 +234,27 @@ const Admin = () => {
                           <div>Кем выдан паспорт: {contract.pasportPlace}</div>
                           <div>Телефон: {contract.phone}</div>
                           <div>Место проведения: {contract.place}</div>
-                          {/* <Button
-                            onClick={handleCreate}
-                            data-id={`${contract.user}`}
-                          >
-                            Создать договор
-                          </Button> */}
+
                           <Button
                             onClick={handleSendToParent}
                             data-id={`${contract.user}`}
+                            variant="contained"
                           >
                             отправить родителям
                           </Button>
                           <Button
                             onClick={handleSendToAdmin}
                             data-id={`${contract.user}`}
+                            variant="contained"
                           >
                             отправить мне
+                          </Button>
+                          <Button
+                            onClick={handleCreate}
+                            data-id={`${contract.user}`}
+                            variant="contained"
+                          >
+                            Закончить создание
                           </Button>
                           <Button
                             onClick={handleDelete}

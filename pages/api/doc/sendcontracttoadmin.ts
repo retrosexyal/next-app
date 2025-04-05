@@ -3,7 +3,15 @@ import mongoose from "mongoose";
 import { env } from "process";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
-import { transporter, mailOptionsBirthday } from "@/config/nodemailer";
+import fs from "fs";
+import {
+  transporter,
+  test,
+  mailOptionsRegist,
+  mailOptionsBirthday,
+} from "@/config/nodemailer";
+import ShablonModel from "@/models/shablon-model";
+import gridfs from "gridfs-stream";
 import { GridFSBucket } from "mongodb";
 import { contractService } from "@/services/contract-service";
 import { IContract } from "@/interface/iContact";
@@ -17,13 +25,20 @@ export default async function handler(
 ) {
   try {
     if (mongoose.connection.readyState !== 1) {
-      await mongoose.connect(DB!);
-      console.log("bd ok");
+      try {
+        await mongoose.connect(DB!);
+      } catch (e) {
+        res.status(500).json("error connect to bd");
+      }
     }
     const data = req.body;
     const db = mongoose.connection.db;
     const bucket = new GridFSBucket(db);
     const contract = (await contractService.getContract(data.id)) as IContract;
+
+    if (!contract) {
+      res.status(500).json("no contract");
+    }
     const user = await userService.getUser(data.id);
     const numberContract = await contractService.getNumberContract();
 
@@ -32,6 +47,7 @@ export default async function handler(
     // Найти файл в базе данных и получить поток данных
     const file = await bucket.find({ filename: fileName }).toArray();
     if (file.length === 0) {
+      res.status(500).json("no contract");
       throw new Error(`Файл ${fileName} не найден в базе данных`);
     }
     const readStream = bucket.openDownloadStreamByName(fileName);
@@ -73,10 +89,6 @@ export default async function handler(
       // Получить буфер с обновленным содержимым документа
       const generatedDoc = await doc.getZip().generate({ type: "nodebuffer" });
 
-      if (!generatedDoc) {
-        res.status(500).json("не смог создать файл");
-      }
-
       try {
         await transporter.sendMail({
           ...mailOptionsBirthday,
@@ -84,27 +96,19 @@ export default async function handler(
           text: "Копия договора во вложении",
           attachments: [
             {
-              filename: `${user.email}договор.docx`,
+              filename: `договор.docx`,
               content: generatedDoc,
             },
           ],
         });
       } catch (e) {
-        res.status(500).json("ошибка отправки договора админу");
+        res.status(500).json("ошибка отправки договора пользователю");
       }
-    });
 
-    try {
-      await contractService.updateContract(data.id);
-    } catch (e) {
-      res.status(500).json("ошибко обновления контракта");
-    }
-    try {
-      await contractService.setNumberContract();
-    } catch (e) {
-      res.status(500).json("Ошибка установки номера контракта");
-    }
-    res.status(200).json("договор успешно сохранен");
+      res
+        .status(200)
+        .json("договор успешно отправлен пользователю" + " " + user.email);
+    });
   } catch (error) {
     console.error(error);
     res.statusCode = 400;

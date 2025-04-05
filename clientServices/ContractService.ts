@@ -7,6 +7,16 @@ export default class ContractService {
       info,
     });
   }
+  static async senContractToParent(id: string) {
+    return api.post("/api/doc/sendcontracttoparent", {
+      id,
+    });
+  }
+  static async senContractToAdmin(id: string) {
+    return api.post("/api/doc/sendcontracttoadmin", {
+      id,
+    });
+  }
   static async changeContract(info: IContract) {
     return api.post("/api/changecontract", {
       info,

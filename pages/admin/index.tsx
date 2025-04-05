@@ -118,7 +118,7 @@ const Admin = () => {
   const handleContract = () => {
     setIsHiden(!isHiden);
   };
-/* если необходимо что-то обновить  const handleUpdateContracts = () => {
+  /* если необходимо что-то обновить  const handleUpdateContracts = () => {
     try {
       ContractService.unsetContract()
         .then((data) => {
@@ -163,6 +163,46 @@ const Admin = () => {
     return <div>необходимо перелогиниться, ИЛИ НЕТ ДОСТУПА</div>;
   }
 
+  const handleSendToParent = (e: any) => {
+    const id = (e.target as HTMLDivElement).getAttribute("data-id");
+    setIsLoading(true);
+    if (id) {
+      try {
+        ContractService.senContractToParent(id)
+          .then(() => {
+            setIsLoading(false);
+          })
+          .catch((e) => {
+            console.log("ошибка первая " + e);
+            setIsLoading(false);
+          });
+      } catch (e) {
+        alert("ошибка");
+        console.log(e);
+      }
+    }
+  };
+
+  const handleSendToAdmin = (e: React.MouseEvent) => {
+    const id = (e.target as HTMLDivElement).getAttribute("data-id");
+    setIsLoading(true);
+    if (id) {
+      try {
+        ContractService.senContractToAdmin(id)
+          .then(() => {
+            setIsLoading(false);
+          })
+          .catch((e) => {
+            console.log("ошибка первая " + e);
+            setIsLoading(false);
+          });
+      } catch (e) {
+        alert("ошибка");
+        console.log(e);
+      }
+    }
+  };
+
   return (
     <div className="wrapper">
       <div className={styles.wrapper}>
@@ -181,7 +221,7 @@ const Admin = () => {
                 data.map((contract) => {
                   return (
                     <React.Fragment key={contract.user}>
-                      {!contract.isDone && !contract.isOldContract &&  (
+                      {!contract.isDone && !contract.isOldContract && (
                         <div className={styles.container}>
                           <div>Имя родителя: {contract.parentName}</div>
                           <div>Серия паспорта: {contract.KB}</div>
@@ -194,11 +234,27 @@ const Admin = () => {
                           <div>Кем выдан паспорт: {contract.pasportPlace}</div>
                           <div>Телефон: {contract.phone}</div>
                           <div>Место проведения: {contract.place}</div>
+
+                          <Button
+                            onClick={handleSendToParent}
+                            data-id={`${contract.user}`}
+                            variant="contained"
+                          >
+                            отправить родителям
+                          </Button>
+                          <Button
+                            onClick={handleSendToAdmin}
+                            data-id={`${contract.user}`}
+                            variant="contained"
+                          >
+                            отправить мне
+                          </Button>
                           <Button
                             onClick={handleCreate}
                             data-id={`${contract.user}`}
+                            variant="contained"
                           >
-                            Создать договор
+                            Закончить создание
                           </Button>
                           <Button
                             onClick={handleDelete}

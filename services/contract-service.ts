@@ -19,6 +19,7 @@ class ContractService {
       test.pasportPlace = info.whoPass;
       test.phone = info.phone;
       test.isOldContract = false;
+      test.isSend = true;
       await test.save();
       /* throw new Error(`договор у ${userId} уже существует`, { cause: test }); */
       try {
@@ -41,6 +42,7 @@ class ContractService {
         pasportDate: info.datePass,
         pasportPlace: info.whoPass,
         phone: info.phone,
+        isSend: true,
       });
       try {
         const user = await userModel.findById(userId);

@@ -11,6 +11,7 @@ export interface IContract {
   user: string;
   isDone: boolean;
   isOldContract?: boolean;
+  isSend: boolean;
 }
 export interface IInfo {
   FIOP: string;

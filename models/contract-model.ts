@@ -11,6 +11,7 @@ const ContractSchema = new Schema({
   pasportPlace: { type: String, required: true },
   phone: { type: String, required: true },
   isDone: { type: Boolean, require: true, default: false },
+  isSend: { type: Boolean, require: true, default: false },
   isOldContract: { type: Boolean, require: false, default: false },
   date: { type: String },
   number: { type: Number },

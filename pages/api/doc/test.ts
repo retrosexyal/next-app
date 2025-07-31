@@ -8,6 +8,7 @@ import { transporter, test } from "@/config/nodemailer";
 import ShablonModel from "@/models/shablon-model";
 import gridfs from "gridfs-stream";
 import { GridFSBucket } from "mongodb";
+import axios from "axios";
 
 const DB = env.DB_URL;
 export default async function handler(
@@ -15,21 +16,44 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-/*     if (mongoose.connection.readyState !== 1) {
+    if (mongoose.connection.readyState !== 1) {
       await mongoose.connect(DB!);
       console.log("bd ok");
     }
     const db = mongoose.connection.db;
-    const bucket = new GridFSBucket(db);
-    const readStream = fs.createReadStream("D:/ARTEM/trash/dogovor.docx");
-    const uploadStream = bucket.openUploadStream("dogovor.docx");
+    // const bucket = new GridFSBucket(db);
+    // const fileUrl =
+    //   "https://docs.google.com/document/d/1jlfv1rqiQsc7hetlYrFtTgvVs-htorjh/export?format=docx";
 
-    readStream.pipe(uploadStream);
+    // const readStream = await axios.get(fileUrl, { responseType: "stream" });
+    // /* const readStream = fs.createReadStream("D:/ARTEM/trash/dogovor.docx"); */
+    // const uploadStream = bucket.openUploadStream("dogovor.docx");
 
-    uploadStream.on("finish", () => {
-      console.log(`File saved to MongoDB with id:`);
-    }); */
-/* раскоментить всё сверху для добавления в БД файла */
+    // /* readStream.pipe(uploadStream); */
+    // readStream.data.pipe(uploadStream);
+    /* раскоментить всё сверху для добавления в БД файла */
+
+    /*   const contracts = db.collection("contracts");
+    const updateResult = await contracts.updateMany(
+      {},
+      { $set: { isDone: false } }
+    ); */
+
+  /*   const contracts = db.collection("contracts");
+    const updateResult = await contracts.updateMany(
+      {},
+      { $set: { isSend: false } }
+    ); */
+
+    /* const users = db.collection("users");
+    const updateUsers = await users.updateMany(
+      {},
+      { $set: { status: "" } }
+    );
+
+    const students = db.collection("students");
+    await students.deleteMany({}); */
+
     /* const gfs = gridfs(mongoose.connection.db, mongoose.mongo); */
 
     //const data = req.body;

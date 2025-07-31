@@ -221,7 +221,7 @@ const Admin = () => {
                 data.map((contract) => {
                   return (
                     <React.Fragment key={contract.user}>
-                      {!contract.isDone && !contract.isOldContract && (
+                      {!contract.isDone && contract.isSend && (
                         <div className={styles.container}>
                           <div>Имя родителя: {contract.parentName}</div>
                           <div>Серия паспорта: {contract.KB}</div>

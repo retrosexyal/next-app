@@ -20,7 +20,7 @@ export default async function handler(
       await mongoose.connect(DB!);
       console.log("bd ok");
     }
-    const db = mongoose.connection.db;
+    // const db = mongoose.connection.db;
     // const bucket = new GridFSBucket(db);
     // const fileUrl =
     //   "https://docs.google.com/document/d/1jlfv1rqiQsc7hetlYrFtTgvVs-htorjh/export?format=docx";

@@ -23,11 +23,12 @@ export const Contract = () => {
     dateB: "",
     desiases: "",
     place: "",
-
     KB: "",
     datePass: "",
     whoPass: "",
     phone: "",
+    sex: "мою дочь",
+    address: "",
   });
   const [showList, setShowList] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
@@ -43,11 +44,15 @@ export const Contract = () => {
     whoPass,
     phone,
     desiases,
+    sex,
+    address,
   } = info;
 
   const { id } = useAppSelector((state) => state.user.user);
 
   useEffect(() => {
+    console.log(sex);
+
     if (
       FIOP &&
       FIOC &&
@@ -57,7 +62,9 @@ export const Contract = () => {
       datePass &&
       whoPass &&
       phone &&
-      desiases
+      desiases &&
+      sex &&
+      address
     ) {
       setIsDisabled(false);
     } else {
@@ -70,6 +77,10 @@ export const Contract = () => {
       try {
         const response = await ContractService.getContract(id);
         const data = response.data;
+        if (!data) {
+          return;
+        }
+
         setInfo({
           FIOP: data.parentName,
           place: data.place,
@@ -80,6 +91,8 @@ export const Contract = () => {
           FIOC: data.childrenName,
           dateB: data.birthday,
           desiases: data.diseases,
+          address: data.address,
+          sex: data.sex,
         });
       } catch (error) {
         console.error(error);
@@ -162,6 +175,38 @@ export const Contract = () => {
             <MenuItem value={"ФОК Орловского"}>ФОК Орловского</MenuItem>
             <MenuItem value={"ФОК Златоустовкого"}>ФОК Златоустовкого</MenuItem>
             <MenuItem value={"Дворец гимнастики"}>Дворец гимнастики</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Пол ребёнка</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={info.sex}
+            label="Пол ребёнка"
+            onChange={(e) => {
+              console.log(e.target.value);
+
+              setInfo({ ...info, sex: e.target.value });
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black  !important",
+              },
+              "& .MuiOutlinedInput-input": {
+                color: "black  !important",
+              },
+            }}
+            style={
+              isStyled
+                ? {
+                    background: "wheat",
+                  }
+                : {}
+            }
+          >
+            <MenuItem value={"мою дочь"}>Девочка</MenuItem>
+            <MenuItem value={"моего сына"}>Мальчик</MenuItem>
           </Select>
         </FormControl>
         <TextField
@@ -361,6 +406,38 @@ export const Contract = () => {
           variant="outlined"
           value={info.desiases}
           onChange={(e) => setInfo({ ...info, desiases: e.target.value })}
+          InputProps={{
+            style: {
+              borderColor: "black  !important",
+              background: "wheat  !important",
+              color: "black  !important",
+            },
+          }}
+          InputLabelProps={{
+            style: { color: "black  !important" },
+          }}
+          sx={{
+            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+              borderColor: "black  !important",
+            },
+            "& .MuiOutlinedInput-input": {
+              color: "black  !important",
+            },
+          }}
+          style={
+            isStyled
+              ? {
+                  background: "wheat",
+                }
+              : {}
+          }
+        />
+        <TextField
+          id="outlined-basic8"
+          label="Адрес проживания"
+          variant="outlined"
+          value={info.address}
+          onChange={(e) => setInfo({ ...info, address: e.target.value })}
           InputProps={{
             style: {
               borderColor: "black  !important",

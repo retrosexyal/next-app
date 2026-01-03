@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import style from "./footer.module.scss";
 import { Svg } from "@/components/UI/svg";
 import Link from "next/link";
-import Image, { StaticImageData } from "next/image";
-import Image1 from "assets/imgs/1.jpg";
-import Image2 from "assets/imgs/2.jpg";
+import Image from "next/image";
+
+const Image1 = "/imgs/1.png";
 
 export const Footer = () => {
-  const [currentImg, setCurrentImg] = useState<StaticImageData | null>(null);
-  const handleOpenImg = (src: StaticImageData) => () => {
+  const [currentImg, setCurrentImg] = useState<string | null>(null);
+  const handleOpenImg = (src: string) => () => {
     setCurrentImg(src);
   };
 
@@ -36,6 +36,8 @@ export const Footer = () => {
             src={currentImg}
             alt="sertificat"
             style={{ objectFit: "contain" }}
+            width={1200}
+            height={700}
           />
         </div>
       )}
@@ -55,14 +57,6 @@ export const Footer = () => {
           height={200}
           style={{ objectFit: "contain", cursor: "pointer" }}
           onClick={handleOpenImg(Image1)}
-        />
-        <Image
-          src={Image2}
-          alt="sertificat"
-          width={200}
-          height={200}
-          style={{ objectFit: "contain", cursor: "pointer" }}
-          onClick={handleOpenImg(Image2)}
         />
       </div>
       <div className="wrapper">

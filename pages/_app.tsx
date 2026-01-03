@@ -1,5 +1,7 @@
-import { store } from "@/store";
+"use client";
+
 import "@/styles/globals.css";
+import { store } from "@/store";
 import type { AppProps } from "next/app";
 import { Provider } from "react-redux";
 

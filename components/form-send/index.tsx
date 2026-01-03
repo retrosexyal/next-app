@@ -28,6 +28,8 @@ export const FormSend = () => {
     datePass: "",
     whoPass: "",
     phone: "",
+    address: "",
+    sex: "",
   });
   const [isDisabled, setIsDisabled] = useState(true);
 

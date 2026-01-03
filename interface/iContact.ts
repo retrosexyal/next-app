@@ -12,6 +12,8 @@ export interface IContract {
   isDone: boolean;
   isOldContract?: boolean;
   isSend: boolean;
+  sex: string;
+  address: string;
 }
 export interface IInfo {
   FIOP: string;
@@ -23,4 +25,6 @@ export interface IInfo {
   datePass: string;
   whoPass: string;
   phone: string;
+  sex: string;
+  address: string;
 }

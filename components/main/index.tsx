@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import styles from "./main.module.scss";
-import mainImg from "/public/imgs/background_main1.webp";
 import Header from "../header";
 import { Button } from "@mui/material";
 import Popup from "../popup";
@@ -46,7 +45,13 @@ const Main = () => {
   return (
     <>
       <div className={styles.wrapper} id="main">
-        <Image className={styles.img} src={mainImg} alt="background" />
+        <Image
+          className={styles.img}
+          src="/imgs/background_main1.webp"
+          alt="background"
+          width={3936}
+          height={2624}
+        />
         <div className="wrapper">
           <Header className={styles.header} />
 

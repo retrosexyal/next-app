@@ -20,6 +20,8 @@ class ContractService {
       test.phone = info.phone;
       test.isOldContract = false;
       test.isSend = true;
+      test.address = info.address;
+      test.sex = info.sex;
       await test.save();
       /* throw new Error(`договор у ${userId} уже существует`, { cause: test }); */
       try {
@@ -42,6 +44,8 @@ class ContractService {
         pasportDate: info.datePass,
         pasportPlace: info.whoPass,
         phone: info.phone,
+        address: info.address,
+        sex: info.sex,
         isSend: true,
       });
       try {
@@ -92,7 +96,7 @@ class ContractService {
     const contract = await contractModel.findOne({ user: userId });
     if (contract) {
       contract.isDone = true;
-      contract.save();
+      await contract.save();
       return contract;
     }
     return { message: "информацию отсутствует" };

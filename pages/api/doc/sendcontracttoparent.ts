@@ -80,6 +80,8 @@ export default async function handler(
         phone: contract.phone,
         number: numberContract,
         date: getCurrentDate(),
+        sex: contract.sex,
+        address: contract.address,
       };
 
       // Заполнить шаблон данными и обработать его

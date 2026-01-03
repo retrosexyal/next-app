@@ -47,3 +47,4 @@ app.prepare().then(() => {
     }`
   )
 })
+/* $env:NODE_OPTIONS="--dns-result-order=ipv4first"  */

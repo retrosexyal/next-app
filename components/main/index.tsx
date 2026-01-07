@@ -53,7 +53,7 @@ const Main = () => {
           height={2624}
         />
         <div className="wrapper">
-          <Header className={styles.header} />
+          <Header />
 
           <div className={styles.content}>
             <div className={styles.content_background}>

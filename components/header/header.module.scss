@@ -4,6 +4,10 @@
   align-items: center;
   color: #ffffff;
   height: 100%;
+
+  @media (max-width: 800px) {
+    padding: 0 20px;
+  }
 }
 
 .title {

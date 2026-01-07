@@ -291,6 +291,9 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
               <Link href="/password" className={styles.link_forgot_pass}>
                 Забыли пароль?
               </Link>
+              <Link href="/password/change" className={styles.link_forgot_pass}>
+                Сменить пароль
+              </Link>
             </div>
           </>
         )}

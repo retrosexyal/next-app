@@ -56,15 +56,95 @@ class UserService {
     await transporter.sendMail({
       ...mailOptionsRegist(email),
       subject: "Восстановление пароля",
-      text: "_",
+      text: "Вы запросили восстановление пароля. Проверьте письмо в HTML-формате.",
       html: `
-      <h3> для сброса пароля пройдите по <a href='${URL}api/forgotpass/refresh/${
-        user.activationLink
-      }'>ссылке</a></h3>
-      <h2>после прохождение по ссылке временный пароль будет <span style="color:red;font-size:30px;"> ${
-        user.activationLink.split("-")[0]
-      } </span></h2>`,
+  <div style="
+    max-width:600px;
+    margin:0 auto;
+    padding:24px;
+    font-family:Arial, Helvetica, sans-serif;
+    background-color:#f9fafb;
+    color:#111827;
+  ">
+    <div style="
+      background:#ffffff;
+      border-radius:12px;
+      padding:32px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    ">
+
+      <h1 style="margin-top:0; color:#111827;">
+        🔐 Восстановление пароля
+      </h1>
+
+      <p style="font-size:16px; line-height:1.5;">
+        Вы получили это письмо, потому что был отправлен запрос на восстановление пароля
+        для вашей учётной записи.
+      </p>
+
+      <h3 style="margin-top:28px;">
+        Что нужно сделать:
+      </h3>
+
+      <ol style="font-size:16px; line-height:1.6;">
+        <li>Нажмите на кнопку ниже</li>
+        <li>Вы будете перенаправлены на страницу входа</li>
+        <li>Используйте временный пароль из этого письма</li>
+        <li>После входа обязательно смените пароль</li>
+      </ol>
+
+      <div style="text-align:center; margin:32px 0;">
+        <a
+          href="${URL}api/forgotpass/refresh/${user.activationLink}"
+          style="
+            display:inline-block;
+            padding:14px 28px;
+            background-color:#2563eb;
+            color:#ffffff;
+            text-decoration:none;
+            border-radius:8px;
+            font-size:16px;
+            font-weight:bold;
+          "
+        >
+          Сбросить пароль
+        </a>
+      </div>
+
+      <p style="font-size:16px;">
+        <strong>Ваш временный пароль:</strong>
+      </p>
+
+      <div style="
+        background:#f3f4f6;
+        border-radius:8px;
+        padding:16px;
+        text-align:center;
+        font-size:28px;
+        font-weight:bold;
+        letter-spacing:2px;
+        color:#dc2626;
+        margin-bottom:24px;
+      ">
+        ${user.activationLink.split("-")[0]}
+      </div>
+
+      <p style="font-size:14px; color:#6b7280;">
+        Если вы не запрашивали восстановление пароля — просто проигнорируйте это письмо.
+        Ваш аккаунт останется в безопасности.
+      </p>
+
+      <hr style="margin:32px 0; border:none; border-top:1px solid #e5e7eb;" />
+
+      <p style="font-size:12px; color:#9ca3af;">
+        Это письмо создано автоматически. Пожалуйста, не отвечайте на него.
+      </p>
+
+    </div>
+  </div>
+  `,
     });
+
     return { message: "сообщение отправлено" };
   }
 

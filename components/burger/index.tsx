@@ -7,7 +7,7 @@ import { data } from "../header/constants";
 import Login from "../login";
 import style from "./burger.module.scss";
 
-export const Burger = (/* { children }: { children: ReactElement[] } */) => {
+export const Burger = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

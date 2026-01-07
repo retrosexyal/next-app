@@ -51,6 +51,24 @@ export default function Home() {
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              name: "Школа-студия ЛиМи",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Могилёв",
+                addressCountry: "BY",
+              },
+              telephone: "+375291999231",
+              priceRange: "12 BYN",
+              url: "https://limistudio.by",
+            }),
+          }}
+        />
       </Head>
       <main className="main">
         <Main />

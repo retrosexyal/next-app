@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import styles from "./header.module.scss";
 import Login from "../login";
-import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
+import { Link as ScrollLink } from "react-scroll";
 import { data } from "./constants";
 import { Burger } from "../burger";
 
-interface IProps {
-  className?: string;
-}
-
-const Header: React.FC<IProps> = ({ className }) => {
+const Header: React.FC = () => {
   const [isActive, setIsActive] = useState(false);
 
   const handleLogin = (e: React.MouseEvent) => {
@@ -17,8 +13,9 @@ const Header: React.FC<IProps> = ({ className }) => {
     e.preventDefault();
     setIsActive(!isActive);
   };
+
   return (
-    <div className={`${className} ${styles.content}`}>
+    <div className={styles.content}>
       <div className="wrapper">
         <div className={styles.content_wrapper}>
           <h2 className={styles.title}>

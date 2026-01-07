@@ -13,9 +13,11 @@
 }
 
 .content {
-  width: 80%;
+  max-width: 80%;
   height: 80%;
-  padding: 20px;
+  width: fit-content;
+  height: fit-content;
+  padding: 60px;
   background-color: rgba($color: #f1ebeb, $alpha: 1) !important;
   display: flex;
   flex-direction: column;
@@ -26,6 +28,7 @@
   text-align: center;
   position: relative;
   border: 1px solid white !important;
+  border-radius: 16px;
 }
 
 .label {
@@ -39,7 +42,7 @@
 
 .link {
   padding: 15px 10px;
-  background-color: rgba($color: rgb(63, 57, 57), $alpha: 0.2) !important;
+  background-color: rgba($color: rgb(63, 57, 57), $alpha: 0.2);
   box-shadow: 1 1 1 black;
   border-radius: 20px;
 }
@@ -49,6 +52,15 @@
 }
 .btn_container {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  & > div {
+    width: 100%;
+  }
 }
 .link_forgot_pass {
   font-size: 12px;

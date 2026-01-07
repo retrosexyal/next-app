@@ -112,7 +112,7 @@ export const Contract = () => {
   };
 
   return (
-    <div>
+    <>
       <form className={styles.form_wrapper} id="form-for-contract">
         <TextField
           id="outlined-basic1"
@@ -502,6 +502,6 @@ export const Contract = () => {
           <ContractList info={info} />
         </Box>
       </Modal>
-    </div>
+    </>
   );
 };

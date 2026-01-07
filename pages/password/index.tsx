@@ -4,7 +4,7 @@ import styles from "./settings.module.scss";
 import { Backdrop, Button, CircularProgress, TextField } from "@mui/material";
 import Link from "next/link";
 import AuthService from "@/clientServices/AuthService";
-import { ERROR_MESSAGE, SUCCESS_MESSAGE } from "./constants";
+import { ERROR_MESSAGE, SUCCESS_MESSAGE } from "@/constants.ts";
 
 const Password = () => {
   const [message, setMessage] = useState("");

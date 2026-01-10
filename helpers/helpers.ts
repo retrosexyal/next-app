@@ -1,6 +1,6 @@
 import { IUser } from "@/clientModels/IUser";
 import { tokenService } from "@/services/token-service";
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export const checkAdmin = (req: NextApiRequest) => {
   const accessToken = req.headers["authorization"]?.split(" ")[1];
@@ -10,6 +10,18 @@ export const checkAdmin = (req: NextApiRequest) => {
       return true;
     }
     return false;
+  }
+};
+
+export const returnNotAdmin = ({
+  req,
+  res,
+}: {
+  req: NextApiRequest;
+  res: NextApiResponse;
+}) => {
+  if (!checkAdmin(req)) {
+    res.status(401).json("не админ");
   }
 };
 export const getUserInfo = (req: NextApiRequest) => {

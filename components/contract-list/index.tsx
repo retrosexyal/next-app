@@ -4,6 +4,7 @@ import ContractService from "@/clientServices/ContractService";
 import { Backdrop, Button, CircularProgress } from "@mui/material";
 import { IInfo } from "@/interface/iContact";
 import Link from "next/link";
+import { formattedDate } from "@/helpers/helpers";
 
 export const ContractList = ({ info }: { info: IInfo }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +30,7 @@ export const ContractList = ({ info }: { info: IInfo }) => {
   };
   const now = new Date();
 
-  const formattedDate = now.toLocaleDateString("ru-RU", {
+  const today = now.toLocaleDateString("ru-RU", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -46,11 +47,11 @@ export const ContractList = ({ info }: { info: IInfo }) => {
         <p className={styles.right}>{info.address}</p>
         <p className={styles.right}>{info.phone}</p>
         <p className={styles.bold}>ЗАЯВЛЕНИЕ</p>
-        <p>{formattedDate}</p>
+        <p>{today}</p>
         <br />
         <p>
-          Прошу зачислить {info.sex} ({info.FIOC}, {info.dateB})в объединение по
-          интересам ООО “Про свет ЛиМи” на 1 год обучения
+          Прошу зачислить {info.sex} ({info.FIOC}, {formattedDate(info.dateB)})в
+          объединение по интересам ООО “Про свет ЛиМи” на 1 год обучения
         </p>
         <br />
         <p>Приложение:</p>
@@ -77,7 +78,7 @@ export const ContractList = ({ info }: { info: IInfo }) => {
       <p className={styles.center}>ДОГОВОР № _________</p>
       <div className={styles.flex}>
         <p>г. Могилев</p>
-        <p>{formattedDate}</p>
+        <p>{today}</p>
       </div>
       <p className={styles.redP}>
         {`ООО “Про свет ЛиМи”, именуемая в дальнейшем – Танцевальная студия, в лице директора Михеенко Елизаветы Александровны, действующая на основании устава, с одной стороны, и ${info.FIOP} ( в
@@ -96,7 +97,7 @@ export const ContractList = ({ info }: { info: IInfo }) => {
       <p className={styles.redP}>
         {`1.3. Договор заключается в интересах несовершеннолетнего ребенка`}
         <p>{`(ФИО ребёнка) ${info.FIOC}`}</p>
-        <p>{`(Дата рождения ребёнка) ${info.dateB}`}</p>
+        <p>{`(Дата рождения ребёнка) ${formattedDate(info.dateB)}`}</p>
         <p>{`(Наличие хронических заболеваний у ребёнка) ${info.desiases}`}</p>
       </p>
 

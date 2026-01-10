@@ -1,8 +1,9 @@
-import { IContract, IInfo } from "@/interface/iContact";
+import { IInfo } from "@/interface/iContact";
 import contractModel from "@/models/contract-model";
 import shablonModel from "@/models/shablon-model";
 import userModel from "@/models/user-model";
 import { status } from "@/constants/constants";
+import { formattedDate } from "@/helpers/helpers";
 
 class ContractService {
   async createContract(userId: string, info: IInfo) {
@@ -12,7 +13,7 @@ class ContractService {
       test.parentName = info.FIOP;
       test.childrenName = info.FIOC;
       test.diseases = info.desiases;
-      test.birthday = info.dateB;
+      test.birthday = formattedDate(info.dateB);
       test.place = info.place;
       test.KB = info.KB;
       test.pasportDate = info.datePass;
@@ -80,12 +81,30 @@ class ContractService {
     return { message: "информацию отсутствует" };
   }
   async deleteContract(userId: string) {
+    /* todo сделать удаление */
     /* const contractData = await contractModel.deleteOne({ user: userId }); */
     const contractData = await contractModel.findOne({ user: userId });
     try {
       const user = await userModel.findById(userId);
-      user.status = status.RETURNED;
+      user.status = "";
+      contractData.isSend = false;
       await user.save();
+      await contractData.save();
+    } catch (e) {
+      console.log(e);
+    }
+
+    return contractData;
+  }
+  async returnContract(userId: string) {
+    /* const contractData = await contractModel.deleteOne({ user: userId }); */
+    const contractData = await contractModel.findOne({ user: userId });
+    try {
+      const user = await userModel.findById(userId);
+      user.status = "";
+      contractData.isSend = false;
+      await user.save();
+      await contractData.save();
     } catch (e) {
       console.log(e);
     }

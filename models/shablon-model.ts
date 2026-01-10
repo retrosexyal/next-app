@@ -5,4 +5,4 @@ const ShablonSchema = new Schema({
   number: { type: Number, required: true, default: 1 },
 });
 
-export default models.Shablon || model("Shablon", ShablonSchema);
+export default models?.Shablon || model("Shablon", ShablonSchema);

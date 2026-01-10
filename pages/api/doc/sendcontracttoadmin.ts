@@ -98,7 +98,7 @@ export default async function handler(
           text: "Копия договора во вложении",
           attachments: [
             {
-              filename: `договор.docx`,
+              filename: `${user.email}-${contract.childrenName}-договор.docx`,
               content: generatedDoc,
             },
           ],

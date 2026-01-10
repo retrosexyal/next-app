@@ -18,9 +18,6 @@ export default async function handler(
       await mongoose.connect(DB!);
       console.log("bd ok");
     }
-    console.log(
-      "__________________________________________________________________________________"
-    );
     const data = req.body;
     const accessToken = req.headers["authorization"]?.split(" ")[1];
 
@@ -28,7 +25,6 @@ export default async function handler(
 
     if (token.isActivated) {
       const contract = await contractService.deleteContract(data.id);
-      console.log("tut if " + contract);
       return res.status(200).json({ message: "договор удалён" });
     } else {
       return res.status(400).json({ message: "пользователь не авторизирован" });

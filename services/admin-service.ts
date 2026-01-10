@@ -2,6 +2,8 @@ import StudentModel from "@/models/student-model";
 import messageModel from "@/models/message-model";
 import { IGroup } from "@/clientModels/IGroup";
 import GroupModels from "@/models/group-models";
+import userModel from "@/models/user-model";
+import contractModel from "@/models/contract-model";
 
 class AdminService {
   async addStudent(name: string, date: string, place: string, group: string) {
@@ -34,7 +36,7 @@ class AdminService {
 
     const group = await GroupModels.create({
       name,
-      students
+      students,
     });
 
     return {
@@ -96,6 +98,18 @@ class AdminService {
     user.message = message;
     await user.save();
     return user;
+  }
+
+  async resetAllContractsAndUsers() {
+    try {
+      await userModel.updateMany({}, { $set: { status: "" } });
+      await contractModel.updateMany({}, { $set: { isSend: false } });
+
+      return { success: true };
+    } catch (e) {
+      console.error(e);
+      throw new Error("Ошибка при массовом обновлении");
+    }
   }
 }
 

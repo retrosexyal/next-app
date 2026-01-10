@@ -260,7 +260,7 @@ const Admin = () => {
                             onClick={handleDelete}
                             data-id={`${contract.user}`}
                           >
-                            Удалить договор
+                            Вернуть договор
                           </Button>
                           <Button
                             onClick={() => handleSendMessage(contract.user)}
@@ -300,7 +300,7 @@ const Admin = () => {
                             onClick={handleDelete}
                             data-id={`${contract.user}`}
                           >
-                            Удалить договор
+                            Вернуть договор
                           </Button>
                         </div>
                       }

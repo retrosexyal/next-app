@@ -5,4 +5,4 @@ const MessageSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", unique: true },
 });
 
-export default models.Message || model("Message", MessageSchema);
+export default models?.Message || model("Message", MessageSchema);

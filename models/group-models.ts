@@ -10,4 +10,4 @@ const GroupSchema = new Schema({
   ],
 });
 
-export default models.Group || model("Group", GroupSchema);
+export default models?.Group || model("Group", GroupSchema);

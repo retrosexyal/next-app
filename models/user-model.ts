@@ -9,4 +9,4 @@ const UserSchema = new Schema({
   status: { type: String },
 });
 
-export default models.User || model("User", UserSchema);
+export default models?.User || model("User", UserSchema);

@@ -20,4 +20,4 @@ const ContractSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", unique: true },
 });
 
-export default models.Contract || model("Contract", ContractSchema);
+export default models?.Contract || model("Contract", ContractSchema);

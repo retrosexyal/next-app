@@ -5,4 +5,4 @@ const TokenSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User" },
 });
 
-export default models.Token || model("Token", TokenSchema);
+export default models?.Token || model("Token", TokenSchema);

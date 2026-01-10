@@ -9,4 +9,4 @@ const StudentSchema = new Schema({
   isHaveContract: { type: Boolean, default: false },
 });
 
-export default models.Student || model("Student", StudentSchema);
+export default models?.Student || model("Student", StudentSchema);

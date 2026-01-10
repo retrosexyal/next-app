@@ -53,12 +53,6 @@ const Settings = () => {
 
   return (
     <div className={`wrapper ${styles.wrapper}`}>
-      <Link className={styles.link} href="/">
-        Вернуться на главную страницу
-      </Link>
-      <Link className={styles.link} href="/password/change">
-        Изменить пароль
-      </Link>
       {email === "admin@admin" && (
         <>
           <Link className={styles.link} href="/groups">

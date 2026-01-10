@@ -4,13 +4,17 @@ import Login from "../login";
 import { Link as ScrollLink } from "react-scroll";
 import { data } from "./constants";
 import { Burger } from "../burger";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import Image from "next/image";
 
 const Header: React.FC = () => {
   const [isActive, setIsActive] = useState(false);
+  const router = useRouter();
 
-  const handleLogin = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const isHomePage = router.pathname === "/";
+
+  const handleLogin = () => {
     setIsActive(!isActive);
   };
 
@@ -18,36 +22,38 @@ const Header: React.FC = () => {
     <div className={styles.content}>
       <div className="wrapper">
         <div className={styles.content_wrapper}>
-          <h2 className={styles.title}>
-            <ScrollLink
-              activeClass="active"
-              to="main"
-              spy={true}
-              smooth={true}
-              offset={-70}
-              duration={500}
-            >
-              ЛиМи
-            </ScrollLink>
-          </h2>
+          <Link href="/" className={styles.logo}>
+            <Image
+              src="/logo-header.png"
+              width={2116}
+              height={1547}
+              alt="logo limistudio"
+              priority
+            />
+          </Link>
+
           <nav>
             <Burger />
 
             <ul className={styles.list}>
-              {data.map((el) => {
+              {data.map(({ id, text, href }) => {
                 return (
-                  <ScrollLink
-                    key={el.id}
-                    className={styles.list_item}
-                    activeClass="active"
-                    to={el.id}
-                    spy={true}
-                    smooth={true}
-                    offset={-70}
-                    duration={500}
-                  >
-                    {el.text}
-                  </ScrollLink>
+                  <li key={id} className={styles.list_item}>
+                    {isHomePage ? (
+                      <ScrollLink
+                        activeClass="active"
+                        to={id}
+                        spy={true}
+                        smooth={true}
+                        offset={-70}
+                        duration={500}
+                      >
+                        {text}
+                      </ScrollLink>
+                    ) : (
+                      <Link href={href}>{text}</Link>
+                    )}
+                  </li>
                 );
               })}
               <li className={styles.list_item} onClick={handleLogin}>

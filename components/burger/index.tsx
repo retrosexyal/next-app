@@ -1,4 +1,4 @@
-import React, { ReactComponentElement, ReactElement, useState } from "react";
+import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -6,6 +6,8 @@ import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
 import { data } from "../header/constants";
 import Login from "../login";
 import style from "./burger.module.scss";
+import { useRouter } from "next/router";
+import Link from "next/link";
 
 export const Burger = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -13,14 +15,16 @@ export const Burger = () => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const router = useRouter();
+
+  const isHomePage = router.pathname === "/";
+
   const handleClose = () => {
     setAnchorEl(null);
   };
   const [isActive, setIsActive] = useState(false);
 
-  const handleLogin = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handleLogin = (e?: React.MouseEvent) => {
     setIsActive(!isActive);
     setAnchorEl(null);
   };
@@ -59,20 +63,23 @@ export const Burger = () => {
           "aria-labelledby": "basic-button",
         }}
       >
-        {data.map((el) => {
+        {data.map(({ href, id, text }) => {
           return (
-            <MenuItem onClick={handleClose} key={el.id}>
-              <ScrollLink
-                onClick={handleClose}
-                activeClass="active"
-                to={el.id}
-                spy={true}
-                smooth={true}
-                offset={-70}
-                duration={500}
-              >
-                {el.text}
-              </ScrollLink>
+            <MenuItem onClick={handleClose} key={id}>
+              {isHomePage ? (
+                <ScrollLink
+                  activeClass="active"
+                  to={id}
+                  spy={true}
+                  smooth={true}
+                  offset={-70}
+                  duration={500}
+                >
+                  {text}
+                </ScrollLink>
+              ) : (
+                <Link href={href}>{text}</Link>
+              )}
             </MenuItem>
           );
         })}

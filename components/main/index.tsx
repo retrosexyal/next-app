@@ -53,13 +53,11 @@ const Main = () => {
           height={2624}
         />
         <div className="wrapper">
-          <Header />
-
           <div className={styles.content}>
             <div className={styles.content_background}>
               <p className={styles.main_text}>ВАШ РЕБЕНОК ХОЧЕТ ТАНЦЕВАТЬ?</p>
               <p className={styles.sub_text}>
-                Приглашаем всех желающих от 3х до 18 лет на занятия по
+                Приглашаем всех желающих от 3х до 14 лет на занятия по
                 хореографии, дефиле и гимнастики
               </p>
             </div>

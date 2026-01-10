@@ -7,21 +7,21 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import { setUser as setUserApp } from "@/store/slices/userSlice";
 import {
   Backdrop,
-  Box,
   CircularProgress,
   IconButton,
   InputAdornment,
   TextField,
-  Tooltip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useRouter } from "next/router";
 
 interface IProps {
-  handleLogin: (event: React.MouseEvent) => void;
+  handleLogin: (event?: React.MouseEvent) => void;
 }
 
 const Login: React.FC<IProps> = ({ handleLogin }) => {
+  const router = useRouter();
   const [auth, setAuth] = useState({
     email: "",
     password: "",
@@ -58,6 +58,8 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
           setIsLoading(false);
           const userData = res.data.user;
           dispatch(setUserApp(userData));
+          handleLogin();
+          router.push("/settings");
         }
       })
       .catch((err) => {
@@ -67,18 +69,6 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
         }
       });
   };
-  useEffect(() => {
-    const scrollY = window.scrollY;
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.top = "";
-      window.scrollTo(0, scrollY);
-    };
-  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -194,7 +184,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
               <Link
                 className={styles.link}
                 href="/settings"
-                onClick={() => setIsLoading(true)}
+                onClick={handleLogin}
               >
                 Перейти в личный кабинет
               </Link>
@@ -206,6 +196,9 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
               </div>
             )}
             <Button text="выйти из учётной записи" onClick={handleLogout} />
+            <Link href="/password/change" className={styles.link_forgot_pass} onClick={handleLogin}>
+              Сменить пароль
+            </Link>
           </>
         )}
 
@@ -288,10 +281,10 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
             <div className={styles.btn_container}>
               {!isShow && <Button text="Войти" onClick={sendLogin} />}
               <Button text="Зарегистироваться" onClick={handleRegistr} />
-              <Link href="/password" className={styles.link_forgot_pass}>
+              <Link href="/password" className={styles.link_forgot_pass} onClick={handleLogin}>
                 Забыли пароль?
               </Link>
-              <Link href="/password/change" className={styles.link_forgot_pass}>
+              <Link href="/password/change" className={styles.link_forgot_pass} onClick={handleLogin}>
                 Сменить пароль
               </Link>
             </div>

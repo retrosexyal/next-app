@@ -103,7 +103,10 @@ class AdminService {
   async resetAllContractsAndUsers() {
     try {
       await userModel.updateMany({}, { $set: { status: "" } });
-      await contractModel.updateMany({}, { $set: { isSend: false } });
+      await contractModel.updateMany(
+        {},
+        { $set: { isSend: false, isDone: false } }
+      );
 
       return { success: true };
     } catch (e) {

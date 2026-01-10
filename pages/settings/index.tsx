@@ -60,12 +60,10 @@ const Settings = () => {
         Изменить пароль
       </Link>
       {email === "admin@admin" && (
+        <>
           <Link className={styles.link} href="/groups">
             Мои группы
           </Link>
-      )}
-      {email === "admin@admin" && (
-        <>
           <Link className={styles.link} href="/admin">
             Согласование договоров
           </Link>

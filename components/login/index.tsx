@@ -196,7 +196,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
               </div>
             )}
             <Button text="выйти из учётной записи" onClick={handleLogout} />
-            <Link href="/password/change" className={styles.link_forgot_pass}>
+            <Link href="/password/change" className={styles.link_forgot_pass} onClick={handleLogin}>
               Сменить пароль
             </Link>
           </>
@@ -281,10 +281,10 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
             <div className={styles.btn_container}>
               {!isShow && <Button text="Войти" onClick={sendLogin} />}
               <Button text="Зарегистироваться" onClick={handleRegistr} />
-              <Link href="/password" className={styles.link_forgot_pass}>
+              <Link href="/password" className={styles.link_forgot_pass} onClick={handleLogin}>
                 Забыли пароль?
               </Link>
-              <Link href="/password/change" className={styles.link_forgot_pass}>
+              <Link href="/password/change" className={styles.link_forgot_pass} onClick={handleLogin}>
                 Сменить пароль
               </Link>
             </div>

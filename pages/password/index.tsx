@@ -35,9 +35,6 @@ const Password = () => {
   };
   return (
     <div className={`wrapper ${styles.wrapper}`}>
-      <Button variant="outlined">
-        <Link href={"/"}>Вернуться на главную</Link>
-      </Button>
       {message ? (
         <>
           <span>{message}</span>

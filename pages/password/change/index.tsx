@@ -83,9 +83,6 @@ const Change = () => {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   return (
     <div className={`wrapper ${styles.wrapper}`}>
-      <Button variant="outlined">
-        <Link href={"/"}>Вернуться на главную</Link>
-      </Button>
       <span>
         Для смены пароля необходимо ввести старый пароль(либо пароль полученный
         по электронной почте, при восстановлении пароля)

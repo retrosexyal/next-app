@@ -8,6 +8,7 @@ import { Questions } from "@/container/questions";
 import { Reviews } from "@/container/reviews";
 import { Footer } from "@/container/footer";
 import { Contact } from "@/container/contact";
+import { VacanciesPreview } from "@/components/VacanciesPreview";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +22,7 @@ export default function Home() {
         </title>
         <meta
           name="description"
-          content="Школа-студия ЛиМи в г. Могилёве предлагает профессиональное обучение детей хореографии, гимнастики и дефиле. Наша студия принимает детей в возрасте от 3х до 16 лет. Качественные занятия, опытные преподаватели и дружеская атмосфера ждут вас в Школе-студии ЛиМи!"
+          content="Школа-студия ЛиМи в г. Могилёве предлагает профессиональное обучение детей хореографии, гимнастики и дефиле. Наша студия принимает детей в возрасте от 3х до 14 лет. Качественные занятия, опытные преподаватели и дружеская атмосфера ждут вас в Школе-студии ЛиМи! Мы также приглашаем педагогов в нашу команду."
         />
         <meta name="yandex-verification" content="f6fd21dc1ea4850e" />
         <meta
@@ -78,7 +79,7 @@ export default function Home() {
         <Questions />
         <Reviews />
         <Contact />
-        <Footer />
+        <VacanciesPreview />
       </main>
     </>
   );

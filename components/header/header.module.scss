@@ -35,7 +35,7 @@
 .list {
   display: flex;
   gap: 20px;
-  @media (max-width: 850px) {
+  @media (max-width: 950px) {
     display: none;
   }
 }
@@ -46,5 +46,30 @@
     cursor: pointer;
     opacity: 0.9;
     box-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.logo {
+  width: 80px;
+  height: auto;
+  padding: 6px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transition: filter 0.25s ease;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:hover img {
+    filter: brightness(1.15);
   }
 }

@@ -90,6 +90,9 @@ a {
 
 .main {
   width: 100vw;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 .swiper {

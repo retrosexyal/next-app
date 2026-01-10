@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px 0;
+  padding: 80px 0 20px;
   width: 100vw;
   background-color: #f3f6ff;
   color: #0f172a;
@@ -28,18 +28,6 @@
     z-index: -1;
   }
 }
-
-/* .link {
-  padding: 15px 10px;
-  background-color: rgba($color: rgb(49, 37, 37), $alpha: 0.5);
-  box-shadow: 1 1 1 black;
-  border-radius: 20px;
-  margin-bottom: 5px;
-}
-
-.link:hover {
-  background-color: rgba($color: rgb(213, 77, 77), $alpha: 0.4);
-} */
 
 .link {
   display: inline-flex;

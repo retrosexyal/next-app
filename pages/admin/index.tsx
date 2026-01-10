@@ -204,7 +204,7 @@ const Admin = () => {
   };
 
   return (
-    <div className="wrapper">
+    <div style={{ paddingTop: "80px" }} className="wrapper">
       <div className={styles.wrapper}>
         <Link className={styles.link} href="/">
           Вернуться на главную страницу

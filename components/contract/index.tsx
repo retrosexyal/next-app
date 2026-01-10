@@ -51,8 +51,6 @@ export const Contract = () => {
   const { id } = useAppSelector((state) => state.user.user);
 
   useEffect(() => {
-    console.log(sex);
-
     if (
       FIOP &&
       FIOC &&

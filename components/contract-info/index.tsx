@@ -6,48 +6,43 @@ interface IProps {
   data: IContract;
 }
 
-export const ContractInfo: React.FC<IProps> = ({ data }) => {
+const InfoRow = ({ label, value }: { label: string; value?: string }) => (
+  <div className={styles.row}>
+    <span className={styles.label}>{label}</span>
+    <span className={styles.value}>{value}</span>
+  </div>
+);
+
+export const ContractInfo: React.FC<IProps> = ({
+  data: {
+    KB,
+    address,
+    birthday,
+    childrenName,
+    diseases,
+    parentName,
+    pasportDate,
+    pasportPlace,
+    phone,
+    place,
+  },
+}) => {
   return (
-    <div className={styles.content_wrapper}>
-      <h2>Информация внесённая в договор</h2>
-      <div className={styles.content_wrapper}>
-        <div className={styles.flex_wrapper}>
-          <div className={styles.title}>ФИО родителя: </div>
-          <div className={styles.content}>{data.parentName}</div>
-        </div>
-        <div className={styles.flex_wrapper}>
-          <div className={styles.title}>Серия паспорта: </div>
-          <div className={styles.content}>{data.KB}</div>
-        </div>
-        <div className={styles.flex_wrapper}>
-          <div className={styles.title}>Когда выдан паспорта: </div>
-          <div className={styles.content}>{data.pasportDate}</div>
-        </div>
-        <div className={styles.flex_wrapper}>
-          <div className={styles.title}>Кем выдан паспорт: </div>
-          <div className={styles.content}>{data.pasportPlace}</div>
-        </div>
-        <div className={styles.flex_wrapper}>
-          <div className={styles.title}>Контактный телефон: </div>
-          <div className={styles.content}>{data.phone}</div>
-        </div>
-        <div className={styles.flex_wrapper}>
-          <div className={styles.title}>Место занятий: </div>
-          <div className={styles.content}>{data.place}</div>
-        </div>
-        <div className={styles.flex_wrapper}>
-          <div className={styles.title}>ФИО ребёнка: </div>
-          <div className={styles.content}>{data.childrenName}</div>
-        </div>
-        <div className={styles.flex_wrapper}>
-          <div className={styles.title}>Дата рождения ребёнка: </div>
-          <div className={styles.content}>{data.birthday}</div>
-        </div>
-        <div className={styles.flex_wrapper}>
-          <div className={styles.title}>Хронические заболевания ребёнка: </div>
-          <div className={styles.content}>{data.diseases}</div>
-        </div>
+    <section className={styles.wrapper}>
+      <h2 className={styles.title}>Информация, внесённая в договор</h2>
+
+      <div className={styles.card}>
+        <InfoRow label="ФИО родителя" value={parentName} />
+        <InfoRow label="Серия паспорта" value={KB} />
+        <InfoRow label="Когда выдан паспорт" value={pasportDate} />
+        <InfoRow label="Кем выдан паспорт" value={pasportPlace} />
+        <InfoRow label="Контактный телефон" value={phone} />
+        <InfoRow label="Место занятий" value={place} />
+        <InfoRow label="ФИО ребёнка" value={childrenName} />
+        <InfoRow label="Дата рождения ребёнка" value={birthday} />
+        <InfoRow label="Хронические заболевания" value={diseases || "—"} />
+        <InfoRow label="Адрес проживания" value={address || "—"} />
       </div>
-    </div>
+    </section>
   );
 };

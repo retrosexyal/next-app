@@ -18,6 +18,8 @@ const Header: React.FC = () => {
     setIsActive(!isActive);
   };
 
+  /* toDo доделать дропдаун */
+
   return (
     <div className={styles.content}>
       <div className="wrapper">
@@ -36,7 +38,7 @@ const Header: React.FC = () => {
             <Burger />
 
             <ul className={styles.list}>
-              {data.map(({ id, text, href }) => {
+              {data.map(({ id, text, href, submenu }) => {
                 return (
                   <li key={`${id}${text}`} className={styles.list_item}>
                     {isHomePage ? (
@@ -52,6 +54,15 @@ const Header: React.FC = () => {
                       </ScrollLink>
                     ) : (
                       <Link href={href}>{text}</Link>
+                    )}
+                    {submenu && (
+                      <ul className={styles.dropdownMenu}>
+                        {submenu.map((item) => (
+                          <li key={item.href}>
+                            <Link href={item.href}>{item.text}</Link>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </li>
                 );

@@ -1,6 +1,6 @@
 .preview {
   padding: 80px 0;
-  background-color: #f6e5e5e6;
+  background: var(--bg-pink-white);
 }
 
 .header {
@@ -36,7 +36,9 @@
   font-weight: 600;
   color: #111;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-3px);

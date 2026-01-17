@@ -2,6 +2,12 @@
   width: 100vw;
   padding-top: 70px;
   text-align: center;
+  background: var(--bg-pink-white);
+  padding-bottom: 20px;
+
+  @media (max-width: 700px) {
+    padding-bottom: 0px;
+  }
 }
 .content {
   display: flex;

@@ -25,8 +25,8 @@ export const AboutCard: React.FC<IProps> = ({
           className={isStyled ? styles.img : ""}
           src={imgSrc}
           alt="number of title"
-          width={`${isStyled ? "400" : "50"}`}
-          height={`${isStyled ? "400" : "50"}`}
+          width={`${isStyled ? "640" : "50"}`}
+          height={`${isStyled ? "640" : "50"}`}
         />
       </div>
       <div className={styles.title}>{title}</div>

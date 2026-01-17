@@ -1,4 +1,4 @@
-import { IInfo } from "@/interface/iContact";
+import { IContract, IInfo } from "@/interface/iContact";
 import contractModel from "@/models/contract-model";
 import shablonModel from "@/models/shablon-model";
 import userModel from "@/models/user-model";
@@ -6,73 +6,64 @@ import { status } from "@/constants/constants";
 import { formattedDate } from "@/helpers/helpers";
 
 class ContractService {
-  async createContract(userId: string, info: IInfo) {
-    const test = await contractModel.findOne({ user: userId });
+  async createContract(userId: string, info: IContract) {
+    const contractId = info["_id"];
 
-    if (test) {
-      test.parentName = info.FIOP;
-      test.childrenName = info.FIOC;
-      test.diseases = info.desiases;
-      test.birthday = formattedDate(info.dateB);
+    console.log(contractId);
+
+    if (contractId) {
+      const test = await contractModel.findOne({ _id: contractId });
+
+      if (!test) {
+        throw new Error("Contract not found");
+      }
+      test.parentName = info.parentName;
+      test.childrenName = info.childrenName;
+      test.diseases = info.diseases;
+      test.birthday = formattedDate(info.birthday);
       test.place = info.place;
       test.KB = info.KB;
-      test.pasportDate = info.datePass;
-      test.pasportPlace = info.whoPass;
+      test.pasportDate = info.pasportDate;
+      test.pasportPlace = info.pasportPlace;
       test.phone = info.phone;
       test.isOldContract = false;
       test.isSend = true;
       test.address = info.address;
       test.sex = info.sex;
       await test.save();
-      /* throw new Error(`договор у ${userId} уже существует`, { cause: test }); */
-      try {
-        const user = await userModel.findById(userId);
-        user.status = status.SEND;
-        await user.save();
-      } catch (e) {
-        console.log(e);
-      }
+
       return test;
-    } else {
-      const contract = await contractModel.create({
-        user: userId,
-        parentName: info.FIOP,
-        childrenName: info.FIOC,
-        diseases: info.desiases,
-        birthday: info.dateB,
-        place: info.place,
-        KB: info.KB,
-        pasportDate: info.datePass,
-        pasportPlace: info.whoPass,
-        phone: info.phone,
-        address: info.address,
-        sex: info.sex,
-        isSend: true,
-      });
-      try {
-        const user = await userModel.findById(userId);
-        user.status = status.SEND;
-        await user.save();
-      } catch (e) {
-        console.log(e);
-      }
-      return contract;
     }
-    /* try {
-      const user = await userModel.findById(userId);
-      user.status = "send";
-      await user.save();
+
+    try {
+      const { _id, ...newData } = info;
+      const contract = await contractModel.create({
+        ...newData,
+        isSend: true,
+        user: userId,
+        birthday: formattedDate(info.birthday),
+      });
+
+      return contract;
     } catch (e) {
       console.log(e);
-    } */
+    }
   }
-  async getContract(userId: string) {
-    const contract = await contractModel.findOne({ user: userId });
+  async getContract(contractId: string) {
+    const contract = await contractModel.findOne({ _id: contractId });
     if (contract) {
       return contract;
     }
     return { message: "информацию отсутствует" };
   }
+  async getAllUserContract(userId: string) {
+    const contract = await contractModel.find({ user: userId });
+    if (contract) {
+      return contract;
+    }
+    return { message: "информацию отсутствует" };
+  }
+
   async getAllContract() {
     const contract = await contractModel.find();
     if (contract) {
@@ -80,10 +71,17 @@ class ContractService {
     }
     return { message: "информацию отсутствует" };
   }
-  async deleteContract(userId: string) {
+  async deleteContract({
+    userId,
+    contractId,
+  }: {
+    userId: string;
+    contractId: string;
+  }) {
     /* todo сделать удаление */
     /* const contractData = await contractModel.deleteOne({ user: userId }); */
-    const contractData = await contractModel.findOne({ user: userId });
+    const contractData = await contractModel.findOne({ _id: contractId });
+
     try {
       const user = await userModel.findById(userId);
       user.status = "";
@@ -111,8 +109,8 @@ class ContractService {
 
     return contractData;
   }
-  async updateContract(userId: string) {
-    const contract = await contractModel.findOne({ user: userId });
+  async updateContract(contractId: string) {
+    const contract = await contractModel.findOne({ _id: contractId });
     if (contract) {
       contract.isDone = true;
       await contract.save();

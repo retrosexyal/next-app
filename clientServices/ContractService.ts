@@ -2,19 +2,33 @@ import api from "@/http";
 import { IContract, IInfo } from "@/interface/iContact";
 
 export default class ContractService {
-  static async addContract(info: IInfo) {
+  static async addContract(info: IContract) {
     return api.post("/api/createcontract", {
       info,
     });
   }
-  static async senContractToParent(id: string) {
+  static async senContractToParent({
+    userId,
+    contractId,
+  }: {
+    userId: string;
+    contractId: string;
+  }) {
     return api.post("/api/doc/sendcontracttoparent", {
-      id,
+      userId,
+      contractId,
     });
   }
-  static async senContractToAdmin(id: string) {
+  static async senContractToAdmin({
+    userId,
+    contractId,
+  }: {
+    userId: string;
+    contractId: string;
+  }) {
     return api.post("/api/doc/sendcontracttoadmin", {
-      id,
+      userId,
+      contractId,
     });
   }
   static async changeContract(info: IContract) {
@@ -22,14 +36,22 @@ export default class ContractService {
       info,
     });
   }
-  static async getContract(id: string) {
+  static async getContract(id: string, isAllContract?: boolean) {
     return api.post("/api/getcontract", {
       id,
+      isAllContract,
     });
   }
-  static async deleteContract(id: string) {
+  static async deleteContract({
+    userId,
+    contractId,
+  }: {
+    userId: string;
+    contractId: string;
+  }) {
     return api.post("/api/returncontract", {
-      id,
+      userId,
+      contractId,
     });
   }
   static async getAllContract() {

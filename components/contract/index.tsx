@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import styles from "./contract.module.scss";
 import {
   Box,
@@ -8,467 +8,153 @@ import {
   MenuItem,
   Modal,
   Select,
+  SelectChangeEvent,
   TextField,
 } from "@mui/material";
 import { ContractList } from "../contract-list";
 import ContractService from "@/clientServices/ContractService";
 
-import { IInfo } from "@/interface/iContact";
+import { IContract } from "@/interface/iContact";
 import { useAppSelector } from "@/store";
+import { INPUTS, REQUIRED_FIELDS } from "./constants";
+import { ContractProps } from "./models";
 
-export const Contract = () => {
-  const [info, setInfo] = useState<IInfo>({
-    FIOP: "",
-    FIOC: "",
-    dateB: "",
-    desiases: "",
-    place: "",
-    KB: "",
-    datePass: "",
-    whoPass: "",
-    phone: "",
-    sex: "мою дочь",
-    address: "",
-  });
-  const [showList, setShowList] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [isStyled, setIsStyled] = useState(false);
-  const {
-    FIOP,
-    FIOC,
-    dateB,
-    place,
+export const Contract = ({ info, setInfo }: ContractProps) => {
+  const [selectedInfoId, setSelectedInfoId] = useState<string | null>(null);
 
-    KB,
-    datePass,
-    whoPass,
-    phone,
-    desiases,
-    sex,
-    address,
-  } = info;
-
-  const { id } = useAppSelector((state) => state.user.user);
-
-  useEffect(() => {
-    if (
-      FIOP &&
-      FIOC &&
-      dateB &&
-      place &&
-      KB &&
-      datePass &&
-      whoPass &&
-      phone &&
-      desiases &&
-      sex &&
-      address
-    ) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
-    }
-  }, [info]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await ContractService.getContract(id);
-        const data = response.data;
-        if (!data) {
-          return;
-        }
-
-        setInfo({
-          FIOP: data.parentName,
-          place: data.place,
-          KB: data.KB,
-          datePass: data.pasportDate,
-          whoPass: data.pasportPlace,
-          phone: data.phone,
-          FIOC: data.childrenName,
-          dateB: data.birthday,
-          desiases: data.diseases,
-          address: data.address,
-          sex: data.sex,
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    setTimeout(() => {
-      setIsStyled(true);
-      fetchData();
-    }, 500);
-  }, []);
-
-  const handleSubmit = () => {
-    setShowList(true);
+  const handleOpenInfo = (infoId: string) => () => {
+    setSelectedInfoId(infoId);
   };
   const handleClose = () => {
-    setShowList(false);
+    setSelectedInfoId(null);
   };
+
+  const handleChangeValue =
+    (currentId: string, key: string) =>
+    ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+      setInfo((prev) =>
+        prev.map((prevInfo) => {
+          if (prevInfo["_id"] !== currentId) {
+            return prevInfo;
+          }
+
+          return { ...prevInfo, [key as keyof IContract]: value };
+        }),
+      );
+    };
+
+  const handleSelectValue =
+    (currentId: string, key: string) =>
+    ({ target: { value } }: SelectChangeEvent<HTMLInputElement>) => {
+      setInfo((prev) =>
+        prev.map((prevInfo) => {
+          if (prevInfo["_id"] !== currentId) {
+            return prevInfo;
+          }
+
+          return { ...prevInfo, [key as keyof IContract]: value };
+        }),
+      );
+    };
+
+  const toInputDate = (date: string): string => {
+    if (!date || !date.includes(".")) {
+      return date;
+    }
+
+    const [day, month, year] = date.split(".");
+    return `${year}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
+  };
+
+  const selectedInfo = [info].find(({ _id }) => _id === selectedInfoId);
 
   return (
     <>
-      <form className={styles.form_wrapper} id="form-for-contract">
-        <TextField
-          id="outlined-basic1"
-          label="Ф.И.О. родителя"
-          variant="outlined"
-          value={info.FIOP}
-          onChange={(e) => setInfo({ ...info, FIOP: e.target.value })}
-          InputProps={{
-            style: {
-              borderColor: "black  !important",
-              background: "wheat  !important",
-              color: "black  !important",
-            },
-          }}
-          InputLabelProps={{
-            style: { color: "black  !important" },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              borderColor: "black  !important",
-            },
-            "& .MuiOutlinedInput-input": {
-              color: "black  !important",
-            },
-          }}
-          style={
-            isStyled
-              ? {
-                  background: "wheat",
-                }
-              : {}
-          }
-        />
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">
-            Зал где вы занимаетесь
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={info.place || ""}
-            label="Зал где вы занимаетесь"
-            onChange={(e) => setInfo({ ...info, place: e.target.value })}
-            sx={{
-              "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black  !important",
-              },
-              "& .MuiOutlinedInput-input": {
-                color: "black  !important",
-              },
-            }}
-            style={
-              isStyled
-                ? {
-                    background: "wheat",
-                  }
-                : {}
-            }
-          >
-            <MenuItem value={"ФОК Орловского"}>ФОК Орловского</MenuItem>
-            <MenuItem value={"ФОК Златоустовкого"}>ФОК Златоустовкого</MenuItem>
-            <MenuItem value={"Дворец гимнастики"}>Дворец гимнастики</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Пол ребёнка</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={info.sex}
-            label="Пол ребёнка"
-            onChange={(e) => {
-              console.log(e.target.value);
+      {[info].map((infoProps, indKey) => {
+        const { _id } = infoProps;
 
-              setInfo({ ...info, sex: e.target.value });
-            }}
-            sx={{
-              "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black  !important",
-              },
-              "& .MuiOutlinedInput-input": {
-                color: "black  !important",
-              },
-            }}
-            style={
-              isStyled
-                ? {
-                    background: "wheat",
-                  }
-                : {}
-            }
+        return (
+          <form
+            className={styles.form_wrapper}
+            id={`"form-for-contract"__${_id}_${indKey}`}
+            key={`${_id}${indKey}`}
           >
-            <MenuItem value={"мою дочь"}>Девочка</MenuItem>
-            <MenuItem value={"моего сына"}>Мальчик</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          id="outlined-basic2"
-          label="Номер паспорта(в формате KB111111111)"
-          variant="outlined"
-          value={info.KB}
-          onChange={(e) => setInfo({ ...info, KB: e.target.value })}
-          InputProps={{
-            style: {
-              borderColor: "black  !important",
-              background: "wheat  !important",
-              color: "black  !important",
-            },
-          }}
-          InputLabelProps={{
-            style: { color: "black  !important" },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              borderColor: "black  !important",
-            },
-            "& .MuiOutlinedInput-input": {
-              color: "black  !important",
-            },
-          }}
-          style={
-            isStyled
-              ? {
-                  background: "wheat",
-                }
-              : {}
-          }
-        />
-        <TextField
-          id="outlined-basic3"
-          label="Когда выдан"
-          variant="outlined"
-          value={info.datePass}
-          onChange={(e) => setInfo({ ...info, datePass: e.target.value })}
-          InputProps={{
-            style: {
-              borderColor: "black  !important",
-              background: "wheat  !important",
-              color: "black  !important",
-            },
-          }}
-          InputLabelProps={{
-            style: { color: "black  !important" },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              borderColor: "black  !important",
-            },
-            "& .MuiOutlinedInput-input": {
-              color: "black  !important",
-            },
-          }}
-          style={
-            isStyled
-              ? {
-                  background: "wheat",
-                }
-              : {}
-          }
-        />
-        <TextField
-          id="outlined-basic4"
-          label="Кем выдан"
-          variant="outlined"
-          value={info.whoPass}
-          onChange={(e) => setInfo({ ...info, whoPass: e.target.value })}
-          InputProps={{
-            style: {
-              borderColor: "black  !important",
-              background: "wheat  !important",
-              color: "black  !important",
-            },
-          }}
-          InputLabelProps={{
-            style: { color: "black  !important" },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              borderColor: "black  !important",
-            },
-            "& .MuiOutlinedInput-input": {
-              color: "black  !important",
-            },
-          }}
-          style={
-            isStyled
-              ? {
-                  background: "wheat",
-                }
-              : {}
-          }
-        />
-        <TextField
-          id="outlined-basic5"
-          label="Телефон"
-          variant="outlined"
-          value={info.phone}
-          onChange={(e) => setInfo({ ...info, phone: e.target.value })}
-          InputProps={{
-            style: {
-              borderColor: "black  !important",
-              background: "wheat  !important",
-              color: "black  !important",
-            },
-          }}
-          InputLabelProps={{
-            style: { color: "black  !important" },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              borderColor: "black  !important",
-            },
-            "& .MuiOutlinedInput-input": {
-              color: "black  !important",
-            },
-          }}
-          style={
-            isStyled
-              ? {
-                  background: "wheat",
-                }
-              : {}
-          }
-        />
-        <TextField
-          id="outlined-basic6"
-          label="Ф.И.О. ребёнка"
-          variant="outlined"
-          value={info.FIOC}
-          onChange={(e) => setInfo({ ...info, FIOC: e.target.value })}
-          InputProps={{
-            style: {
-              borderColor: "black  !important",
-              background: "wheat  !important",
-              color: "black  !important",
-            },
-          }}
-          InputLabelProps={{
-            style: { color: "black  !important" },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              borderColor: "black  !important",
-            },
-            "& .MuiOutlinedInput-input": {
-              color: "black  !important",
-            },
-          }}
-          style={
-            isStyled
-              ? {
-                  background: "wheat",
-                }
-              : {}
-          }
-        />
-        <TextField
-          id="outlined-basic7"
-          label="Дата рождения ребёнка"
-          variant="outlined"
-          value={info.dateB}
-          onChange={(e) => setInfo({ ...info, dateB: e.target.value })}
-          type="date"
-          InputLabelProps={{ shrink: true }}
-          InputProps={{
-            style: {
-              borderColor: "black  !important",
-              background: "wheat  !important",
-              color: "black  !important",
-            },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              borderColor: "black  !important",
-            },
-            "& .MuiOutlinedInput-input": {
-              color: "black  !important",
-            },
-          }}
-          style={
-            isStyled
-              ? {
-                  background: "wheat",
-                }
-              : {}
-          }
-        />
-        <TextField
-          id="outlined-basic8"
-          label="Хронические заболевания ребёнка"
-          variant="outlined"
-          value={info.desiases}
-          onChange={(e) => setInfo({ ...info, desiases: e.target.value })}
-          InputProps={{
-            style: {
-              borderColor: "black  !important",
-              background: "wheat  !important",
-              color: "black  !important",
-            },
-          }}
-          InputLabelProps={{
-            style: { color: "black  !important" },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              borderColor: "black  !important",
-            },
-            "& .MuiOutlinedInput-input": {
-              color: "black  !important",
-            },
-          }}
-          style={
-            isStyled
-              ? {
-                  background: "wheat",
-                }
-              : {}
-          }
-        />
-        <TextField
-          id="outlined-basic8"
-          label="Адрес проживания"
-          variant="outlined"
-          value={info.address}
-          onChange={(e) => setInfo({ ...info, address: e.target.value })}
-          InputProps={{
-            style: {
-              borderColor: "black  !important",
-              background: "wheat  !important",
-              color: "black  !important",
-            },
-          }}
-          InputLabelProps={{
-            style: { color: "black  !important" },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              borderColor: "black  !important",
-            },
-            "& .MuiOutlinedInput-input": {
-              color: "black  !important",
-            },
-          }}
-          style={
-            isStyled
-              ? {
-                  background: "wheat",
-                }
-              : {}
-          }
-        />
-        <Button variant="outlined" disabled={isDisabled} onClick={handleSubmit}>
-          Предварительный просмотр
-        </Button>
-      </form>
+            {INPUTS.map(({ key, label, items }, ind) => {
+              const val = infoProps[key as keyof IContract];
+
+              if (items) {
+                return (
+                  <FormControl fullWidth key={`${label}${ind}`}>
+                    <InputLabel id={label}>{label}</InputLabel>
+                    <Select
+                      labelId={label}
+                      required
+                      id={`${label}_`}
+                      value={(val as undefined) || ""}
+                      label="Зал где вы занимаетесь"
+                      onChange={handleSelectValue(_id, key)}
+                      sx={{
+                        backgroundColor: "#fff",
+                        color: "#000",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#000",
+                        },
+                        "& .MuiSvgIcon-root": {
+                          color: "#000",
+                        },
+                      }}
+                    >
+                      {items.map(({ label, value }, ind) => (
+                        <MenuItem value={value} key={`${value}${label}${ind}`}>
+                          {label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                );
+              }
+
+              const isDate = key === "birthday";
+
+              return (
+                <TextField
+                  key={`${label}${ind}`}
+                  label={label}
+                  variant="outlined"
+                  value={isDate ? toInputDate(val as string) : val}
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  type={isDate ? "date" : undefined}
+                  onChange={handleChangeValue(_id, key)}
+                  sx={{
+                    "& input::-webkit-calendar-picker-indicator": {
+                      filter: "invert(0)",
+                      opacity: 1,
+                      cursor: "pointer",
+                    },
+                  }}
+                />
+              );
+            })}
+            <Button
+              variant="outlined"
+              disabled={
+                !REQUIRED_FIELDS.every(
+                  (field) => !!infoProps[field as keyof IContract] === true,
+                )
+              }
+              onClick={handleOpenInfo(_id)}
+            >
+              Предварительный просмотр
+            </Button>
+          </form>
+        );
+      })}
 
       <Modal
-        open={showList}
+        open={selectedInfoId !== null}
         onClose={handleClose}
         aria-labelledby="parent-modal-title"
         aria-describedby="parent-modal-description"
@@ -497,7 +183,7 @@ export const Contract = () => {
           >
             редактировать
           </button>
-          <ContractList info={info} />
+          {selectedInfo && <ContractList info={selectedInfo} />}
         </Box>
       </Modal>
     </>

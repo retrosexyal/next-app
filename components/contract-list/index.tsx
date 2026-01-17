@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import styles from "./contract-list.module.scss";
 import ContractService from "@/clientServices/ContractService";
 import { Backdrop, Button, CircularProgress } from "@mui/material";
-import { IInfo } from "@/interface/iContact";
+import { IContract, IInfo } from "@/interface/iContact";
 import Link from "next/link";
 import { formattedDate } from "@/helpers/helpers";
 
-export const ContractList = ({ info }: { info: IInfo }) => {
+export const ContractList = ({ info }: { info: IContract }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const handleSubmit = async () => {
@@ -35,6 +35,19 @@ export const ContractList = ({ info }: { info: IInfo }) => {
     month: "2-digit",
     year: "numeric",
   });
+  const {
+    KB,
+    address,
+    birthday,
+    childrenName,
+    diseases,
+    parentName,
+    pasportDate,
+    pasportPlace,
+    phone,
+    place,
+    sex,
+  } = info;
 
   return (
     <div className={styles.wrapper}>
@@ -42,16 +55,16 @@ export const ContractList = ({ info }: { info: IInfo }) => {
         <p className={styles.right}>Директору</p>
         <p className={styles.right}>ООО “Про свет ЛиМи”</p>
         <p className={styles.right}>Михеенко Елизавете Александровне</p>
-        <p className={styles.right}>{info.FIOP}</p>
+        <p className={styles.right}>{parentName}</p>
         <p className={styles.right}>проживающего по адресу:</p>
-        <p className={styles.right}>{info.address}</p>
-        <p className={styles.right}>{info.phone}</p>
+        <p className={styles.right}>{address}</p>
+        <p className={styles.right}>{phone}</p>
         <p className={styles.bold}>ЗАЯВЛЕНИЕ</p>
         <p>{today}</p>
         <br />
         <p>
-          Прошу зачислить {info.sex} ({info.FIOC}, {formattedDate(info.dateB)})в
-          объединение по интересам ООО “Про свет ЛиМи” на 1 год обучения
+          Прошу зачислить {info.sex} ({childrenName}, {formattedDate(birthday)}
+          )в объединение по интересам ООО “Про свет ЛиМи” на 1 год обучения
         </p>
         <br />
         <p>Приложение:</p>
@@ -81,7 +94,7 @@ export const ContractList = ({ info }: { info: IInfo }) => {
         <p>{today}</p>
       </div>
       <p className={styles.redP}>
-        {`ООО “Про свет ЛиМи”, именуемая в дальнейшем – Танцевальная студия, в лице директора Михеенко Елизаветы Александровны, действующая на основании устава, с одной стороны, и ${info.FIOP} ( в
+        {`ООО “Про свет ЛиМи”, именуемая в дальнейшем – Танцевальная студия, в лице директора Михеенко Елизаветы Александровны, действующая на основании устава, с одной стороны, и ${parentName} ( в
         дальнейшем - Родитель), с другой стороны, заключили настоящий договор о
         нижеследующем:`}
       </p>
@@ -96,9 +109,9 @@ export const ContractList = ({ info }: { info: IInfo }) => {
       </p>
       <p className={styles.redP}>
         {`1.3. Договор заключается в интересах несовершеннолетнего ребенка`}
-        <p>{`(ФИО ребёнка) ${info.FIOC}`}</p>
-        <p>{`(Дата рождения ребёнка) ${formattedDate(info.dateB)}`}</p>
-        <p>{`(Наличие хронических заболеваний у ребёнка) ${info.desiases}`}</p>
+        <p>{`(ФИО ребёнка) ${childrenName}`}</p>
+        <p>{`(Дата рождения ребёнка) ${formattedDate(birthday)}`}</p>
+        <p>{`(Наличие хронических заболеваний у ребёнка) ${diseases}`}</p>
       </p>
 
       <p className={styles.redP}>
@@ -207,11 +220,11 @@ export const ContractList = ({ info }: { info: IInfo }) => {
         </p>
         <p>
           <div className={styles.center}>РОДИТЕЛЬ:</div>
-          <div>{`Ф.И.О. ${info.FIOP}`}</div>
-          <div>{`Серия паспорта: ${info.KB}`}</div>
-          <div>{`Когда выдан: ${info.datePass}`}</div>
-          <div>{`Кем выдан: ${info.whoPass}`}</div>
-          <div>{`Тел.моб.: ${info.phone}`}</div>
+          <div>{`Ф.И.О. ${parentName}`}</div>
+          <div>{`Серия паспорта: ${KB}`}</div>
+          <div>{`Когда выдан: ${pasportDate}`}</div>
+          <div>{`Кем выдан: ${pasportPlace}`}</div>
+          <div>{`Тел.моб.: ${phone}`}</div>
         </p>
       </div>
 

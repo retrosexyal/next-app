@@ -14,6 +14,7 @@ export interface IContract {
   isSend: boolean;
   sex: string;
   address: string;
+  _id: string;
 }
 export interface IInfo {
   FIOP: string;
@@ -27,4 +28,5 @@ export interface IInfo {
   phone: string;
   sex: string;
   address: string;
+  _id: string;
 }

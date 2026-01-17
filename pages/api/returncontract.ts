@@ -2,9 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import mongoose from "mongoose";
 import { env } from "process";
 import { contractService } from "@/services/contract-service";
-import { tokenService } from "@/services/token-service";
-import { IUser } from "@/clientModels/IUser";
-import jwt from "jsonwebtoken";
+import { returnNotAdmin } from "@/helpers/helpers";
 
 const DB = env.DB_URL;
 const accessKey = env.ACCESS_TOKEN_KEY;
@@ -18,24 +16,31 @@ export default async function handler(
       await mongoose.connect(DB!);
       console.log("bd ok");
     }
-    const data = req.body;
-    const accessToken = req.headers["authorization"]?.split(" ")[1];
+    const { userId, contractId } = req.body;
 
-    const token = tokenService.validateAccessToken(accessToken!) as IUser;
+    if (!userId || !contractId) {
+      res.status(404).json("net userId or contractId");
 
-    if (token.isActivated) {
-      const contract = await contractService.deleteContract(data.id);
-      return res.status(200).json({ message: "договор удалён" });
-    } else {
-      return res.status(400).json({ message: "пользователь не авторизирован" });
+      return;
     }
+
+    returnNotAdmin({ req, res });
+
+    await contractService.deleteContract({
+      contractId,
+      userId,
+    });
+
+    res.status(200).json({ message: "договор возвращён" });
+
+    return;
   } catch (error: any) {
     if (typeof error === "object" && "cause" in error) {
       res.statusCode = 404;
-      res.json({ message: "договор уже есть" });
+      res.json({ message: "договор не возвращён" });
     } else {
       res.statusCode = 401;
-      res.json({ message: "ошибка создания" });
+      res.json({ message: "ошибка возврата" });
     }
   }
 }

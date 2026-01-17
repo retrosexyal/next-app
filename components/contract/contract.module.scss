@@ -24,9 +24,16 @@
   background: #ffffff;
   border-radius: 16px;
   padding: 32px 28px;
+  color: #000;
 
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08),
     0 2px 8px rgba(15, 23, 42, 0.04);
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(50%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(0%)
+      contrast(100%);
+    cursor: pointer;
+  }
 }
 .modal {
   display: flex;

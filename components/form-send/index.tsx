@@ -19,6 +19,7 @@ export const FormSend = () => {
   const [isSending, setIsSending] = useState(false);
   const [isFinish, setIsFinish] = useState("");
   const [info, setInfo] = useState<IInfo>({
+    _id: "",
     FIOP: "",
     FIOC: "",
     dateB: "",

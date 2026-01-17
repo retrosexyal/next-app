@@ -65,7 +65,7 @@ export const Burger = () => {
       >
         {data.map(({ href, id, text }) => {
           return (
-            <MenuItem onClick={handleClose} key={id}>
+            <MenuItem onClick={handleClose} key={`${id}${text}burger`}>
               {isHomePage ? (
                 <ScrollLink
                   activeClass="active"

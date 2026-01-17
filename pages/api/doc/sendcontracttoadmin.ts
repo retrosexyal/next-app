@@ -3,15 +3,7 @@ import mongoose from "mongoose";
 import { env } from "process";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
-import fs from "fs";
-import {
-  transporter,
-  test,
-  mailOptionsRegist,
-  mailOptionsBirthday,
-} from "@/config/nodemailer";
-import ShablonModel from "@/models/shablon-model";
-import gridfs from "gridfs-stream";
+import { transporter, mailOptionsBirthday } from "@/config/nodemailer";
 import { GridFSBucket } from "mongodb";
 import { contractService } from "@/services/contract-service";
 import { IContract } from "@/interface/iContact";
@@ -31,15 +23,25 @@ export default async function handler(
         res.status(500).json("error connect to bd");
       }
     }
-    const data = req.body;
+
+    const { userId, contractId } = req.body;
+
+    if (!userId || !contractId) {
+      res.status(404).json(`userId:${userId},contractId:${contractId}`);
+
+      return;
+    }
+
     const db = mongoose.connection.db;
     const bucket = new GridFSBucket(db);
-    const contract = (await contractService.getContract(data.id)) as IContract;
+    const contract = (await contractService.getContract(
+      contractId
+    )) as IContract;
 
     if (!contract) {
       res.status(500).json("no contract");
     }
-    const user = await userService.getUser(data.id);
+    const user = await userService.getUser(userId);
     const numberContract = await contractService.getNumberContract();
 
     const fileName = "dogovor.docx";

@@ -17,7 +17,7 @@ const ContractSchema = new Schema({
   isOldContract: { type: Boolean, required: false, default: false },
   date: { type: String },
   number: { type: Number },
-  user: { type: Schema.Types.ObjectId, ref: "User", unique: true },
+  user: { type: Schema.Types.ObjectId, ref: "User" },
 });
 
 export default models?.Contract || model("Contract", ContractSchema);

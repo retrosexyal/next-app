@@ -1,6 +1,6 @@
 import Students from "@/components/students";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./settings.module.scss";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { Contract } from "@/components/contract";
@@ -11,13 +11,31 @@ import MessageService from "@/clientServices/MessageService";
 import { IContract } from "@/interface/iContact";
 import { Loader } from "@/components/loader";
 import { ContractInfo } from "@/components/contract-info";
-import { status as STATUS } from "@/constants/constants";
+import { ThemeProvider } from "@mui/material";
+import { theme } from "@/theme";
+import Button from "@/components/button";
+
+const EMPTY_DATA = {
+  _id: "",
+  address: "",
+  birthday: "",
+  childrenName: "",
+  diseases: "нет",
+  isDone: false,
+  isSend: false,
+  KB: "",
+  parentName: "",
+  pasportDate: "",
+  pasportPlace: "",
+  phone: "",
+  place: "",
+  sex: "",
+  user: "",
+};
 
 const Settings = () => {
-  const { isActivated, email, id, status } = useAppSelector(
-    (state) => state.user.user
-  );
-  const [data, setData] = useState<IContract | null>(null);
+  const { isActivated, email, id } = useAppSelector((state) => state.user.user);
+  const [data, setData] = useState<IContract[]>([EMPTY_DATA]);
   const [message, setMessage] = useState("");
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -31,9 +49,10 @@ const Settings = () => {
       })
       .then(() => {
         if (id) {
-          ContractService.getContract(id)
+          ContractService.getContract(id, true)
             .then(({ data }) => {
-              setData(data);
+              const isEmptyData = Array.isArray(data) && data.length === 0;
+              setData(isEmptyData ? [EMPTY_DATA] : data);
             })
             .catch((err) => {
               console.log(err);
@@ -51,50 +70,100 @@ const Settings = () => {
       });
   }, [dispatch, id]);
 
+  const isNotAdmin = email !== "admin@admin";
+
+  const handleAddChildren = () => {
+    setData((prev) => [...prev, EMPTY_DATA]);
+  };
+
   return (
-    <div className={`wrapper ${styles.wrapper}`}>
-      {email === "admin@admin" && (
-        <>
-          <Link className={styles.link} href="/groups">
-            Мои группы
-          </Link>
-          <Link className={styles.link} href="/admin">
-            Согласование договоров
-          </Link>
-          <Students />
-        </>
-      )}
-      <div>
-        {isActivated && email !== "admin@admin" && status !== STATUS.SEND && (
-          <Contract />
+    <ThemeProvider theme={theme}>
+      <div className={`wrapper ${styles.wrapper}`}>
+        {email === "admin@admin" && (
+          <>
+            <Link className={styles.link} href="/groups">
+              Мои группы
+            </Link>
+            <Link className={styles.link} href="/admin">
+              Согласование договоров
+            </Link>
+            <Students />
+          </>
         )}
-      </div>
-      {data?.isDone && email !== "admin@admin" && <ContractInfo data={data} />}
-      <div>
-        {data &&
-          !data.isDone &&
-          email !== "admin@admin" &&
-          status === STATUS.SEND && (
-            <div className={styles.content_wrapper}>
-              <h2 style={{ textAlign: "center" }}>
-                Ваш договор находится на согласовании у руководителя студии
-              </h2>
-              <h3 style={{ textAlign: "center" }}>
-                После подписания он будет направлен Вам в почту
-              </h3>
-            </div>
-          )}
-      </div>
-      {message && (
-        <div>
-          <h2 style={{ textAlign: "center" }}>
-            Сообщение от руководителя студии ЛиМи:
-          </h2>
-          <h3 style={{ textAlign: "center" }}>{message}</h3>
+        <div className={styles.flex_col}>
+          {isNotAdmin &&
+            data?.map((contract, ind) => {
+              const { isDone, _id, isSend, childrenName } = contract;
+              const isLastItem = ind === data.length - 1;
+
+              if (isDone) {
+                return (
+                  <>
+                    <ContractInfo data={contract} key={`${_id}_${ind}`} />
+                    {isLastItem && (
+                      <Button
+                        onClick={handleAddChildren}
+                        text="добавить ребёнка"
+                      />
+                    )}
+                  </>
+                );
+              }
+
+              if (isSend) {
+                return (
+                  <>
+                    <div
+                      className={styles.content_wrapper}
+                      key={`${_id}_${ind}`}
+                    >
+                      <h2 style={{ textAlign: "center" }}>
+                        Ваш договор на занятия с ребёнком {childrenName}{" "}
+                        находится на согласовании у руководителя студии
+                      </h2>
+                      <h3 style={{ textAlign: "center" }}>
+                        После подписания он будет направлен Вам в почту
+                      </h3>
+                    </div>
+                    {isLastItem && data.length < 3 && (
+                      <Button
+                        onClick={handleAddChildren}
+                        text="добавить ребёнка"
+                      />
+                    )}
+                  </>
+                );
+              }
+
+              if (isActivated) {
+                return (
+                  <>
+                    <p style={{ textAlign: "center", maxWidth: "80%" }}>
+                      Заполните информация для заключения договора
+                    </p>
+                    <Contract
+                      key={`${_id}_${ind}`}
+                      info={contract}
+                      setInfo={setData}
+                    />
+                  </>
+                );
+              }
+
+              return null;
+            })}
         </div>
-      )}
-      {isLoading && <Loader />}
-    </div>
+        {message && (
+          <div>
+            <h2 style={{ textAlign: "center" }}>
+              Сообщение от руководителя студии ЛиМи:
+            </h2>
+            <h3 style={{ textAlign: "center" }}>{message}</h3>
+          </div>
+        )}
+        {isLoading && <Loader />}
+      </div>
+    </ThemeProvider>
   );
 };
 

@@ -15,15 +15,20 @@ export default async function handler(
       await mongoose.connect(DB!);
       console.log("bd ok");
     }
-    const data = req.body;
+    const { id, isAllContract } = req.body;
+
     if (checkAdmin(req)) {
-      const contract = await contractService.getContract(data.id);
+      const contract = isAllContract
+        ? await contractService.getAllUserContract(id)
+        : await contractService.getContract(id);
       return res.status(200).json(contract);
     }
     const user = getUserInfo(req);
 
     if (user && (await contractService.getContract(user.id))) {
-      const contract = await contractService.getContract(user.id);
+      const contract = isAllContract
+        ? await contractService.getAllUserContract(id)
+        : await contractService.getContract(user.id);
       return res.status(200).json(contract);
     }
     return res.status(400).json({ message: "ошибка доступа" });

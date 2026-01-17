@@ -61,11 +61,15 @@ const Admin = () => {
   }, [isLoading]);
 
   const handleCreate = (e: React.MouseEvent) => {
-    const id = (e.target as HTMLDivElement).getAttribute("data-id");
+    const userId = (e.target as HTMLDivElement).getAttribute("data-id");
+    const contractId = (e.target as HTMLDivElement).getAttribute(
+      "data-contract-id",
+    );
+
     setIsLoading(true);
-    if (id) {
+    if (userId && contractId) {
       try {
-        ContractService.createContract(id)
+        ContractService.createContract(contractId)
           .then(() => {
             setIsLoading(false);
           })
@@ -78,13 +82,13 @@ const Admin = () => {
         console.log(e);
       }
       try {
-        const contract = data?.find((obj) => obj.user === id);
+        const contract = data?.find((obj) => obj["_id"] === contractId);
         if (contract) {
           AuthService.addStudent(
             contract.childrenName,
-            formatDate(contract.birthday),
+            contract.birthday,
             contract.place,
-            contract.place
+            contract.place,
           );
         }
       } catch (e) {
@@ -93,15 +97,18 @@ const Admin = () => {
     }
   };
   const handleDelete = (e: React.MouseEvent) => {
-    const id = (e.target as HTMLDivElement).getAttribute("data-id");
+    const userId = (e.target as HTMLDivElement).getAttribute("data-id");
+    const contractId = (e.target as HTMLDivElement).getAttribute(
+      "data-contract-id",
+    );
     setIsLoading(true);
     const key = prompt(
       `вы хотите вернуть договор?\n
-      напишите "удалить" для подтверждения`
+      напишите "да" для подтверждения`,
     );
-    if (id && key === "удалить") {
+    if (userId && contractId && key === "да") {
       try {
-        ContractService.deleteContract(id)
+        ContractService.deleteContract({ contractId, userId })
           .then(() => {
             setIsLoading(false);
           })
@@ -118,20 +125,7 @@ const Admin = () => {
   const handleContract = () => {
     setIsHiden(!isHiden);
   };
-  /* если необходимо что-то обновить  const handleUpdateContracts = () => {
-    try {
-      ContractService.unsetContract()
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((e) => {
-          console.log("ошибка первая " + e);
-        });
-    } catch (e) {
-      alert("ошибка");
-      console.log(e);
-    }
-  }; */
+
 
   const handleShowChange = (data: IContract) => {
     setIsShowChange(!isShowChange);
@@ -163,42 +157,27 @@ const Admin = () => {
     return <div>необходимо перелогиниться, ИЛИ НЕТ ДОСТУПА</div>;
   }
 
-  const handleSendToParent = (e: any) => {
-    const id = (e.target as HTMLDivElement).getAttribute("data-id");
-    setIsLoading(true);
-    if (id) {
-      try {
-        ContractService.senContractToParent(id)
-          .then(() => {
-            setIsLoading(false);
-          })
-          .catch((e) => {
-            console.log("ошибка первая " + e);
-            setIsLoading(false);
-          });
-      } catch (e) {
-        alert("ошибка");
-        console.log(e);
-      }
-    }
-  };
+  const handleSendMail = (forMe?: boolean) => (e: any) => {
+    const userId = (e.target as HTMLDivElement).getAttribute("data-id");
+    const contractId = (e.target as HTMLDivElement).getAttribute(
+      "data-contract-id",
+    );
 
-  const handleSendToAdmin = (e: React.MouseEvent) => {
-    const id = (e.target as HTMLDivElement).getAttribute("data-id");
     setIsLoading(true);
-    if (id) {
+    if (contractId && userId) {
       try {
-        ContractService.senContractToAdmin(id)
-          .then(() => {
-            setIsLoading(false);
+        ContractService[forMe ? "senContractToAdmin" : "senContractToParent"]({
+          contractId,
+          userId,
+        })
+          .catch(() => {
+            alert("ошибка");
           })
-          .catch((e) => {
-            console.log("ошибка первая " + e);
+          .finally(() => {
             setIsLoading(false);
           });
       } catch (e) {
         alert("ошибка");
-        console.log(e);
       }
     }
   };
@@ -213,14 +192,15 @@ const Admin = () => {
           <Button onClick={handleBirthday}>Проверить дни рождения</Button>
         )}
         <Button onClick={handleContract}>Получить все договоры</Button>
-        {/* если необходимо что-то обновить <Button onClick={handleUpdateContracts}>Обновить договора</Button> */}
         {email === "admin@admin" && (
           <div>
             <div>
               {data &&
-                data.map((contract) => {
+                data.map((contract, ind) => {
                   return (
-                    <React.Fragment key={contract.user}>
+                    <React.Fragment
+                      key={`${contract.user}_${ind}_${contract._id}`}
+                    >
                       {!contract.isDone && contract.isSend && (
                         <div className={styles.container}>
                           <div>Имя родителя: {contract.parentName}</div>
@@ -236,14 +216,16 @@ const Admin = () => {
                           <div>Место проведения: {contract.place}</div>
 
                           <Button
-                            onClick={handleSendToParent}
+                            onClick={handleSendMail()}
                             data-id={`${contract.user}`}
+                            data-contract-id={`${contract["_id"]}`}
                             variant="contained"
                           >
                             отправить родителям
                           </Button>
                           <Button
-                            onClick={handleSendToAdmin}
+                            onClick={handleSendMail(true)}
+                            data-contract-id={`${contract["_id"]}`}
                             data-id={`${contract.user}`}
                             variant="contained"
                           >
@@ -252,6 +234,7 @@ const Admin = () => {
                           <Button
                             onClick={handleCreate}
                             data-id={`${contract.user}`}
+                            data-contract-id={`${contract["_id"]}`}
                             variant="contained"
                           >
                             Закончить создание
@@ -259,6 +242,7 @@ const Admin = () => {
                           <Button
                             onClick={handleDelete}
                             data-id={`${contract.user}`}
+                            data-contract-id={`${contract["_id"]}`}
                           >
                             Вернуть договор
                           </Button>
@@ -270,6 +254,7 @@ const Admin = () => {
                           <Button
                             onClick={() => handleShowChange(contract)}
                             data-id={`${contract.user}`}
+                            data-contract-id={`${contract["_id"]}`}
                           >
                             Изменить договор
                           </Button>

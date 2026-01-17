@@ -63,7 +63,28 @@ export const Burger = () => {
           "aria-labelledby": "basic-button",
         }}
       >
-        {data.map(({ href, id, text }) => {
+        {data.map(({ href, id, text, submenu }) => {
+          if (submenu) {
+            return submenu.map((item) => (
+              <MenuItem onClick={handleClose} key={item.href}>
+                {isHomePage ? (
+                  <ScrollLink
+                    activeClass="active"
+                    to={id}
+                    spy={true}
+                    smooth={true}
+                    offset={-70}
+                    duration={500}
+                  >
+                    {item.text}
+                  </ScrollLink>
+                ) : (
+                  <Link href={item.href}>{item.text}</Link>
+                )}
+              </MenuItem>
+            ));
+          }
+
           return (
             <MenuItem onClick={handleClose} key={`${id}${text}burger`}>
               {isHomePage ? (

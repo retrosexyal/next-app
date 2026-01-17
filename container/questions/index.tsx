@@ -10,25 +10,27 @@ import { data } from "./constants";
 
 export const Questions = () => {
   return (
-    <div className={`${style.wrapper} wrapper`} id="questions">
-      <Title text="Ответы на популярные вопросы" />
-      {data.map((e) => {
-        return (
-          <React.Fragment key={e.title}>
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls={e.title}
-              >
-                <Typography>{e.title}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>{e.subtitle}</Typography>
-              </AccordionDetails>
-            </Accordion>
-          </React.Fragment>
-        );
-      })}
+    <div className={`${style.wrapper}`} id="questions">
+      <div className="wrapper">
+        <Title text="Ответы на популярные вопросы" />
+        {data.map((e) => {
+          return (
+            <React.Fragment key={e.title}>
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls={e.title}
+                >
+                  <Typography>{e.title}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography>{e.subtitle}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            </React.Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 };

@@ -11,7 +11,7 @@ export const Contact = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     const isMobile =
       /mobile|iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(
-        userAgent
+        userAgent,
       );
     if (isMobile) {
       return (window.location.href = "tel:+375291999231");
@@ -23,25 +23,27 @@ export const Contact = () => {
     setIsFormOpen(!isFormOpen);
   };
   return (
-    <div className="wrapper" id="contact">
-      <div className={style.wrapper}>
-        <div className={style.title}>Вы готовы начать заниматься?</div>
-        <div className={style.subtitle}>
-          ПРОСТО СВЯЖИТЕСЬ С НАМИ В СОЦСЕТЯХ ИЛИ ПО ТЕЛЕФОНУ
-        </div>
-        <Button variant="contained" className={style.btn} onClick={makeCall}>
-          {!isPressed ? "ПОЗВОНИТЬ" : "+375(29)199-92-31"}
-        </Button>
-        {/* <Button variant="contained" className={style.btn} onClick={openForm}>
+    <div className={style["section-wrapper"]}>
+      <div className="wrapper" id="contact">
+        <div className={style.wrapper}>
+          <div className={style.title}>Вы готовы начать заниматься?</div>
+          <div className={style.subtitle}>
+            ПРОСТО СВЯЖИТЕСЬ С НАМИ В СОЦСЕТЯХ ИЛИ ПО ТЕЛЕФОНУ
+          </div>
+          <Button variant="contained" className={style.btn} onClick={makeCall}>
+            {!isPressed ? "ПОЗВОНИТЬ" : "+375(29)199-92-31"}
+          </Button>
+          {/* <Button variant="contained" className={style.btn} onClick={openForm}>
           ОСТАВИТЬ ЗАЯВКУ
         </Button> */}
-        <>
-          {isFormOpen && (
-            <Popup onClick={openForm}>
-              <FormSend />
-            </Popup>
-          )}
-        </>
+          <>
+            {isFormOpen && (
+              <Popup onClick={openForm}>
+                <FormSend />
+              </Popup>
+            )}
+          </>
+        </div>
       </div>
     </div>
   );

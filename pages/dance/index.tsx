@@ -1,3 +1,4 @@
+import { SeoContact } from "@/components/SeoContacts";
 import { WayPage } from "@/components/WayPage";
 import Head from "next/head";
 
@@ -54,6 +55,7 @@ export default function Horeografiya() {
           "/imgs/lesson/6.jpg",
         ]}
       />
+      <SeoContact direction="гимнастику" age="от 3 лет" />
     </>
   );
 }

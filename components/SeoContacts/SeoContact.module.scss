@@ -1,0 +1,67 @@
+.section {
+  padding: 70px 0;
+  background: linear-gradient(180deg, #fff5f6 0%, #ffffff 100%);
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #b11226;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.text {
+  max-width: 800px;
+  margin: 0 auto 36px;
+  font-size: 18px;
+  line-height: 1.7;
+  text-align: center;
+  color: #444;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.secondary {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #b11226;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.phone {
+  font-size: 22px;
+  font-weight: 600;
+  color: #b11226;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.button {
+  padding: 14px 34px !important;
+  font-size: 16px !important;
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 26px;
+  }
+
+  .text {
+    font-size: 16px;
+  }
+}

@@ -1,3 +1,4 @@
+import { SeoContact } from "@/components/SeoContacts";
 import { WayPage } from "@/components/WayPage";
 import Head from "next/head";
 
@@ -54,6 +55,7 @@ export default function GymnasticPage() {
           "/imgs/lesson/3.jpg",
         ]}
       />
+      <SeoContact direction="хореографию" age="от 3 лет" />
     </>
   );
 }

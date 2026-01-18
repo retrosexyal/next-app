@@ -23,10 +23,13 @@ export const Contact = () => {
     setIsFormOpen(!isFormOpen);
   };
   return (
-    <div className={style["section-wrapper"]}>
+    <section
+      className={style["section-wrapper"]}
+      aria-labelledby="contact-title"
+    >
       <div className="wrapper" id="contact">
         <div className={style.wrapper}>
-          <div className={style.title}>Вы готовы начать заниматься?</div>
+          <h2 className={style.title}>Вы готовы начать заниматься?</h2>
           <div className={style.subtitle}>
             ПРОСТО СВЯЖИТЕСЬ С НАМИ В СОЦСЕТЯХ ИЛИ ПО ТЕЛЕФОНУ
           </div>
@@ -45,6 +48,6 @@ export const Contact = () => {
           </>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

@@ -7,16 +7,24 @@ interface IProps {
 }
 const Popup: React.FC<IProps> = ({ children, onClick }) => {
   const handleClick = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).getAttribute("data-close") === "close") {
+    if ((e.target as HTMLElement).dataset.close === "close") {
       onClick();
     }
   };
+
   return (
-    <div className={styles.wrapper} onClick={handleClick} data-close="close">
+    <div
+      className={styles.wrapper}
+      onClick={handleClick}
+      data-close="close"
+      role="dialog"
+      aria-modal="true"
+    >
       <div className={styles.content}>
-        <div className={styles.close} onClick={onClick}>
-          {<CloseIcon /> || "X"}
-        </div>
+        <button className={styles.close} onClick={onClick} aria-label="Закрыть">
+          <CloseIcon />
+        </button>
+
         {children}
       </div>
     </div>

@@ -6,9 +6,9 @@ import { Ways } from "@/container/ways";
 import { Photo } from "@/container/photo";
 import { Questions } from "@/container/questions";
 import { Reviews } from "@/container/reviews";
-import { Footer } from "@/container/footer";
 import { Contact } from "@/container/contact";
 import { VacanciesPreview } from "@/components/VacanciesPreview";
+import { YoutubeSection } from "@/components/YoutubeSection";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -75,6 +75,7 @@ export default function Home() {
         <About />
         <Ways />
         <Photo />
+        <YoutubeSection />
         <Questions />
         <Reviews />
         <Contact />

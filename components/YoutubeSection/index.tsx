@@ -1,6 +1,24 @@
+import { useEffect } from "react";
 import styles from "./YoutubeSection.module.scss";
 
 export const YoutubeSection = () => {
+  useEffect(() => {
+    fetch("/version.json", { cache: "no-store" })
+      .then((r) => r.json())
+      .then(({ version }) => {
+        const current = localStorage.getItem("version");
+
+        if (current && current !== version) {
+          localStorage.setItem("version", version);
+          location.reload();
+        }
+
+        if (!current) {
+          localStorage.setItem("version", version);
+        }
+      });
+  }, []);
+
   return (
     <section className={styles.section} aria-labelledby="youtube-title">
       <div className="wrapper">

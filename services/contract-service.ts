@@ -111,8 +111,15 @@ class ContractService {
   }
   async updateContract(contractId: string) {
     const contract = await contractModel.findOne({ _id: contractId });
+
     if (contract) {
       contract.isDone = true;
+      const { address, sex } = contract;
+
+      if (!address) {
+        contract.address = "не указан";
+      }
+
       await contract.save();
       return contract;
     }

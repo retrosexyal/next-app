@@ -39,6 +39,22 @@ const Settings = () => {
   const [message, setMessage] = useState("");
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    fetch("/version.json", { cache: "no-store" })
+      .then((r) => r.json())
+      .then(({ version }) => {
+        const current = localStorage.getItem("version");
+
+        if (current && current !== version) {
+          localStorage.setItem("version", version);
+          location.reload();
+        }
+
+        if (!current) {
+          localStorage.setItem("version", version);
+        }
+      });
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);

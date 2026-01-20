@@ -44,21 +44,21 @@ const Admin = () => {
       .finally(() => {
         setIsLoading(false);
       });
-    ContractService.getAllContract()
-      .then(({ data }) => setData(data))
-      .catch((e) => console.error(e))
-      .finally(() => {
-        setIsLoading(false);
-      });
   }, []);
   useEffect(() => {
-    ContractService.getAllContract()
-      .then(({ data }) => setData(data))
-      .catch((e) => console.error(e))
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [isLoading]);
+    if (!email) {
+      return;
+    }
+
+    if (!data || isLoading) {
+      ContractService.getAllContract()
+        .then(({ data }) => setData(data))
+        .catch((e) => console.error(e))
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [isLoading, email, data]);
 
   const handleCreate = (e: React.MouseEvent) => {
     const userId = (e.target as HTMLDivElement).getAttribute("data-id");
@@ -125,7 +125,6 @@ const Admin = () => {
   const handleContract = () => {
     setIsHiden(!isHiden);
   };
-
 
   const handleShowChange = (data: IContract) => {
     setIsShowChange(!isShowChange);

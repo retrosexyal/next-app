@@ -25,7 +25,7 @@ import { userService } from "@/services/user-service";
 const DB = env.DB_URL;
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   try {
     if (mongoose.connection.readyState !== 1) {

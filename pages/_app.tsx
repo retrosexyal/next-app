@@ -7,8 +7,15 @@ import { Provider } from "react-redux";
 import { Footer } from "@/container/footer";
 import Header from "@/components/header";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 export default function App({ Component, pageProps }: AppProps) {
+    const router = useRouter();
+
+  const canonicalUrl =
+    "https://www.limistudio.by" +
+    (router.asPath === "/" ? "" : router.asPath.split("?")[0]);
+    
   return (
     <Provider store={store}>
       <Head>
@@ -60,6 +67,7 @@ export default function App({ Component, pageProps }: AppProps) {
           content="Школа-студия ЛиМи, Обучение детей хореографии, Гимнастика для детей, Хореография для детей в Могилёве, Гимнастика и танцы для детей, Профессиональные танцевальные занятия, Детская хореография и гимнастика, Школа танцев для детей в Могилёве, Танцевальные занятия от 3 до 16 лет, Уроки танцев и гимнастики для детей, Курсы хореографии и дефиле, Детские танцевальные коллективы, Профессиональные тренеры и преподаватели, Дружеская атмосфера и творческая обстановка, танцы Могилёв, детские танцы, хореография Могилев, гимнастика Могилев, занятия для детей"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href={canonicalUrl} />
         <link rel="icon" href="/favicon.ico" />
         <link
           rel="apple-touch-icon"

@@ -275,6 +275,7 @@ body {
   scrollbar-width: none;
   -ms-overflow-style: none;
   background-color: #ffffff;
+  color: #000000;
 }
 
 .MuiDataGrid-cell::-webkit-scrollbar {
@@ -295,4 +296,21 @@ body {
 
 body::-webkit-scrollbar {
   display: none;
+}
+
+.policy {
+  max-width: 900px;
+  margin: 120px auto;
+  padding: 0 20px;
+  line-height: 1.7;
+}
+
+.policy h1 {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.policy h2 {
+  margin-top: 24px;
+  font-size: 20px;
 }

@@ -41,57 +41,53 @@ export const Footer = () => {
           />
         </div>
       )}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "10px",
-          marginBottom: "20px",
-        }}
-      >
-        <Image
-          src={Image1}
-          alt="sertificat"
-          width={200}
-          height={200}
-          style={{ objectFit: "contain", cursor: "pointer" }}
-          onClick={handleOpenImg(Image1)}
-        />
+        <div className={style.certWrapper}>
+    <Image
+      src={Image1}
+      alt="sertificat"
+      width={180}
+      height={180}
+      onClick={handleOpenImg(Image1)}
+    />
+  </div>
+
+  {/* ОСНОВНОЙ ФУТЕР */}
+  <div className={style.mainFooter}>
+    <div className={style.container}>
+      <div className={style.title}>Могилёв</div>
+      <div className={style.subtitle}>
+        {'"'}Дворец гимнастики{'"'}: ул. Крупской, 137
       </div>
-      <div className="wrapper">
-        <div className={style.content_wrapper}>
-          <div className={style.container}>
-            <div className={style.title}>Могилев</div>
-            <div className={style.container_content}>
-              <div
-                className={style.subtitle}
-              >{`"Дворец гимнастики": ул. Крупской, 137`}</div>
-              <div
-                className={style.subtitle}
-              >{`СДЮШОР: ул. Орловского, 24а`}</div>
-              <div
-                className={style.subtitle}
-              >{`ФОК: ул. Златоустовского, 1`}</div>
-            </div>
-          </div>
-          <div className={style.container}>
-            <div className={style.title}>БОЛЬШЕ В СОЦСЕТЯХ</div>
-            <div>
-              <Link href="https://m.vk.com/limistudio?from=groups">
-                <Svg type="vk" />
-              </Link>
-              <Link href="https://www.instagram.com/limistudio.by/">
-                <Svg type="inst" />
-              </Link>
-            </div>
-          </div>
-          <div className={style.container}>
-            <div className={style.title}>Телефон</div>
-            <div className={style.subtitle}>+375 29 1 999 231</div>
-          </div>
-        </div>
+      <div className={style.subtitle}>СДЮШОР: ул. Орловского, 24а</div>
+      <div className={style.subtitle}>ФОК: ул. Златоустовского, 1</div>
+    </div>
+
+    <div className={style.container}>
+      <div className={style.title}>Больше в соцсетях</div>
+      <div className={style.socials}>
+        <Link href="https://m.vk.com/limistudio?from=groups">
+          <Svg type="vk" />
+        </Link>
+        <Link href="https://www.instagram.com/limistudio.by/">
+          <Svg type="inst" />
+        </Link>
       </div>
+    </div>
+
+    <div className={style.container}>
+      <div className={style.title}>Телефон</div>
+      <a href="tel:+375291999231" className={style.phone}>
+        +375 29 1 999 231
+      </a>
+    </div>
+  </div>
+
+  {/* НИЖНЯЯ ПОЛОСА */}
+  <div className={style.legalBar}>
+    <Link href="/terms">Пользовательское соглашение</Link>
+    <span>•</span>
+    <Link href="/privacy">Политика конфиденциальности</Link>
+  </div>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import Script from "next/script";
 import styles from "./vacancies.module.scss";
 import Head from "next/head";
 
@@ -27,9 +26,10 @@ export default function VacanciesPage() {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://limistudio.by/vacancies" />
+        <link rel="canonical" href="https://limistudio.by/vacancies" />
       </Head>
 
-      <Script
+      <script
         id="job-posting"
         type="application/ld+json"
         dangerouslySetInnerHTML={{

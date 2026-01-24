@@ -27,7 +27,7 @@ export default function Horeografiya() {
         <meta property="og:type" content="website" />
         <meta
           property="og:image"
-          content="https://limistudio.by/og/dance.jpg"
+          content="https://limistudio.by/og/dance.webp"
         />
         <meta property="og:url" content="https://limistudio.by/dance" />
         <meta property="og:site_name" content="Школа-студия ЛиМи" />
@@ -50,9 +50,9 @@ export default function Horeografiya() {
         ]}
         audience="Занятия подойдут детям от 3 лет — как активным, так и застенчивым. Программа адаптируется под возраст и индивидуальные особенности ребёнка."
         photos={[
-          "/imgs/lesson/4.jpg",
-          "/imgs/lesson/5.jpg",
-          "/imgs/lesson/6.jpg",
+          "/imgs/lesson/4.webp",
+          "/imgs/lesson/5.webp",
+          "/imgs/lesson/6.webp",
         ]}
       />
       <SeoContact direction="гимнастику" age="от 3 лет" />

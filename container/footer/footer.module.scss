@@ -29,12 +29,19 @@
   color: #fff;
   text-transform: uppercase;
 }
+
 .subtitle {
   font-size: 14px;
   line-height: 1.5;
-  font-style: normal;
   color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+
+  &:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
 }
+
 .container_content {
   display: flex;
   flex-direction: column;
@@ -51,5 +58,96 @@
   & img {
     width: 80%;
     height: 80%;
+  }
+}
+
+.wrapper {
+  width: 100%;
+  background: #000;
+  color: #fff;
+}
+
+.certWrapper {
+  display: flex;
+  justify-content: center;
+
+  img {
+    cursor: pointer;
+    object-fit: contain;
+  }
+}
+
+.mainFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 40px;
+
+  @media (max-width: 700px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+}
+
+.container {
+  width: 33%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (max-width: 700px) {
+    width: 100%;
+  }
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.socials {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.phone {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* НИЖНЯЯ ПОЛОСА */
+.legalBar {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+
+  @media (max-width: 550px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+  }
+
+  a {
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 6px;
+
+    &:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
   }
 }

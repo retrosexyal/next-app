@@ -27,7 +27,7 @@ export default function GymnasticPage() {
         <meta property="og:type" content="website" />
         <meta
           property="og:image"
-          content="https://limistudio.by/og/gymnastic.jpg"
+          content="https://limistudio.by/og/gymnastic.webp"
         />
         <meta property="og:url" content="https://limistudio.by/gymtastic" />
         <meta property="og:site_name" content="Школа-студия ЛиМи" />
@@ -50,9 +50,9 @@ export default function GymnasticPage() {
         ]}
         audience="Занятия подходят детям от 3 лет, независимо от уровня подготовки. Особенно полезны для активных детей и тех, кому важно укрепить здоровье."
         photos={[
-          "/imgs/lesson/1.jpg",
-          "/imgs/lesson/2.jpg",
-          "/imgs/lesson/3.jpg",
+          "/imgs/lesson/1.webp",
+          "/imgs/lesson/2.webp",
+          "/imgs/lesson/3.webp",
         ]}
       />
       <SeoContact direction="хореографию" age="от 3 лет" />

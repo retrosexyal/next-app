@@ -64,7 +64,7 @@ export const Gallery: React.FC<ImageGalleryProps> = ({ images }) => {
               className={style["image-item"]}
               onClick={() => setCurrentImg(img)}
             >
-              <img src={img} alt={`Image ${index + 1}`} />
+              <img src={img} alt={`Image ${index + 1}`} loading="lazy"/>
             </div>
           ))}
         </div>
@@ -97,7 +97,7 @@ export const Gallery: React.FC<ImageGalleryProps> = ({ images }) => {
             setCurrentImg(null);
           }}
         >
-          <img src={currentImg} alt="photo" style={{ objectFit: "contain" }} />
+          <img src={currentImg} alt="photo" style={{ objectFit: "contain" }} loading="lazy" />
         </div>
       )}
     </div>

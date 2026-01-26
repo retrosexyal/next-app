@@ -9,13 +9,21 @@ import Header from "@/components/header";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
+import { Roboto } from "next/font/google";
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
+});
+
 export default function App({ Component, pageProps }: AppProps) {
-    const router = useRouter();
+  const router = useRouter();
 
   const canonicalUrl =
     "https://www.limistudio.by" +
     (router.asPath === "/" ? "" : router.asPath.split("?")[0]);
-    
+
   return (
     <Provider store={store}>
       <Head>
@@ -123,7 +131,7 @@ export default function App({ Component, pageProps }: AppProps) {
           }}
         />
       </Head>
-      <main className="main">
+      <main className={`${roboto.className} main`}>
         <Header />
         <Component {...pageProps} />
         <Footer />

@@ -36,21 +36,61 @@ export default function VacanciesPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "JobPosting",
-            title: "Педагог-хореограф",
+            title: "Педагог-хореограф/Педагог по гимнастики",
             description:
-              "Проведение занятий по хореографии для детей от 3 до 14 лет.",
-            employmentType: "PART_TIME",
+              "Проведение занятий по хореографии/гимнастики для детей от 3 до 14 лет.",
+            datePosted: "2026-01-20",
+            validThrough: "2026-12-31",
+            employmentType: ["PART_TIME", "FULL_TIME"],
             hiringOrganization: {
               "@type": "Organization",
               name: "Школа-студия танца ЛиМи",
               sameAs: "https://limistudio.by",
+              logo: "https://limistudio.by/og/logo_colored.webp",
             },
-            jobLocation: {
-              "@type": "Place",
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Могилёв",
-                addressCountry: "BY",
+            jobLocation: [
+              {
+                "@type": "Place",
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: "ул. Орловского, 24а",
+                  addressLocality: "Могилёв",
+                  addressRegion: "Могилёвская область",
+                  postalCode: "212000",
+                  addressCountry: "BY",
+                },
+              },
+              {
+                "@type": "Place",
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: "ул. Златоустовского, 1",
+                  addressLocality: "Могилёв",
+                  addressRegion: "Могилёвская область",
+                  postalCode: "212000",
+                  addressCountry: "BY",
+                },
+              },
+              {
+                "@type": "Place",
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: "ул. Крупской, 137",
+                  addressLocality: "Могилёв",
+                  addressRegion: "Могилёвская область",
+                  postalCode: "212000",
+                  addressCountry: "BY",
+                },
+              },
+            ],
+            baseSalary: {
+              "@type": "MonetaryAmount",
+              currency: "BYN",
+              value: {
+                "@type": "QuantitativeValue",
+                minValue: 15,
+                maxValue: 40,
+                unitText: "HOUR",
               },
             },
           }),

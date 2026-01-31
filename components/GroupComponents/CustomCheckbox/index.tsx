@@ -30,7 +30,6 @@ export const CustomCheckbox = ({
     }
 
     if (!isChecked) {
-      console.log('unchecked')
       setStudent((prev) => {
         if (
           prev.find(

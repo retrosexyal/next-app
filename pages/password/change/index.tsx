@@ -43,7 +43,6 @@ const Change = () => {
         AuthService.change(email, password, newPass)
           .then((data) => {
             setIsModalOpen(true);
-            console.log(data);
           })
           .catch((e) => {
             console.log(e);

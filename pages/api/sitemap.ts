@@ -4,9 +4,9 @@ const PAGES = ["/", "/dance", "/gymnastic", "/vacancies", "/privacy", "/terms"];
 
 const EXCLUDED = [
   "/finishSignUp",
-  "/groups",
   "/settings",
   "/admin",
+  "/teacher",
   "/password",
 ];
 

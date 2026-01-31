@@ -9,7 +9,6 @@ export const MessageToUser = ({ id }: { id: string }) => {
   const handleSend = () => {
     setIsLoading(true);
     MessageService.sendMessage(id, message)
-      .then((data) => console.log(data))
       .catch((e) => console.error(e))
       .finally(() => setIsLoading(false));
   };

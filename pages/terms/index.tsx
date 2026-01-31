@@ -9,6 +9,7 @@ export default function Terms() {
           name="description"
           content="Пользовательское соглашение школы-студии ЛиМи в Могилёве. Условия использования сайта, права и обязанности сторон."
         />
+        <link rel="canonical" href="https://limistudio.by/terms" />
         <script
   type="application/ld+json"
   dangerouslySetInnerHTML={{

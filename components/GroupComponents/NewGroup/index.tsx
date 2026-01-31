@@ -23,10 +23,6 @@ export function NewGroup({ students, handleDelete, groupName }: NewGroupProps) {
     }));
 
     GroupService.createGroup({ name: groupName, students: studentsArr })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((e) => console.log(e));
   };
 
   return (

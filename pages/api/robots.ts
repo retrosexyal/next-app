@@ -11,6 +11,7 @@ Disallow: /finishSignUp
 Disallow: /groups
 Disallow: /settings
 Disallow: /admin
+Disallow: /teacher
 
 Sitemap: ${baseUrl}/sitemap.xml
 `);

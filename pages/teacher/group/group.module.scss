@@ -1,0 +1,200 @@
+.container {
+  padding: 72px 8px 12px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.back {
+  background: none;
+  border: none;
+  color: #2563eb;
+  margin-bottom: 6px;
+}
+
+.offline {
+  background: #facc15;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+}
+
+.item {
+  padding: 10px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.present {
+  background: #22c55e;
+  color: white;
+}
+
+.temp {
+  font-size: 11px;
+  opacity: 0.6;
+  margin-left: 6px;
+}
+
+.sub {
+  background: #2563eb;
+  color: white;
+  border-radius: 50%;
+  min-width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.add {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  margin-top: 8px;
+}
+
+.payBtn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #16a34a;
+}
+
+.addForm {
+  background: #f1f5f9;
+  padding: 10px;
+  border-radius: 12px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  input {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+}
+
+.addActions {
+  display: flex;
+  gap: 6px;
+
+  button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+  }
+
+  button:first-child {
+    background: #16a34a;
+    color: white;
+  }
+
+  button:last-child {
+    background: #ef4444;
+    color: white;
+  }
+}
+
+.lastPay {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.payNone {
+  color: #aaa;
+}
+
+.payOk {
+  color: #2ecc71;
+}
+
+.payWarn {
+  color: #f39c12;
+}
+
+.payBad {
+  color: #e74c3c;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modalBox {
+  background: #fff;
+  width: 90%;
+  max-width: 420px;
+  max-height: 80vh;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalList {
+  flex: 1;
+  overflow-y: auto;
+  margin: 8px 0;
+}
+
+.modalRow {
+  padding: 8px 0;
+  border-bottom: 1px dashed #ddd;
+  font-size: 14px;
+}
+
+.modal button {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #111;
+  color: #fff;
+}
+
+.subOk {
+  background: #22c55e;
+}
+.subWarn {
+  background: #f59e0b;
+}
+.subDanger {
+  background: #ef4444;
+}
+
+.plusBtn {
+  background: #a855f7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

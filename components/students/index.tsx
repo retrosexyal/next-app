@@ -46,7 +46,6 @@ const Students = () => {
     setSort(e.target.value);
   };
   const handleChange = (e: React.MouseEvent<HTMLElement>) => {
-    console.log((e.target as HTMLElement).getAttribute("data-change"));
     if ((e.target as HTMLElement).getAttribute("data-change")) {
       setStudChange({
         ...studChange,
@@ -58,13 +57,13 @@ const Students = () => {
     if ((e.target as HTMLElement).getAttribute("data-del")) {
       const key = prompt(
         `вы хотите удалить ${(e.target as HTMLElement).getAttribute(
-          "data-name"
+          "data-name",
         )}?\n
-        напишите "удалить" для подтверждения`
+        напишите "удалить" для подтверждения`,
       );
       if (key === "удалить") {
         AuthService.deleteStudent(
-          (e.target as HTMLElement).getAttribute("data-del")!
+          (e.target as HTMLElement).getAttribute("data-del")!,
         );
       }
     }
@@ -87,7 +86,7 @@ const Students = () => {
       studChange.name,
       studChange.place,
       formatDate(studChange.date),
-      studChange.group
+      studChange.group,
     ).catch((err) => console.log(err));
     setIsChange(false);
   };
@@ -139,8 +138,8 @@ const Students = () => {
       <div className={styles.wrapper} onClick={handleChange}>
         {[...students]
           .filter((stud) => {
-            return (stud.name + stud.place + stud.group + stud.date)
-              .toUpperCase()
+            return `${stud.name + stud.place + stud.group + stud.date}`
+              ?.toUpperCase()
               .includes(find.toLocaleUpperCase());
           })
           /* ?.sort((a, b) => {

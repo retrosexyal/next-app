@@ -9,6 +9,7 @@ export default function Privacy() {
           name="description"
           content="Политика конфиденциальности школы-студии ЛиМи. Как мы обрабатываем персональные данные."
         />
+        <link rel="canonical" href="https://limistudio.by/privacy" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

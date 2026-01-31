@@ -1,0 +1,16 @@
+.container {
+  padding: 82px 12px 12px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.list { list-style: none; padding: 0; }
+
+.item {
+  padding: 14px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  cursor: pointer;
+  &:hover { box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+}

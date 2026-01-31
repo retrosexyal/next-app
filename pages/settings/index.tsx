@@ -14,6 +14,9 @@ import { ContractInfo } from "@/components/contract-info";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "@/theme";
 import Button from "@/components/button";
+import { TEACHERS } from "@/helpers/helpers";
+import { useRouter } from "next/router";
+import Head from "next/head";
 
 const EMPTY_DATA = {
   _id: "",
@@ -35,6 +38,7 @@ const EMPTY_DATA = {
 
 const Settings = () => {
   const { isActivated, email, id } = useAppSelector((state) => state.user.user);
+  const router = useRouter();
   const [data, setData] = useState<IContract[]>([EMPTY_DATA]);
   const [message, setMessage] = useState("");
   const dispatch = useAppDispatch();
@@ -92,94 +96,109 @@ const Settings = () => {
     setData((prev) => [...prev, EMPTY_DATA]);
   };
 
+  useEffect(() => {
+    if (TEACHERS.includes(email) && email !== "admin@admin") {
+      router.push("/teacher/groups");
+    }
+  }, [email, router]);
+
   return (
-    <ThemeProvider theme={theme}>
-      <div className={`wrapper ${styles.wrapper}`}>
-        {email === "admin@admin" && (
-          <>
-            <Link className={styles.link} href="/groups">
-              Мои группы
-            </Link>
-            <Link className={styles.link} href="/admin">
-              Согласование договоров
-            </Link>
-            <Students />
-          </>
-        )}
-        <div className={styles.flex_col}>
-          {isNotAdmin &&
-            data?.map((contract, ind) => {
-              const { isDone, _id, isSend, childrenName } = contract;
-              const isLastItem = ind === data.length - 1;
+    <>
+      <Head>
+        <meta name="robots" content="noindex, nofollow" />
+      </Head>
 
-              if (isDone) {
-                return (
-                  <>
-                    <ContractInfo data={contract} key={`${_id}_${ind}`} />
-                    {isLastItem && (
-                      <Button
-                        onClick={handleAddChildren}
-                        text="добавить ребёнка"
+      <ThemeProvider theme={theme}>
+        <div className={`wrapper ${styles.wrapper}`}>
+          {email === "admin@admin" && (
+            <>
+              <Link className={styles.link} href="/admin/groups">
+                Все группы
+              </Link>
+              <Link className={styles.link} href="/teacher/groups">
+                Мои группы
+              </Link>
+              <Link className={styles.link} href="/admin">
+                Согласование договоров
+              </Link>
+              <Students />
+            </>
+          )}
+          <div className={styles.flex_col}>
+            {isNotAdmin &&
+              data?.map((contract, ind) => {
+                const { isDone, _id, isSend, childrenName } = contract;
+                const isLastItem = ind === data.length - 1;
+
+                if (isDone) {
+                  return (
+                    <>
+                      <ContractInfo data={contract} key={`${_id}_${ind}`} />
+                      {isLastItem && (
+                        <Button
+                          onClick={handleAddChildren}
+                          text="добавить ребёнка"
+                        />
+                      )}
+                    </>
+                  );
+                }
+
+                if (isSend) {
+                  return (
+                    <>
+                      <div
+                        className={styles.content_wrapper}
+                        key={`${_id}_${ind}`}
+                      >
+                        <h2 style={{ textAlign: "center" }}>
+                          Ваш договор на занятия с ребёнком {childrenName}{" "}
+                          находится на согласовании у руководителя студии
+                        </h2>
+                        <h3 style={{ textAlign: "center" }}>
+                          После подписания он будет направлен Вам в почту
+                        </h3>
+                      </div>
+                      {isLastItem && data.length < 3 && (
+                        <Button
+                          onClick={handleAddChildren}
+                          text="добавить ребёнка"
+                        />
+                      )}
+                    </>
+                  );
+                }
+
+                if (isActivated) {
+                  return (
+                    <>
+                      <p style={{ textAlign: "center", maxWidth: "80%" }}>
+                        Заполните информация для заключения договора
+                      </p>
+                      <Contract
+                        key={`${_id}_${ind}`}
+                        info={contract}
+                        setInfo={setData}
                       />
-                    )}
-                  </>
-                );
-              }
+                    </>
+                  );
+                }
 
-              if (isSend) {
-                return (
-                  <>
-                    <div
-                      className={styles.content_wrapper}
-                      key={`${_id}_${ind}`}
-                    >
-                      <h2 style={{ textAlign: "center" }}>
-                        Ваш договор на занятия с ребёнком {childrenName}{" "}
-                        находится на согласовании у руководителя студии
-                      </h2>
-                      <h3 style={{ textAlign: "center" }}>
-                        После подписания он будет направлен Вам в почту
-                      </h3>
-                    </div>
-                    {isLastItem && data.length < 3 && (
-                      <Button
-                        onClick={handleAddChildren}
-                        text="добавить ребёнка"
-                      />
-                    )}
-                  </>
-                );
-              }
-
-              if (isActivated) {
-                return (
-                  <>
-                    <p style={{ textAlign: "center", maxWidth: "80%" }}>
-                      Заполните информация для заключения договора
-                    </p>
-                    <Contract
-                      key={`${_id}_${ind}`}
-                      info={contract}
-                      setInfo={setData}
-                    />
-                  </>
-                );
-              }
-
-              return null;
-            })}
-        </div>
-        {message && (
-          <div>
-            <h2 style={{ textAlign: "center" }}>
-              Сообщение от руководителя студии ЛиМи:
-            </h2>
-            <h3 style={{ textAlign: "center" }}>{message}</h3>
+                return null;
+              })}
           </div>
-        )}
-        {isLoading && <Loader />}
-      </div>
-    </ThemeProvider>
+          {message && (
+            <div>
+              <h2 style={{ textAlign: "center" }}>
+                Сообщение от руководителя студии ЛиМи:
+              </h2>
+              <h3 style={{ textAlign: "center" }}>{message}</h3>
+            </div>
+          )}
+          {isLoading && <Loader />}
+        </div>
+      </ThemeProvider>
+    </>
   );
 };
 

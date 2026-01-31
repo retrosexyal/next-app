@@ -1,7 +1,7 @@
 import StudentModel from "@/models/student-model";
 import messageModel from "@/models/message-model";
 import { IGroup } from "@/clientModels/IGroup";
-import GroupModels from "@/models/group-models";
+import GroupModels from "@/models/group-model";
 import userModel from "@/models/user-model";
 import contractModel from "@/models/contract-model";
 

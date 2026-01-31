@@ -9,8 +9,6 @@ class ContractService {
   async createContract(userId: string, info: IContract) {
     const contractId = info["_id"];
 
-    console.log(contractId);
-
     if (contractId) {
       const test = await contractModel.findOne({ _id: contractId });
 
@@ -129,7 +127,6 @@ class ContractService {
     const result = await contractModel.updateMany({}, { isOldContract: true });
 
     if (result) {
-      console.log(result);
 
       return { message: "Информация обновлена" };
     }

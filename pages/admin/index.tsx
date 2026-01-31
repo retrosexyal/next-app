@@ -11,6 +11,7 @@ import { Backdrop, CircularProgress } from "@mui/material";
 import Popup from "@/components/popup";
 import { ContractChange } from "@/components/contract-change";
 import { MessageToUser } from "@/components/message-to-user";
+import Head from "next/head";
 
 function formatDate(date: string) {
   const parts = date.split("-");
@@ -182,143 +183,157 @@ const Admin = () => {
   };
 
   return (
-    <div style={{ paddingTop: "80px" }} className="wrapper">
-      <div className={styles.wrapper}>
-        <Link className={styles.link} href="/">
-          Вернуться на главную страницу
-        </Link>
-        {email === "admin@admin" && (
-          <Button onClick={handleBirthday}>Проверить дни рождения</Button>
-        )}
-        <Button onClick={handleContract}>Получить все договоры</Button>
-        {email === "admin@admin" && (
-          <div>
-            <div>
-              {data &&
-                data.map((contract, ind) => {
-                  return (
-                    <React.Fragment
-                      key={`${contract.user}_${ind}_${contract._id}`}
-                    >
-                      {!contract.isDone && contract.isSend && (
-                        <div className={styles.container}>
-                          <div>Имя родителя: {contract.parentName}</div>
-                          <div>Серия паспорта: {contract.KB}</div>
-                          <div>День рождения: {contract.birthday}</div>
-                          <div>Имя ребёнка: {contract.childrenName}</div>
-                          <div>
-                            Хронические заболевания: {contract.diseases}
-                          </div>
-                          <div>Когда выдан паспорт: {contract.pasportDate}</div>
-                          <div>Кем выдан паспорт: {contract.pasportPlace}</div>
-                          <div>Телефон: {contract.phone}</div>
-                          <div>Место проведения: {contract.place}</div>
+    <>
+      <Head>
+        <meta name="robots" content="noindex, nofollow" />
+      </Head>
 
-                          <Button
-                            onClick={handleSendMail()}
-                            data-id={`${contract.user}`}
-                            data-contract-id={`${contract["_id"]}`}
-                            variant="contained"
-                          >
-                            отправить родителям
-                          </Button>
-                          <Button
-                            onClick={handleSendMail(true)}
-                            data-contract-id={`${contract["_id"]}`}
-                            data-id={`${contract.user}`}
-                            variant="contained"
-                          >
-                            отправить мне
-                          </Button>
-                          <Button
-                            onClick={handleCreate}
-                            data-id={`${contract.user}`}
-                            data-contract-id={`${contract["_id"]}`}
-                            variant="contained"
-                          >
-                            Закончить создание
-                          </Button>
-                          <Button
-                            onClick={handleDelete}
-                            data-id={`${contract.user}`}
-                            data-contract-id={`${contract["_id"]}`}
-                          >
-                            Вернуть договор
-                          </Button>
-                          <Button
-                            onClick={() => handleSendMessage(contract.user)}
-                          >
-                            Написать сообщение
-                          </Button>
-                          <Button
-                            onClick={() => handleShowChange(contract)}
-                            data-id={`${contract.user}`}
-                            data-contract-id={`${contract["_id"]}`}
-                          >
-                            Изменить договор
-                          </Button>
-                        </div>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              {!isHiden &&
-                data &&
-                data.map((contract) => {
-                  return (
-                    <React.Fragment key={contract.user}>
-                      {
-                        <div className={styles.container}>
-                          <div>Имя родителя: {contract.parentName}</div>
-                          <div>Серия паспорта: {contract.KB}</div>
-                          <div>День рождения: {contract.birthday}</div>
-                          <div>Имя ребёнка: {contract.childrenName}</div>
-                          <div>
-                            Хронические заболевания: {contract.diseases}
+      <div style={{ paddingTop: "80px" }} className="wrapper">
+        <div className={styles.wrapper}>
+          <Link className={styles.link} href="/">
+            Вернуться на главную страницу
+          </Link>
+          {email === "admin@admin" && (
+            <Button onClick={handleBirthday}>Проверить дни рождения</Button>
+          )}
+          <Button onClick={handleContract}>Получить все договоры</Button>
+          {email === "admin@admin" && (
+            <div>
+              <div>
+                {data &&
+                  data.map((contract, ind) => {
+                    return (
+                      <React.Fragment
+                        key={`${contract.user}_${ind}_${contract._id}`}
+                      >
+                        {!contract.isDone && contract.isSend && (
+                          <div className={styles.container}>
+                            <div>Имя родителя: {contract.parentName}</div>
+                            <div>Серия паспорта: {contract.KB}</div>
+                            <div>День рождения: {contract.birthday}</div>
+                            <div>Имя ребёнка: {contract.childrenName}</div>
+                            <div>
+                              Хронические заболевания: {contract.diseases}
+                            </div>
+                            <div>
+                              Когда выдан паспорт: {contract.pasportDate}
+                            </div>
+                            <div>
+                              Кем выдан паспорт: {contract.pasportPlace}
+                            </div>
+                            <div>Телефон: {contract.phone}</div>
+                            <div>Место проведения: {contract.place}</div>
+
+                            <Button
+                              onClick={handleSendMail()}
+                              data-id={`${contract.user}`}
+                              data-contract-id={`${contract["_id"]}`}
+                              variant="contained"
+                            >
+                              отправить родителям
+                            </Button>
+                            <Button
+                              onClick={handleSendMail(true)}
+                              data-contract-id={`${contract["_id"]}`}
+                              data-id={`${contract.user}`}
+                              variant="contained"
+                            >
+                              отправить мне
+                            </Button>
+                            <Button
+                              onClick={handleCreate}
+                              data-id={`${contract.user}`}
+                              data-contract-id={`${contract["_id"]}`}
+                              variant="contained"
+                            >
+                              Закончить создание
+                            </Button>
+                            <Button
+                              onClick={handleDelete}
+                              data-id={`${contract.user}`}
+                              data-contract-id={`${contract["_id"]}`}
+                            >
+                              Вернуть договор
+                            </Button>
+                            <Button
+                              onClick={() => handleSendMessage(contract.user)}
+                            >
+                              Написать сообщение
+                            </Button>
+                            <Button
+                              onClick={() => handleShowChange(contract)}
+                              data-id={`${contract.user}`}
+                              data-contract-id={`${contract["_id"]}`}
+                            >
+                              Изменить договор
+                            </Button>
                           </div>
-                          <div>Когда выдан паспорт: {contract.pasportDate}</div>
-                          <div>Кем выдан паспорт: {contract.pasportPlace}</div>
-                          <div>Телефон: {contract.phone}</div>
-                          <div>Место проведения: {contract.place}</div>
-                          <Button
-                            onClick={handleDelete}
-                            data-id={`${contract.user}`}
-                          >
-                            Вернуть договор
-                          </Button>
-                        </div>
-                      }
-                    </React.Fragment>
-                  );
-                })}
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                {!isHiden &&
+                  data &&
+                  data.map((contract) => {
+                    return (
+                      <React.Fragment key={contract.user}>
+                        {
+                          <div className={styles.container}>
+                            <div>Имя родителя: {contract.parentName}</div>
+                            <div>Серия паспорта: {contract.KB}</div>
+                            <div>День рождения: {contract.birthday}</div>
+                            <div>Имя ребёнка: {contract.childrenName}</div>
+                            <div>
+                              Хронические заболевания: {contract.diseases}
+                            </div>
+                            <div>
+                              Когда выдан паспорт: {contract.pasportDate}
+                            </div>
+                            <div>
+                              Кем выдан паспорт: {contract.pasportPlace}
+                            </div>
+                            <div>Телефон: {contract.phone}</div>
+                            <div>Место проведения: {contract.place}</div>
+                            <Button
+                              onClick={handleDelete}
+                              data-id={`${contract.user}`}
+                            >
+                              Вернуть договор
+                            </Button>
+                          </div>
+                        }
+                      </React.Fragment>
+                    );
+                  })}
+              </div>
             </div>
-          </div>
+          )}
+        </div>
+
+        {isLoading && (
+          <Backdrop
+            sx={{
+              color: "#fff",
+              zIndex: (theme: { zIndex: { drawer: number } }) =>
+                theme.zIndex.drawer + 1,
+            }}
+            open={isLoading}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        )}
+        {isShowChange && (
+          <Popup onClick={() => setIsShowChange(!isShowChange)}>
+            {dataToChange && <ContractChange contract={dataToChange} />}
+          </Popup>
+        )}
+        {isShowSendMessage && (
+          <Popup onClick={() => setIsShowSendMessage(false)}>
+            {idToMessage && <MessageToUser id={idToMessage} />}
+          </Popup>
         )}
       </div>
-
-      {isLoading && (
-        <Backdrop
-          sx={{
-            color: "#fff",
-            zIndex: (theme: { zIndex: { drawer: number } }) =>
-              theme.zIndex.drawer + 1,
-          }}
-          open={isLoading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
-      )}
-      {isShowChange && (
-        <Popup onClick={() => setIsShowChange(!isShowChange)}>
-          {dataToChange && <ContractChange contract={dataToChange} />}
-        </Popup>
-      )}
-      {isShowSendMessage && (
-        <Popup onClick={() => setIsShowSendMessage(false)}>
-          {idToMessage && <MessageToUser id={idToMessage} />}
-        </Popup>
-      )}
-    </div>
+    </>
   );
 };
 

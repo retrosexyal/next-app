@@ -42,6 +42,12 @@ export default async function handler(
   const group = await requireGroupAccess(String(lesson.group), user, res);
   if (!group) return;
 
+  const subs = await Subscription.find({
+    student: { $in: items.map((i) => i.studentId) },
+  }).lean();
+
+  const subSet = new Set(subs.map((s) => String(s.student)));
+
   // 1) upsert посещаемости
   const ops = items.map((it) => ({
     updateOne: {
@@ -51,7 +57,7 @@ export default async function handler(
           present: Boolean(it.present),
         },
         $setOnInsert: {
-          source: it.source ?? "free",
+          source: subSet.has(it.studentId) ? "subscription" : "free",
           consumed: false,
         },
       },

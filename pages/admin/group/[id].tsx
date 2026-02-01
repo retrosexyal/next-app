@@ -20,12 +20,14 @@ export default function EditGroup() {
   const { id } = router.query;
 
   const [mode, setMode] = useState<"students" | "journal">("journal");
+  const [expressQuery, setExpressQuery] = useState("");
 
   const [group, setGroup] = useState<any>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [contracts, setContracts] = useState<any[]>([]);
   const [query, setQuery] = useState("");
+  const [expressPays, setExpressPays] = useState<any | null>(null);
 
   const [lessons, setLessons] = useState<any[]>([]);
   const [lessonId, setLessonId] = useState<string>("");
@@ -91,12 +93,28 @@ export default function EditGroup() {
       </Head>
 
       <div className={styles.container}>
-        <button
-          className={styles.back}
-          onClick={() => router.push("/admin/groups")}
-        >
-          ← Назад к группам
-        </button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button
+            className={styles.back}
+            onClick={() => router.push("/admin/groups")}
+          >
+            ← Назад к группам
+          </button>
+
+          <button
+            className={styles.back}
+            onClick={async () => {
+              const r = await fetch("/api/admin/payments/express-last-month", {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              });
+              setExpressPays(await r.json());
+            }}
+          >
+            💳 Express (30 дней)
+          </button>
+        </div>
 
         <div className={styles.tabs}>
           <button
@@ -330,6 +348,57 @@ export default function EditGroup() {
               </div>
 
               <button onClick={() => setPayHistory(null)}>Закрыть</button>
+            </div>
+          </div>
+        )}
+        {expressPays && (
+          <div className={styles.modal} onClick={() => setExpressPays(null)}>
+            <div
+              className={styles.modalBox}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3>Express оплаты (30 дней) — {expressPays.count}</h3>
+
+              <input
+                placeholder="Поиск по телефону или фамилии"
+                value={expressQuery}
+                onChange={(e) => setExpressQuery(e.target.value)}
+                style={{
+                  padding: 8,
+                  borderRadius: 8,
+                  border: "1px solid #ccc",
+                  marginBottom: 8,
+                }}
+              />
+
+              <div className={styles.modalList}>
+                {expressPays.items
+                  .filter((p: any) => {
+                    if (!expressQuery) return true;
+                    const q = expressQuery.toLowerCase();
+
+                    const phone = (p.phone || "").toLowerCase();
+                    const surname = (p.surname || "").toLowerCase();
+
+                    return phone.includes(q) || surname.includes(q);
+                  })
+                  .map((p: any, idx: number) => (
+                    <div key={p.paymentNo || idx} className={styles.modalRow}>
+                      <div>
+                        <b>
+                          {p.surname} {p.firstName}
+                        </b>
+                      </div>
+                      <div>
+                        {p.phone} —{" "}
+                        {p.date ? new Date(p.date).toLocaleDateString() : "—"} —{" "}
+                        {p.amount ? `${p.amount}₽` : ""}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              <button onClick={() => setExpressPays(null)}>Закрыть</button>
             </div>
           </div>
         )}

@@ -7,6 +7,7 @@ import Lesson from "@/models/lesson-model";
 import Attendance from "@/models/attendance-model";
 import Subscription from "@/models/subscription-model";
 import "@/models/subscription-model";
+import Payment from "@/models/payment-model";
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,8 +33,10 @@ export default async function handler(
   if (!group) return res.status(404).json("группа не найдена");
 
   // ---- сегодня (по локальному времени) ----
-  const now = new Date();
-  const start = new Date(now);
+  const nowUtc = new Date();
+  const moscow = new Date(nowUtc.getTime() + 3 * 60 * 60 * 1000);
+
+  const start = new Date(moscow);
   start.setHours(0, 0, 0, 0);
 
   const end = new Date(start);
@@ -57,12 +60,32 @@ export default async function handler(
     });
   }
 
-  const result = {
+  /* const result = {
     ...group.toObject(),
     students: group.students.map((s: any) => ({
       ...s.toObject(),
       todayAttendance: attendanceMap[String(s._id)] || null,
     })),
+  }; */
+
+  const studentsWithLastPay = await Promise.all(
+    group.students.map(async (s: any) => {
+      const last = await Payment.findOne({ student: s._id })
+        .sort({ date: -1 })
+        .select("amount date type")
+        .lean();
+
+      return {
+        ...s.toObject(),
+        lastPayment: last || null,
+        todayAttendance: attendanceMap[String(s._id)] || null,
+      };
+    }),
+  );
+
+  const result = {
+    ...group.toObject(),
+    students: studentsWithLastPay,
   };
 
   return res.status(200).json(result);

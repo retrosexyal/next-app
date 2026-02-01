@@ -85,16 +85,13 @@ export default function TeacherGroup() {
   const ensureLesson = async () => {
     if (lessonId) return lessonId;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     const res = await fetch("/api/lessons/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify({ groupId: id, date: today.toISOString() }),
+      body: JSON.stringify({ groupId: id }),
     });
 
     const data = await res.json();
@@ -159,7 +156,7 @@ export default function TeacherGroup() {
 
     // вчера
     const yesterday = new Date(moscowNow);
-    yesterday.setDate(yesterday.getDate() - 2);
+    yesterday.setDate(yesterday.getDate() - 14);
     const todayMinus1 = yesterday.toISOString().slice(0, 10).replace(/-/g, "");
 
     fetch("/api/payments/sync-group", {
@@ -238,7 +235,7 @@ export default function TeacherGroup() {
                 </div>
 
                 {sub && (
-                  <span
+                  <div
                     className={
                       left <= 1
                         ? styles.subDanger
@@ -246,9 +243,10 @@ export default function TeacherGroup() {
                           ? styles.subWarn
                           : styles.subOk
                     }
+                    style={{ marginTop: 4, fontSize: 12 }}
                   >
-                    {left}
-                  </span>
+                    Осталось: {left}
+                  </div>
                 )}
                 {sub && (
                   <button

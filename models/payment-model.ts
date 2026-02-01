@@ -6,7 +6,7 @@ const PaymentSchema = new Schema({
   lessonsCount: Number,
   amount: Number,
   date: Date,
-  externalId: String
+  externalId: { type: String, unique: true, index: true },
 });
 
 export default models?.Payment || model("Payment", PaymentSchema);

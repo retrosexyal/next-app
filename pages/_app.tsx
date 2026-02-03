@@ -12,9 +12,9 @@ import { useRouter } from "next/router";
 import { Roboto } from "next/font/google";
 
 const roboto = Roboto({
-  subsets: ["latin"],
+  subsets: ["cyrillic", "latin"],
   weight: ["400", "500", "700"],
-  display: "swap",
+  display: "optional",
 });
 
 export default function App({ Component, pageProps }: AppProps) {

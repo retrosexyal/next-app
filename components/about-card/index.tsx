@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import styles from "./aboutCard.module.scss";
+import styles1 from "./aboutCard.module.scss";
+import styles2 from "./reviewCard.module.scss";
 
 interface IProps {
   title?: string;
@@ -17,6 +18,8 @@ export const AboutCard: React.FC<IProps> = ({
   wayTitle,
   isStyled,
 }) => {
+  const styles = isStyled ? styles2 : styles1;
+
   const imgSrc = `/imgs/${src}`;
   return (
     <div className={styles.container}>
@@ -25,8 +28,8 @@ export const AboutCard: React.FC<IProps> = ({
           className={isStyled ? styles.img : ""}
           src={imgSrc}
           alt="number of title"
-          width={`${isStyled ? "640" : "50"}`}
-          height={`${isStyled ? "640" : "50"}`}
+          width={`${isStyled ? "300" : "80"}`}
+          height={`${isStyled ? "300" : "80"}`}
           loading="lazy"
         />
       </div>

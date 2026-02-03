@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./about.module.scss";
 import { AboutCard } from "@/components/about-card";
 import { content } from "@/components/about-card/constants";

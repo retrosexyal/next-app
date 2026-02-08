@@ -14,6 +14,7 @@ export default async function handler(
   if (!admin) return;
 
   const { lessonId } = req.query;
+  if (!lessonId) return res.status(400).json("lessonId обязателен");
 
   const lesson = await Lesson.findById(lessonId);
   if (!lesson) return res.status(404).end();
@@ -21,23 +22,47 @@ export default async function handler(
   const group = await Group.findById(lesson.group).populate("students");
   if (!group) return res.status(404).end();
 
-  const attendances = await Attendance.find({ lesson: lessonId }).populate({
-    path: "student",
-    select: "fullName lastPayment",
-  });
+  // берём посещаемость С оплатами
+  const attendances = await Attendance.find({ lesson: lessonId })
+    .populate({
+      path: "student",
+      select: "fullName",
+    })
+    .lean();
 
-  const map = new Map(attendances.map((a) => [a.student._id.toString(), a]));
+  const attendanceMap = new Map(
+    attendances.map((a: any) => [String(a.student._id), a]),
+  );
 
   const rows = (group.students as any[]).map((s) => {
-    const a = map.get(s._id.toString());
+    const a = attendanceMap.get(String(s._id));
 
     return {
       _id: s._id,
-      student: a?.student || s,
-      present: a ? a.present : false,
-      source: a?.source || "free",
+      student: {
+        _id: s._id,
+        fullName: s.fullName,
+      },
+
+      present: a?.present ?? false,
+      source: a?.source ?? "free",
+
+      // ✅ ВОТ ГЛАВНОЕ
+      payment: a?.payment || {
+        type: "free",
+        amount: 0,
+        date: lesson.date,
+      },
+
+      consumed: a?.consumed ?? false,
     };
   });
 
-  res.json(rows);
+  res.json({
+    lesson: {
+      _id: lesson._id,
+      date: lesson.date,
+    },
+    rows,
+  });
 }

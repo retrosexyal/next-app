@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import styles from "../group.module.scss";
 import ContractService from "@/clientServices/ContractService";
 import Head from "next/head";
+import { MonthReportTable } from "@/components/MonthReportTable";
 
 interface Student {
   _id: string;
@@ -19,7 +20,7 @@ export default function EditGroup() {
   const router = useRouter();
   const { id } = router.query;
 
-  const [mode, setMode] = useState<"students" | "journal">("journal");
+  const [mode, setMode] = useState<"students" | "journal" | "month">("journal");
   const [expressQuery, setExpressQuery] = useState("");
 
   const [group, setGroup] = useState<any>(null);
@@ -34,6 +35,10 @@ export default function EditGroup() {
 
   const [rows, setRows] = useState<any[]>([]);
   const [payHistory, setPayHistory] = useState<any[] | null>(null);
+  const [editSubStudent, setEditSubStudent] = useState<any | null>(null);
+  const [subAddCount, setSubAddCount] = useState<string>("8");
+  const [subRemaining, setSubRemaining] = useState<string>("");
+  const [subReason, setSubReason] = useState<string>("");
 
   const load = async () => {
     if (!id) return;
@@ -77,7 +82,7 @@ export default function EditGroup() {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((r) => r.json())
-      .then(setRows);
+      .then((data) => setRows(data.rows));
   }, [lessonId, mode]);
 
   const filtered = contracts.filter((c) =>
@@ -128,6 +133,12 @@ export default function EditGroup() {
             onClick={() => setMode("journal")}
           >
             Журнал
+          </button>
+          <button
+            className={mode === "month" ? styles.activeTab : ""}
+            onClick={() => setMode("month")}
+          >
+            Месяц
           </button>
         </div>
 
@@ -260,6 +271,16 @@ export default function EditGroup() {
                   >
                     ✕
                   </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditSubStudent(s);
+                      setSubRemaining("");
+                      setSubReason("");
+                    }}
+                  >
+                    ⚙️
+                  </button>
                 </li>
               ))}
             </ul>
@@ -283,8 +304,8 @@ export default function EditGroup() {
 
             <ul className={styles.list}>
               {rows.map((r) => {
-                const last = r.student?.lastPayment
-                  ? new Date(r.student.lastPayment.date)
+                const paymentDate = r.payment?.date
+                  ? new Date(r.payment.date)
                   : null;
 
                 return (
@@ -297,10 +318,10 @@ export default function EditGroup() {
                     <div className={styles.left}>
                       <div className={styles.name}>{r.student?.fullName}</div>
 
-                      {r.student?.lastPayment && (
+                      {r.payment && r.payment.type !== "free" && (
                         <div className={styles.lastPay}>
-                          ₽ {r.student.lastPayment.amount} —{" "}
-                          {last!.toLocaleDateString()}
+                          ₽ {r.payment.amount} —{" "}
+                          {paymentDate?.toLocaleDateString()}
                         </div>
                       )}
                     </div>
@@ -322,12 +343,75 @@ export default function EditGroup() {
                     >
                       ₽
                     </button>
+                    {r.consumed && !r.refunded && (
+                      <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                        <button
+                          style={{ fontSize: 12 }}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await fetch("/api/attendance/refund", {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                              },
+                              body: JSON.stringify({
+                                attendanceId: r._id,
+                                reason: "medical",
+                              }),
+                            });
+                            // перезагружаем журнал
+                            const refreshed = await fetch(
+                              `/api/admin/groups/lesson-view?lessonId=${lessonId}`,
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                },
+                              },
+                            );
+                            setRows((await refreshed.json()).rows);
+                          }}
+                        >
+                          🩺 Справка
+                        </button>
+
+                        <button
+                          style={{ fontSize: 12 }}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await fetch("/api/attendance/refund", {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                              },
+                              body: JSON.stringify({
+                                attendanceId: r._id,
+                                reason: "free",
+                              }),
+                            });
+                            const refreshed = await fetch(
+                              `/api/admin/groups/lesson-view?lessonId=${lessonId}`,
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                },
+                              },
+                            );
+                            setRows((await refreshed.json()).rows);
+                          }}
+                        >
+                          🆓 Пропуск
+                        </button>
+                      </div>
+                    )}
                   </li>
                 );
               })}
             </ul>
           </>
         )}
+        {mode === "month" && <MonthReportTable groupId={id as string} />}
 
         {/* ---------- МОДАЛКА ---------- */}
         {payHistory && (
@@ -399,6 +483,172 @@ export default function EditGroup() {
               </div>
 
               <button onClick={() => setExpressPays(null)}>Закрыть</button>
+            </div>
+          </div>
+        )}
+        {editSubStudent && (
+          <div className={styles.modal} onClick={() => setEditSubStudent(null)}>
+            <div
+              className={styles.modalBox}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3>Абонемент — {editSubStudent.fullName}</h3>
+
+              {/* Текущие данные */}
+              {editSubStudent.activeSubscription ? (
+                (() => {
+                  const sub = editSubStudent.activeSubscription;
+                  const left = Math.max(
+                    0,
+                    (sub.totalLessons || 0) - (sub.usedLessons || 0),
+                  );
+                  return (
+                    <div style={{ fontSize: 14, marginTop: 6 }}>
+                      <div>
+                        Всего: <b>{sub.totalLessons}</b>
+                      </div>
+                      <div>
+                        Списано: <b>{sub.usedLessons}</b>
+                      </div>
+                      <div>
+                        Осталось: <b>{left}</b>
+                      </div>
+                    </div>
+                  );
+                })()
+              ) : (
+                <div style={{ fontSize: 14, marginTop: 6, opacity: 0.7 }}>
+                  Абонемента нет (можно добавить занятия — будет
+                  создан/обновлён)
+                </div>
+              )}
+
+              {/* Причина обязательна */}
+              <input
+                placeholder="Причина (обязательно)"
+                value={subReason}
+                onChange={(e) => setSubReason(e.target.value)}
+                style={{
+                  padding: 10,
+                  borderRadius: 10,
+                  border: "1px solid #ddd",
+                  marginTop: 12,
+                }}
+              />
+
+              {/* Добавить занятия */}
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <input
+                  placeholder="+ занятий"
+                  value={subAddCount}
+                  onChange={(e) => setSubAddCount(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: 10,
+                    borderRadius: 10,
+                    border: "1px solid #ddd",
+                  }}
+                />
+                <button
+                  onClick={async () => {
+                    const count = Number(subAddCount);
+                    if (!Number.isFinite(count) || count === 0)
+                      return alert("Введите число");
+                    if (!subReason.trim()) return alert("Укажите причину");
+
+                    // если нет subscriptionId — нужен способ получить/создать.
+                    // Я предполагаю, что editSubStudent.activeSubscription содержит _id.
+                    const subscriptionId =
+                      editSubStudent.activeSubscription?._id;
+                    if (!subscriptionId)
+                      return alert(
+                        "Нет subscriptionId. Нужно, чтобы сервер отдавал activeSubscription._id",
+                      );
+
+                    await fetch("/api/subscriptions/add-lessons", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                      },
+                      body: JSON.stringify({
+                        subscriptionId,
+                        count,
+                        reason: subReason,
+                      }),
+                    });
+
+                    await load();
+                    setEditSubStudent(null);
+                  }}
+                  style={{
+                    background: "#111",
+                    color: "#fff",
+                    borderRadius: 10,
+                    border: "none",
+                    padding: "10px 12px",
+                  }}
+                >
+                  ➕ Добавить
+                </button>
+              </div>
+
+              {/* Установить остаток */}
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <input
+                  placeholder="Сделать осталось = ..."
+                  value={subRemaining}
+                  onChange={(e) => setSubRemaining(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: 10,
+                    borderRadius: 10,
+                    border: "1px solid #ddd",
+                  }}
+                />
+                <button
+                  onClick={async () => {
+                    const remaining = Number(subRemaining);
+                    if (!Number.isFinite(remaining) || remaining < 0)
+                      return alert("Введите остаток (0 или больше)");
+                    if (!subReason.trim()) return alert("Укажите причину");
+
+                    const subscriptionId =
+                      editSubStudent.activeSubscription?._id;
+                    if (!subscriptionId)
+                      return alert(
+                        "Нет subscriptionId. Нужно, чтобы сервер отдавал activeSubscription._id",
+                      );
+
+                    await fetch("/api/subscriptions/set-remaining", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                      },
+                      body: JSON.stringify({
+                        subscriptionId,
+                        remaining,
+                        reason: subReason,
+                      }),
+                    });
+
+                    await load();
+                    setEditSubStudent(null);
+                  }}
+                  style={{
+                    background: "#111",
+                    color: "#fff",
+                    borderRadius: 10,
+                    border: "none",
+                    padding: "10px 12px",
+                  }}
+                >
+                  ✏️ Применить
+                </button>
+              </div>
+
+              <button onClick={() => setEditSubStudent(null)}>Закрыть</button>
             </div>
           </div>
         )}

@@ -26,7 +26,7 @@ export default async function handler(
     path: "students",
     populate: {
       path: "activeSubscription",
-      select: "totalLessons usedLessons",
+      select: "_id totalLessons usedLessons",
     },
   });
 

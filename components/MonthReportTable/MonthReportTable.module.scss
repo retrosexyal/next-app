@@ -1,0 +1,64 @@
+.wrapper {
+  margin-top: 12px;
+}
+
+.monthInput {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+
+.table th,
+.table td {
+  border: 1px solid #e5e7eb;
+  padding: 6px;
+  text-align: center;
+  min-width: 36px;
+}
+
+.table th {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.student {
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+  background: #f1f5f9;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.present {
+  background: #dcfce7; // зелёный
+  color: #166534;
+  font-weight: 500;
+}
+
+.absent {
+  background: #fee2e2; // красный
+  color: #991b1b;
+}
+
+.empty {
+  background: #f9fafb;
+}
+
+.total {
+  background: #111827;
+  color: white;
+  font-weight: 600;
+}

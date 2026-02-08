@@ -45,6 +45,10 @@ export default function TeacherGroup() {
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [payHistory, setPayHistory] = useState<any[] | null>(null);
+  const [payModal, setPayModal] = useState<{
+    studentId: string;
+    lessonId: string;
+  } | null>(null);
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -138,14 +142,6 @@ export default function TeacherGroup() {
     }
   }, [online]);
 
-  const toggle = (sid: string) => {
-    const next = { ...attendance, [sid]: !attendance[sid] };
-    setAttendance(next);
-
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => sync(next), 500);
-  };
-
   useEffect(() => {
     if (!id) return;
 
@@ -172,6 +168,14 @@ export default function TeacherGroup() {
       }),
     }).then(load);
   }, [id]);
+
+  const openPayModal = async (studentId: string) => {
+    const lid = await ensureLesson(); // 👈 гарантируем урок
+    setPayModal({
+      studentId,
+      lessonId: lid,
+    });
+  };
 
   if (!group) return <div className={styles.container}>Загрузка...</div>;
 
@@ -217,7 +221,7 @@ export default function TeacherGroup() {
               <li
                 key={s._id}
                 className={`${styles.item} ${attendance[s._id] ? styles.present : ""}`}
-                onClick={() => toggle(s._id)}
+                onClick={() => openPayModal(s._id)}
               >
                 <div className={styles.left}>
                   <div className={styles.name}>
@@ -248,45 +252,11 @@ export default function TeacherGroup() {
                     Осталось: {left}
                   </div>
                 )}
-                {sub && (
-                  <button
-                    className={styles.plusBtn}
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      await fetch("/api/subscriptions/add", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${localStorage.getItem("token")}`,
-                        },
-                        body: JSON.stringify({ studentId: s._id }),
-                      });
-                      load();
-                    }}
-                  >
-                    ➕
-                  </button>
-                )}
 
                 <button
                   className={styles.payBtn}
                   onClick={async (e) => {
                     e.stopPropagation();
-                    /* const res = await fetch("/api/payments/check-student", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${localStorage.getItem("token")}`!,
-                    },
-                    body: JSON.stringify({
-                      studentId: s._id,
-                      phone: s.phone,
-                      fullName: s.fullName,
-                    }),
-                  }); */
-
-                    /* const data = await res.json(); */
-                    /* await load();  */ // обновляем lastPayment
                     const h = await fetch(
                       `/api/payments/by-student?id=${s._id}`,
                       {
@@ -296,17 +266,6 @@ export default function TeacherGroup() {
                       },
                     );
                     setPayHistory(await h.json());
-
-                    /*  alert(
-                    data.length
-                      ? data
-                          .map(
-                            (p: any) =>
-                              `${p.Created.slice(6, 8)}.${p.Created.slice(4, 6)} — ${p.Amount}р`,
-                          )
-                          .join("\n")
-                      : "Оплат не найдено",
-                  ); */
                   }}
                 >
                   ₽
@@ -315,6 +274,103 @@ export default function TeacherGroup() {
             );
           })}
         </ul>
+        {payModal && (
+          <div className={styles.modal} onClick={() => setPayModal(null)}>
+            <div
+              className={styles.modalBox}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3>Выберите оплату</h3>
+
+              <button
+                onClick={async () => {
+                  await fetch("/api/attendance/set-payment", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({
+                      lessonId: payModal.lessonId,
+                      studentId: payModal.studentId,
+                      mode: "single",
+                    }),
+                  });
+                  setPayModal(null);
+                  load();
+                }}
+              >
+                Разовое — 12₽
+              </button>
+
+              <button
+                onClick={async () => {
+                  await fetch("/api/attendance/set-payment", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({
+                      lessonId: payModal.lessonId,
+                      studentId: payModal.studentId,
+                      mode: "subscription",
+                    }),
+                  });
+                  setPayModal(null);
+                  load();
+                }}
+              >
+                Абонемент — 84₽
+              </button>
+
+              <button
+                onClick={async () => {
+                  await fetch("/api/attendance/set-payment", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({
+                      lessonId: payModal.lessonId,
+                      studentId: payModal.studentId,
+                      mode: "relative",
+                    }),
+                  });
+                  setPayModal(null);
+                  load();
+                }}
+              >
+                Родственник — 9₽
+              </button>
+              <button
+                style={{ marginTop: 12, color: "red" }}
+                onClick={async () => {
+                  await fetch("/api/attendance/remove", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({
+                      lessonId: payModal.lessonId,
+                      studentId: payModal.studentId,
+                    }),
+                  });
+
+                  setPayModal(null);
+                  load();
+                }}
+              >
+                Отменить присутствие
+              </button>
+
+              <button onClick={() => setPayModal(null)}>Отмена</button>
+            </div>
+          </div>
+        )}
+
         {payHistory && (
           <div className={styles.modal} onClick={() => setPayHistory(null)}>
             <div

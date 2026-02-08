@@ -13,7 +13,6 @@ import "@/models/group-student-model";
 type AttendanceItem = {
   studentId: string;
   present: boolean;
-  source?: AttendanceSource;
 };
 
 type Body = {
@@ -42,49 +41,67 @@ export default async function handler(
   const group = await requireGroupAccess(String(lesson.group), user, res);
   if (!group) return;
 
+  // заранее вытаскиваем абонементы учеников
   const subs = await Subscription.find({
     student: { $in: items.map((i) => i.studentId) },
-  }).lean();
+  });
 
-  const subSet = new Set(subs.map((s) => String(s.student)));
+  const subMap = new Map(
+    subs.map((s) => [String(s.student), s]),
+  );
 
-  // 1) upsert посещаемости
-  const ops = items.map((it) => ({
-    updateOne: {
-      filter: { lesson: lesson._id, student: it.studentId },
-      update: {
-        $set: {
-          present: Boolean(it.present),
+  // 1️⃣ upsert Attendance (БЕЗ списаний)
+  const ops = items.map((it) => {
+    const studentId = it.studentId;
+    const present = Boolean(it.present);
+
+    const hasSub = subMap.has(studentId);
+    const source: AttendanceSource = hasSub ? "subscription" : "free";
+
+    return {
+      updateOne: {
+        filter: { lesson: lesson._id, student: studentId },
+        update: {
+          $set: {
+            present,
+            source,
+          },
+          $setOnInsert: {
+            consumed: false,
+            refunded: false,
+          },
         },
-        $setOnInsert: {
-          source: subSet.has(it.studentId) ? "subscription" : "free",
-          consumed: false,
-        },
+        upsert: true,
       },
-      upsert: true,
-    },
-  }));
+    };
+  });
 
-  await Attendance.bulkWrite(ops);
+  if (ops.length) {
+    await Attendance.bulkWrite(ops);
+  }
 
-  // 2) автосписание по абонементу
-  const saved = await Attendance.find({ lesson: lesson._id });
+  // 2️⃣ Списываем абонементы (СТРОГО 1 РАЗ)
+  const attendances = await Attendance.find({
+    lesson: lesson._id,
+    source: "subscription",
+  });
 
-  for (const a of saved) {
-    if (a.present && a.source === "subscription" && !a.consumed) {
-      const sub = await Subscription.findOne({ student: a.student });
-      if (!sub) continue;
+  for (const a of attendances) {
+    if (a.consumed) continue;
 
-      if (sub.usedLessons < sub.totalLessons) {
-        sub.usedLessons += 1;
-        await sub.save();
+    const sub = subMap.get(String(a.student));
+    if (!sub) continue;
 
-        a.consumed = true;
-        await a.save();
-      }
+    if (sub.usedLessons < sub.totalLessons) {
+      sub.usedLessons += 1;
+      await sub.save();
+
+      a.consumed = true;
+      await a.save();
     }
   }
 
+  // 3️⃣ отдаём результат
   const result = await Attendance.find({ lesson: lesson._id }).populate(
     "student",
   );

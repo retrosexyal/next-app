@@ -174,3 +174,13 @@ export const requireGroupAccess = async (
 
   return group;
 };
+
+export function startOfMoscowDay(date = new Date()) {
+  const utc = Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+  );
+
+  return new Date(utc);
+}

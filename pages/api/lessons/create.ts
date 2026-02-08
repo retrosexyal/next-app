@@ -5,6 +5,7 @@ import {
   connectDB,
   requireGroupAccess,
   requireTeacher,
+  startOfMoscowDay,
 } from "@/helpers/helpers";
 
 type Body = {
@@ -27,12 +28,7 @@ export default async function handler(
   const group = await requireGroupAccess(groupId, user, res);
   if (!group) return;
 
-  const nowUtc = new Date();
-  const moscow = new Date(nowUtc.getTime() + 3 * 60 * 60 * 1000);
-
-  // --- начало дня по Москве ---
-  moscow.setHours(0, 0, 0, 0);
-  const d = moscow;
+  const d = startOfMoscowDay();
 
   try {
     // ищем или создаём

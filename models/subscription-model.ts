@@ -4,7 +4,8 @@ const SubscriptionSchema = new Schema({
   student: { type: Schema.Types.ObjectId, ref: "GroupStudent" },
   totalLessons: Number,
   usedLessons: { type: Number, default: 0 },
-  expiresAt: Date
+  expiresAt: Date,
 });
 
-export default models?.Subscription || model("Subscription", SubscriptionSchema);
+export default models?.Subscription ||
+  model("Subscription", SubscriptionSchema);

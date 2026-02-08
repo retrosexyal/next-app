@@ -3,6 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./group.module.scss";
 import Head from "next/head";
 
+import { useToast } from "@/hooks/useToast";
+import { Toast } from "@/components/Toast";
+import { toastFetch } from "@/utils/toastFetch";
+
 interface Student {
   _id: string;
   fullName: string;
@@ -12,22 +16,9 @@ interface Student {
     totalLessons: number;
     usedLessons: number;
   } | null;
-}
-
-interface Student {
-  _id: string;
-  fullName: string;
-  isTemp: boolean;
-  phone: string;
-
-  activeSubscription?: {
-    totalLessons: number;
-    usedLessons: number;
-  } | null;
-
   lastPayment?: {
     amount: number;
-    date: string; // ISO
+    date: string;
     type: "single" | "subscription";
   };
 }
@@ -35,6 +26,8 @@ interface Student {
 export default function TeacherGroup() {
   const router = useRouter();
   const { id } = router.query;
+
+  const toast = useToast();
 
   const [group, setGroup] = useState<any>(null);
   const [lessonId, setLessonId] = useState<string | null>(null);
@@ -52,6 +45,8 @@ export default function TeacherGroup() {
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
+  /* ---------- ONLINE / OFFLINE ---------- */
+
   useEffect(() => {
     setOnline(navigator.onLine);
     const on = () => setOnline(true);
@@ -64,12 +59,21 @@ export default function TeacherGroup() {
     };
   }, []);
 
-  const load = async () => {
-    const res = await fetch(`/api/groups/get-group?id=${id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
+  /* ---------- LOAD GROUP ---------- */
 
-    const data = await res.json();
+  const load = async () => {
+    const data = await toastFetch<any>(
+      toast,
+      `/api/groups/get-group?id=${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        loadingMessage: "Загружаем группу",
+        silent: true,
+      },
+    );
+
     setGroup(data);
 
     const map: Record<string, boolean> = {};
@@ -86,76 +90,58 @@ export default function TeacherGroup() {
     if (id) load();
   }, [id]);
 
+  /* ---------- ENSURE LESSON ---------- */
+
   const ensureLesson = async () => {
     if (lessonId) return lessonId;
 
-    const res = await fetch("/api/lessons/create", {
+    const data = await toastFetch<any>(toast, "/api/lessons/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ groupId: id }),
+      loadingMessage: "Создаём урок",
+      silent: true,
     });
 
-    const data = await res.json();
     setLessonId(data._id);
     return data._id;
   };
 
-  const sync = async (state: Record<string, boolean>) => {
-    const items = Object.entries(state).map(([studentId, present]) => ({
-      studentId,
-      present,
-    }));
-
-    const payload = { lessonId: await ensureLesson(), items };
-
-    if (!online) {
-      setOfflineQueue((q) => [...q, payload]);
-      return;
-    }
-
-    await fetch("/api/attendance/set", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(payload),
-    });
-  };
+  /* ---------- OFFLINE SYNC ---------- */
 
   useEffect(() => {
     if (online && offlineQueue.length) {
       offlineQueue.forEach((p) =>
-        fetch("/api/attendance/set", {
+        toastFetch(toast, "/api/attendance/set", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(p),
+          silent: true,
         }),
       );
       setOfflineQueue([]);
     }
   }, [online]);
 
+  /* ---------- PAYMENTS SYNC ---------- */
+
   useEffect(() => {
     if (!id) return;
 
     const moscowNow = new Date(Date.now() + 3 * 60 * 60 * 1000);
-
-    // сегодня
     const today = moscowNow.toISOString().slice(0, 10).replace(/-/g, "");
 
-    // вчера
     const yesterday = new Date(moscowNow);
     yesterday.setDate(yesterday.getDate() - 14);
-    const todayMinus1 = yesterday.toISOString().slice(0, 10).replace(/-/g, "");
+    const from = yesterday.toISOString().slice(0, 10).replace(/-/g, "");
 
-    fetch("/api/payments/sync-group", {
+    toastFetch(toast, "/api/payments/sync-group", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -163,14 +149,17 @@ export default function TeacherGroup() {
       },
       body: JSON.stringify({
         groupId: id,
-        from: todayMinus1,
+        from,
         to: today,
       }),
+      silent: true,
     }).then(load);
   }, [id]);
 
+  /* ---------- UI ---------- */
+
   const openPayModal = async (studentId: string) => {
-    const lid = await ensureLesson(); // 👈 гарантируем урок
+    const lid = await ensureLesson();
     setPayModal({
       studentId,
       lessonId: lid,
@@ -205,7 +194,6 @@ export default function TeacherGroup() {
             const left = sub ? sub.totalLessons - sub.usedLessons : 0;
 
             const last = s.lastPayment ? new Date(s.lastPayment.date) : null;
-
             const days = last
               ? Math.floor((Date.now() - last.getTime()) / 86400000)
               : null;
@@ -220,7 +208,9 @@ export default function TeacherGroup() {
             return (
               <li
                 key={s._id}
-                className={`${styles.item} ${attendance[s._id] ? styles.present : ""}`}
+                className={`${styles.item} ${
+                  attendance[s._id] ? styles.present : ""
+                }`}
                 onClick={() => openPayModal(s._id)}
               >
                 <div className={styles.left}>
@@ -257,15 +247,20 @@ export default function TeacherGroup() {
                   className={styles.payBtn}
                   onClick={async (e) => {
                     e.stopPropagation();
-                    const h = await fetch(
+                    const h = await toastFetch<any>(
+                      toast,
                       `/api/payments/by-student?id=${s._id}`,
                       {
                         headers: {
-                          Authorization: `Bearer ${localStorage.getItem("token")}`,
+                          Authorization: `Bearer ${localStorage.getItem(
+                            "token",
+                          )}`,
                         },
+                        loadingMessage: "Загружаем историю оплат",
+                        silent: true,
                       },
                     );
-                    setPayHistory(await h.json());
+                    setPayHistory(h);
                   }}
                 >
                   ₽
@@ -274,6 +269,9 @@ export default function TeacherGroup() {
             );
           })}
         </ul>
+
+        {/* ---------- PAY MODAL ---------- */}
+
         {payModal && (
           <div className={styles.modal} onClick={() => setPayModal(null)}>
             <div
@@ -284,7 +282,7 @@ export default function TeacherGroup() {
 
               <button
                 onClick={async () => {
-                  await fetch("/api/attendance/set-payment", {
+                  await toastFetch(toast, "/api/attendance/set-payment", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -295,6 +293,7 @@ export default function TeacherGroup() {
                       studentId: payModal.studentId,
                       mode: "single",
                     }),
+                    successMessage: "Оплата сохранена",
                   });
                   setPayModal(null);
                   load();
@@ -305,7 +304,7 @@ export default function TeacherGroup() {
 
               <button
                 onClick={async () => {
-                  await fetch("/api/attendance/set-payment", {
+                  await toastFetch(toast, "/api/attendance/set-payment", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -316,6 +315,7 @@ export default function TeacherGroup() {
                       studentId: payModal.studentId,
                       mode: "subscription",
                     }),
+                    successMessage: "Абонемент применён",
                   });
                   setPayModal(null);
                   load();
@@ -326,7 +326,7 @@ export default function TeacherGroup() {
 
               <button
                 onClick={async () => {
-                  await fetch("/api/attendance/set-payment", {
+                  await toastFetch(toast, "/api/attendance/set-payment", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -337,6 +337,7 @@ export default function TeacherGroup() {
                       studentId: payModal.studentId,
                       mode: "relative",
                     }),
+                    successMessage: "Оплата сохранена",
                   });
                   setPayModal(null);
                   load();
@@ -344,10 +345,11 @@ export default function TeacherGroup() {
               >
                 Родственник — 9₽
               </button>
+
               <button
                 style={{ marginTop: 12, color: "red" }}
                 onClick={async () => {
-                  await fetch("/api/attendance/remove", {
+                  await toastFetch(toast, "/api/attendance/remove", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -357,6 +359,7 @@ export default function TeacherGroup() {
                       lessonId: payModal.lessonId,
                       studentId: payModal.studentId,
                     }),
+                    successMessage: "Присутствие отменено",
                   });
 
                   setPayModal(null);
@@ -370,6 +373,8 @@ export default function TeacherGroup() {
             </div>
           </div>
         )}
+
+        {/* ---------- PAY HISTORY ---------- */}
 
         {payHistory && (
           <div className={styles.modal} onClick={() => setPayHistory(null)}>
@@ -393,6 +398,8 @@ export default function TeacherGroup() {
           </div>
         )}
 
+        {/* ---------- ADD STUDENT ---------- */}
+
         {!showAdd ? (
           <button className={styles.add} onClick={() => setShowAdd(true)}>
             + Добавить ученика
@@ -413,9 +420,12 @@ export default function TeacherGroup() {
             <div className={styles.addActions}>
               <button
                 onClick={async () => {
-                  if (!newName) return alert("Введите имя");
+                  if (!newName) {
+                    toast.error("Введите имя");
+                    return;
+                  }
 
-                  await fetch("/api/groups/add-student", {
+                  await toastFetch(toast, "/api/groups/add-student", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -426,6 +436,7 @@ export default function TeacherGroup() {
                       fullName: newName,
                       phone: newPhone,
                     }),
+                    successMessage: "Ученик добавлен",
                   });
 
                   setNewName("");
@@ -442,6 +453,12 @@ export default function TeacherGroup() {
           </div>
         )}
       </div>
+
+      <Toast
+        visible={toast.toast.visible}
+        message={toast.toast.message}
+        type={toast.toast.type}
+      />
     </>
   );
 }

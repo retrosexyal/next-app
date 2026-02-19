@@ -243,7 +243,13 @@ export default function EditGroup() {
 
             <ul className={styles.list}>
               {group.students?.map((s: Student) => (
-                <li key={s._id} className={styles.item}>
+                <li
+                  key={s._id}
+                  className={styles.item}
+                  style={
+                    (s as any).activeSubscription ? { color: "brown" } : {}
+                  }
+                >
                   <div>
                     <b>{s.fullName}</b>
                     {s.isTemp && (
@@ -552,9 +558,9 @@ export default function EditGroup() {
                 <button
                   onClick={async () => {
                     const count = Number(subAddCount);
-                    if (!Number.isFinite(count) || count === 0)
-                      return alert("Введите число");
-                    if (!subReason.trim()) return alert("Укажите причину");
+                    /* if (!Number.isFinite(count) || count === 0)
+                      return alert("Введите число"); */
+                   /*  if (!subReason.trim()) return alert("Укажите причину"); */
 
                     // если нет subscriptionId — нужен способ получить/создать.
                     // Я предполагаю, что editSubStudent.activeSubscription содержит _id.
@@ -609,10 +615,6 @@ export default function EditGroup() {
                 <button
                   onClick={async () => {
                     const remaining = Number(subRemaining);
-                    if (!Number.isFinite(remaining) || remaining < 0)
-                      return alert("Введите остаток (0 или больше)");
-                    if (!subReason.trim()) return alert("Укажите причину");
-
                     const subscriptionId =
                       editSubStudent.activeSubscription?._id;
                     if (!subscriptionId)

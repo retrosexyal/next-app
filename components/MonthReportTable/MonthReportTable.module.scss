@@ -11,6 +11,7 @@
 
 .tableWrap {
   overflow-x: auto;
+  max-width: calc(100vw - 24px);
 }
 
 .table {

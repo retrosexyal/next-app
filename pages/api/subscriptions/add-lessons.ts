@@ -17,24 +17,25 @@ export default async function handler(
 
   const delta = Number(count);
 
-  if (!subscriptionId || !Number.isFinite(delta) || delta <= 0 || !reason) {
+  /*  if (!subscriptionId || !Number.isFinite(delta) || delta <= 0 || !reason) {
     return res
       .status(400)
       .json("subscriptionId, count (>0), reason обязательны");
-  }
+  } */
 
   const sub = await Subscription.findById(subscriptionId);
+
   if (!sub) return res.status(404).json("абонемент не найден");
 
-  sub.totalLessons += delta;
+  sub.totalLessons = delta;
   await sub.save();
 
-  await SubscriptionAdjustment.create({
+  /*   await SubscriptionAdjustment.create({
     subscription: sub._id,
     admin: admin.id,
     delta,
     reason,
-  });
+  }); */
 
   return res.json(sub);
 }

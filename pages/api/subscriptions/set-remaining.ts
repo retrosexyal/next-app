@@ -13,15 +13,9 @@ export default async function handler(
   const admin = requireAdmin({ req, res });
   if (!admin) return;
 
-  const { subscriptionId, remaining, reason } = req.body;
-  const targetRemaining = Number(remaining);
+  const { subscriptionId, remaining } = req.body;
 
-  if (
-    !subscriptionId ||
-    !Number.isFinite(targetRemaining) ||
-    targetRemaining < 0 ||
-    !reason
-  ) {
+  if (!subscriptionId) {
     return res
       .status(400)
       .json("subscriptionId, remaining (>=0), reason обязательны");
@@ -30,29 +24,8 @@ export default async function handler(
   const sub = await Subscription.findById(subscriptionId);
   if (!sub) return res.status(404).json("абонемент не найден");
 
-  // ❗ защита: нельзя сделать меньше, чем уже использовано
-  if (targetRemaining < sub.totalLessons - sub.usedLessons) {
-    return res
-      .status(400)
-      .json("remaining меньше уже использованных занятий");
-  }
-
-  const currentRemaining = sub.totalLessons - sub.usedLessons;
-  const delta = targetRemaining - currentRemaining;
-
-  if (delta === 0) {
-    return res.json(sub);
-  }
-
-  sub.totalLessons += delta;
+  sub.usedLessons = remaining;
   await sub.save();
-
-  await SubscriptionAdjustment.create({
-    subscription: sub._id,
-    admin: admin.id,
-    delta,
-    reason,
-  });
 
   return res.json(sub);
 }

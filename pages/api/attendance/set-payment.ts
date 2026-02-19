@@ -85,8 +85,6 @@ export default async function handler(
     };
   }
 
-  console.log(paymentSnapshot);
-
   // ---- upsert Attendance ----
   await Attendance.updateOne(
     { lesson: lessonId, student: studentId },

@@ -180,7 +180,7 @@ export default function EditGroup() {
                 onChange={(e) => setQuery(e.target.value)}
               />
               <div className={styles.contractList}>
-                {filtered.slice(0, 10).map((c) => (
+                {filtered.map((c) => (
                   <div
                     key={c._id}
                     className={styles.contractItem}
@@ -560,7 +560,7 @@ export default function EditGroup() {
                     const count = Number(subAddCount);
                     /* if (!Number.isFinite(count) || count === 0)
                       return alert("Введите число"); */
-                   /*  if (!subReason.trim()) return alert("Укажите причину"); */
+                    /*  if (!subReason.trim()) return alert("Укажите причину"); */
 
                     // если нет subscriptionId — нужен способ получить/создать.
                     // Я предполагаю, что editSubStudent.activeSubscription содержит _id.

@@ -3,6 +3,8 @@ import styles from "./group.module.scss";
 import { useAppSelector } from "@/store";
 import { useCheckAdmin } from "@/hooks/useCheckAdmin";
 import Head from "next/head";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { TEACHERS } from "@/helpers/helpers";
 
 interface Group {
   _id: string;
@@ -116,11 +118,29 @@ export default function AdminGroups() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <input
+          {/* <input
             placeholder="Email преподавателя"
             value={ownerEmail}
             onChange={(e) => setOwnerEmail(e.target.value)}
-          />
+          /> */}
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Преподователь</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={ownerEmail}
+              label="преподователь"
+              onChange={({ target: { value } }) => {
+                setOwnerEmail(value);
+              }}
+            >
+              {TEACHERS.map((teacher) => (
+                <MenuItem value={teacher} key={teacher}>
+                  {teacher}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <button onClick={create}>Создать</button>
         </div>
       </div>

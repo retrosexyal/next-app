@@ -8,7 +8,12 @@ import { NextRequest } from "next/server";
 
 export const ADMINS = ["admin@admin"];
 
-export const TEACHERS = ["liza@limi.by", "alesia@limi.by", "admin@admin"];
+export const TEACHERS = [
+  "liza@limi.by",
+  "alesia@limi.by",
+  "admin@admin",
+  "arina@limi.by",
+];
 
 export const checkAdmin = (req: NextApiRequest) => {
   const accessToken = req.headers["authorization"]?.split(" ")[1];

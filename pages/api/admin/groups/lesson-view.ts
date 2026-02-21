@@ -42,6 +42,8 @@ export default async function handler(
       student: {
         _id: s._id,
         fullName: s.fullName,
+        message: s.message,
+        lastPayment:s.lastPayment
       },
 
       present: a?.present ?? false,

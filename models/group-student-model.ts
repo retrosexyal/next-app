@@ -13,12 +13,16 @@ export interface IStudent {
     externalId: string;
   };
   paymentsSyncedAt?: Date;
+  message?: string;
+  birthday?: string;
 }
 
 const GroupStudentSchema = new Schema(
   {
     fullName: { type: String, required: true },
     phone: { type: String },
+    message: { type: String },
+    birthday: { type: String },
 
     // может быть null
     contract: { type: Schema.Types.ObjectId, ref: "Contract", default: null },

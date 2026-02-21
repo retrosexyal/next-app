@@ -330,6 +330,20 @@ export default function EditGroup() {
                           {paymentDate?.toLocaleDateString()}
                         </div>
                       )}
+                      {r.student.message && <span>{r.student.message}</span>}
+                      {r.student?.lastPayment.amount && (
+                        <span>
+                          <div className={`${styles.lastPayErip}`}>
+                            оплата:
+                            {r.student?.lastPayment?.amount} —
+                            {r.student?.lastPayment?.date
+                              ? new Date(
+                                  r.student.lastPayment.date,
+                                ).toLocaleDateString()
+                              : ""}
+                          </div>
+                        </span>
+                      )}
                     </div>
 
                     <button
@@ -349,7 +363,8 @@ export default function EditGroup() {
                     >
                       ₽
                     </button>
-                    {r.consumed && !r.refunded && (
+
+                    {/* {r.consumed && !r.refunded && (
                       <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
                         <button
                           style={{ fontSize: 12 }}
@@ -410,7 +425,7 @@ export default function EditGroup() {
                           🆓 Пропуск
                         </button>
                       </div>
-                    )}
+                    )} */}
                   </li>
                 );
               })}

@@ -21,6 +21,8 @@ interface Student {
     date: string;
     type: "single" | "subscription";
   };
+  message?: string;
+  birthday?: string;
 }
 
 export default function TeacherGroup() {
@@ -42,6 +44,7 @@ export default function TeacherGroup() {
     studentId: string;
     lessonId: string;
   } | null>(null);
+  const [studentIdForMark, setStudentIdForMark] = useState<string | null>(null);
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -226,6 +229,13 @@ export default function TeacherGroup() {
                       ₽ {s.lastPayment.amount} — {last!.toLocaleDateString()}
                     </div>
                   )}
+
+                  {s.birthday && (
+                    <span className={styles.temp}>{s.birthday}</span>
+                  )}
+                  {s.message && (
+                    <span className={styles.temp}>{s.message}</span>
+                  )}
                 </div>
 
                 {sub && (
@@ -243,28 +253,38 @@ export default function TeacherGroup() {
                   </div>
                 )}
 
-                <button
-                  className={styles.payBtn}
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    const h = await toastFetch<any>(
-                      toast,
-                      `/api/payments/by-student?id=${s._id}`,
-                      {
-                        headers: {
-                          Authorization: `Bearer ${localStorage.getItem(
-                            "token",
-                          )}`,
+                <div className={styles.btnWrapper}>
+                  <button
+                    className={styles.payBtn}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      const h = await toastFetch<any>(
+                        toast,
+                        `/api/payments/by-student?id=${s._id}`,
+                        {
+                          headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                              "token",
+                            )}`,
+                          },
+                          loadingMessage: "Загружаем историю оплат",
+                          silent: true,
                         },
-                        loadingMessage: "Загружаем историю оплат",
-                        silent: true,
-                      },
-                    );
-                    setPayHistory(h);
-                  }}
-                >
-                  ₽
-                </button>
+                      );
+                      setPayHistory(h);
+                    }}
+                  >
+                    ₽
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStudentIdForMark(s._id);
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
               </li>
             );
           })}
@@ -370,6 +390,67 @@ export default function TeacherGroup() {
               </button>
 
               <button onClick={() => setPayModal(null)}>Отмена</button>
+            </div>
+          </div>
+        )}
+
+        {/* ---------- STUDENT MESSAGE ---------- */}
+
+        {studentIdForMark && (
+          <div
+            className={styles.modal}
+            onClick={() => setStudentIdForMark(null)}
+          >
+            <div
+              className={styles.modalBox}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3>заметка</h3>
+
+              <form
+                className={styles.noteForm}
+                onSubmit={async (e) => {
+                  e.preventDefault();
+
+                  const formData = new FormData(e.currentTarget);
+                  const message = formData.get("message");
+
+                  await toastFetch(toast, "/api/groups/mark-for-student", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({
+                      message,
+                      studentId: studentIdForMark,
+                    }),
+                  });
+
+                  setStudentIdForMark(null);
+                  load();
+                }}
+              >
+                <input
+                  name="message"
+                  className={styles.noteInput}
+                  placeholder="Введите заметку..."
+                />
+
+                <div className={styles.noteButtons}>
+                  <button
+                    type="button"
+                    className={styles.cancelBtn}
+                    onClick={() => setStudentIdForMark(null)}
+                  >
+                    Отмена
+                  </button>
+
+                  <button type="submit" className={styles.saveBtn}>
+                    сохранить
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

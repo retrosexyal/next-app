@@ -6,6 +6,7 @@ import Head from "next/head";
 import { useToast } from "@/hooks/useToast";
 import { Toast } from "@/components/Toast";
 import { toastFetch } from "@/utils/toastFetch";
+import { MonthReportTable } from "@/components/MonthReportTable";
 
 interface Student {
   _id: string;
@@ -50,6 +51,7 @@ export default function TeacherGroup() {
     uuid: string;
     text: string;
   } | null>(null);
+  const [mode, setMode] = useState<"today" | "month">("today");
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -189,158 +191,179 @@ export default function TeacherGroup() {
         >
           ← Назад
         </button>
+        <div className={styles.tabs}>
+          <button
+            className={mode === "today" ? styles.activeTab : ""}
+            onClick={() => setMode("today")}
+          >
+            Сегодня
+          </button>
+          <button
+            className={mode === "month" ? styles.activeTab : ""}
+            onClick={() => setMode("month")}
+          >
+            Месяц
+          </button>
+        </div>
 
         <h2>{group.title}</h2>
+        {mode === "today" ? (
+          <>
+            {!online && (
+              <div className={styles.offline}>Офлайн — сохраняем локально</div>
+            )}
 
-        {!online && (
-          <div className={styles.offline}>Офлайн — сохраняем локально</div>
-        )}
+            <ul className={styles.list}>
+              {group.students.map((s: Student) => {
+                const sub = s.activeSubscription;
+                const left = sub ? sub.totalLessons - sub.usedLessons : 0;
 
-        <ul className={styles.list}>
-          {group.students.map((s: Student) => {
-            const sub = s.activeSubscription;
-            const left = sub ? sub.totalLessons - sub.usedLessons : 0;
+                const last = s.lastPayment
+                  ? new Date(s.lastPayment.date)
+                  : null;
+                const days = last
+                  ? Math.floor((Date.now() - last.getTime()) / 86400000)
+                  : null;
 
-            const last = s.lastPayment ? new Date(s.lastPayment.date) : null;
-            const days = last
-              ? Math.floor((Date.now() - last.getTime()) / 86400000)
-              : null;
+                let payClass = styles.payNone;
+                if (days !== null) {
+                  if (days <= 7) payClass = styles.payOk;
+                  else if (days <= 14) payClass = styles.payWarn;
+                  else payClass = styles.payBad;
+                }
 
-            let payClass = styles.payNone;
-            if (days !== null) {
-              if (days <= 7) payClass = styles.payOk;
-              else if (days <= 14) payClass = styles.payWarn;
-              else payClass = styles.payBad;
-            }
+                return (
+                  <li
+                    key={s._id}
+                    className={`${styles.item} ${
+                      attendance[s._id] ? styles.present : ""
+                    }`}
+                    onClick={() => openPayModal(s._id)}
+                  >
+                    <div className={styles.left}>
+                      <div className={styles.name}>
+                        {s.fullName}
+                        {s.isTemp && (
+                          <span className={styles.temp}>без договора</span>
+                        )}
+                      </div>
 
-            return (
-              <li
-                key={s._id}
-                className={`${styles.item} ${
-                  attendance[s._id] ? styles.present : ""
-                }`}
-                onClick={() => openPayModal(s._id)}
-              >
-                <div className={styles.left}>
-                  <div className={styles.name}>
-                    {s.fullName}
-                    {s.isTemp && (
-                      <span className={styles.temp}>без договора</span>
-                    )}
-                  </div>
+                      {s.lastPayment && (
+                        <div className={`${styles.lastPay} ${payClass}`}>
+                          ₽ {s.lastPayment.amount} —{" "}
+                          {last!.toLocaleDateString()}
+                        </div>
+                      )}
 
-                  {s.lastPayment && (
-                    <div className={`${styles.lastPay} ${payClass}`}>
-                      ₽ {s.lastPayment.amount} — {last!.toLocaleDateString()}
-                    </div>
-                  )}
-
-                  {s.birthday && (
-                    <span className={styles.temp}>{s.birthday}</span>
-                  )}
-                  {/*                   {s.message && (
+                      {s.birthday && (
+                        <span className={styles.temp}>{s.birthday}</span>
+                      )}
+                      {/*                   {s.message && (
                     <span className={styles.temp}>{s.message}</span>
                   )} */}
-                  {s.messages?.map(({ text, uuid }) => (
-                    <div key={uuid} className={styles.messageRow}>
-                      <span className={styles.temp}>{text}</span>
+                      {s.messages?.map(({ text, uuid }) => (
+                        <div key={uuid} className={styles.messageRow}>
+                          <span className={styles.temp}>{text}</span>
 
-                      <div className={styles.messageActions}>
-                        {/* ✏ EDIT */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setStudentIdForMark(s._id);
-                            setEditingMessage({ uuid, text });
-                          }}
-                          
-                        >
-                          ✏
-                        </button>
+                          <div className={styles.messageActions}>
+                            {/* ✏ EDIT */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setStudentIdForMark(s._id);
+                                setEditingMessage({ uuid, text });
+                              }}
+                            >
+                              ✏
+                            </button>
 
-                        {/* ❌ DELETE */}
-                        <button
-                          onClick={async (e) => {
-                            e.stopPropagation();
+                            {/* ❌ DELETE */}
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation();
 
-                            await toastFetch(
-                              toast,
-                              "/api/groups/mark-for-student",
-                              {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${localStorage.getItem("token")}`,
-                                },
-                                body: JSON.stringify({
-                                  action: "delete",
-                                  studentId: s._id,
-                                  messageUuid: uuid,
-                                }),
-                              },
-                            );
+                                await toastFetch(
+                                  toast,
+                                  "/api/groups/mark-for-student",
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                    },
+                                    body: JSON.stringify({
+                                      action: "delete",
+                                      studentId: s._id,
+                                      messageUuid: uuid,
+                                    }),
+                                  },
+                                );
 
-                            load();
-                          }}
-                        >
-                          ✕
-                        </button>
-                      </div>
+                                load();
+                              }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
 
-                {sub && (
-                  <div
-                    className={
-                      left <= 1
-                        ? styles.subDanger
-                        : left <= 3
-                          ? styles.subWarn
-                          : styles.subOk
-                    }
-                    style={{ marginTop: 4, fontSize: 12 }}
-                  >
-                    Осталось: {left}
-                  </div>
-                )}
+                    {sub && (
+                      <div
+                        className={
+                          left <= 1
+                            ? styles.subDanger
+                            : left <= 3
+                              ? styles.subWarn
+                              : styles.subOk
+                        }
+                        style={{ marginTop: 4, fontSize: 12 }}
+                      >
+                        Осталось: {left}
+                      </div>
+                    )}
 
-                <div className={styles.btnWrapper}>
-                  <button
-                    className={styles.payBtn}
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      const h = await toastFetch<any>(
-                        toast,
-                        `/api/payments/by-student?id=${s._id}`,
-                        {
-                          headers: {
-                            Authorization: `Bearer ${localStorage.getItem(
-                              "token",
-                            )}`,
-                          },
-                          loadingMessage: "Загружаем историю оплат",
-                          silent: true,
-                        },
-                      );
-                      setPayHistory(h);
-                    }}
-                  >
-                    ₽
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setStudentIdForMark(s._id);
-                    }}
-                  >
-                    +
-                  </button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                    <div className={styles.btnWrapper}>
+                      <button
+                        className={styles.payBtn}
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          const h = await toastFetch<any>(
+                            toast,
+                            `/api/payments/by-student?id=${s._id}`,
+                            {
+                              headers: {
+                                Authorization: `Bearer ${localStorage.getItem(
+                                  "token",
+                                )}`,
+                              },
+                              loadingMessage: "Загружаем историю оплат",
+                              silent: true,
+                            },
+                          );
+                          setPayHistory(h);
+                        }}
+                      >
+                        ₽
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setStudentIdForMark(s._id);
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        ) : (
+          <MonthReportTable groupId={id as string} isTeacher />
+        )}
 
         {/* ---------- PAY MODAL ---------- */}
 

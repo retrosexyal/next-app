@@ -4,6 +4,10 @@ import styles from "../group.module.scss";
 import ContractService from "@/clientServices/ContractService";
 import Head from "next/head";
 import { MonthReportTable } from "@/components/MonthReportTable";
+import { Toast } from "@/components/Toast";
+import { useToast } from "@/hooks/useToast";
+import { toastFetch } from "@/utils/toastFetch";
+import AdminNotebookButton from "@/components/AdminNotebookButton";
 
 interface Student {
   _id: string;
@@ -19,6 +23,11 @@ interface Student {
 export default function EditGroup() {
   const router = useRouter();
   const { id } = router.query;
+  const toast = useToast();
+  const [payModal, setPayModal] = useState<{
+    studentId: string;
+    lessonId: string;
+  } | null>(null);
 
   const [mode, setMode] = useState<"students" | "journal" | "month">("journal");
   const [expressQuery, setExpressQuery] = useState("");
@@ -74,6 +83,13 @@ export default function EditGroup() {
         if (d[0]) setLessonId(d[0]._id);
       });
   }, [mode, id]);
+
+  const openPayModal = async (studentId: string, lessonId: string) => {
+    setPayModal({
+      studentId,
+      lessonId,
+    });
+  };
 
   useEffect(() => {
     if (!lessonId || mode !== "journal") return;
@@ -320,6 +336,7 @@ export default function EditGroup() {
                     className={`${styles.item} ${
                       r.present ? styles.present : ""
                     }`}
+                    onClick={() => openPayModal(r._id, lessonId)}
                   >
                     <div className={styles.left}>
                       <div className={styles.name}>{r.student?.fullName}</div>
@@ -331,6 +348,11 @@ export default function EditGroup() {
                         </div>
                       )}
                       {r.student.message && <span>{r.student.message}</span>}
+                      {r.student.messages?.map(
+                        ({ uuid, text }: { uuid: string; text: string }) => (
+                          <span key={uuid}>{text}</span>
+                        ),
+                      )}
                       {r.student?.lastPayment.amount && (
                         <span>
                           <div className={`${styles.lastPayErip}`}>
@@ -670,6 +692,112 @@ export default function EditGroup() {
           </div>
         )}
       </div>
+      {/* ---------- PAY MODAL ---------- */}
+
+      {payModal && (
+        <div className={styles.modal} onClick={() => setPayModal(null)}>
+          <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
+            <h3>Выберите оплату</h3>
+
+            <button
+              onClick={async () => {
+                await toastFetch(toast, "/api/attendance/set-payment", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  body: JSON.stringify({
+                    lessonId: payModal.lessonId,
+                    studentId: payModal.studentId,
+                    mode: "single",
+                  }),
+                  successMessage: "Оплата сохранена",
+                });
+                setPayModal(null);
+                load();
+              }}
+            >
+              Разовое — 12₽
+            </button>
+
+            <button
+              onClick={async () => {
+                await toastFetch(toast, "/api/attendance/set-payment", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  body: JSON.stringify({
+                    lessonId: payModal.lessonId,
+                    studentId: payModal.studentId,
+                    mode: "subscription",
+                  }),
+                  successMessage: "Абонемент применён",
+                });
+                setPayModal(null);
+                load();
+              }}
+            >
+              Абонемент — 84₽
+            </button>
+
+            <button
+              onClick={async () => {
+                await toastFetch(toast, "/api/attendance/set-payment", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  body: JSON.stringify({
+                    lessonId: payModal.lessonId,
+                    studentId: payModal.studentId,
+                    mode: "relative",
+                  }),
+                  successMessage: "Оплата сохранена",
+                });
+                setPayModal(null);
+                load();
+              }}
+            >
+              Родственник — 9₽
+            </button>
+
+            <button
+              style={{ marginTop: 12, color: "red" }}
+              onClick={async () => {
+                await toastFetch(toast, "/api/attendance/remove", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  body: JSON.stringify({
+                    lessonId: payModal.lessonId,
+                    studentId: payModal.studentId,
+                  }),
+                  successMessage: "Присутствие отменено",
+                });
+
+                setPayModal(null);
+                load();
+              }}
+            >
+              Отменить присутствие
+            </button>
+
+            <button onClick={() => setPayModal(null)}>Отмена</button>
+          </div>
+        </div>
+      )}
+      <Toast
+        visible={toast.toast.visible}
+        message={toast.toast.message}
+        type={toast.toast.type}
+      />
+      <AdminNotebookButton />
     </>
   );
 }

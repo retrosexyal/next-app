@@ -23,6 +23,7 @@ interface Student {
   };
   message?: string;
   birthday?: string;
+  messages?: { uuid: string; text: string }[];
 }
 
 export default function TeacherGroup() {
@@ -45,6 +46,10 @@ export default function TeacherGroup() {
     lessonId: string;
   } | null>(null);
   const [studentIdForMark, setStudentIdForMark] = useState<string | null>(null);
+  const [editingMessage, setEditingMessage] = useState<{
+    uuid: string;
+    text: string;
+  } | null>(null);
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -233,9 +238,56 @@ export default function TeacherGroup() {
                   {s.birthday && (
                     <span className={styles.temp}>{s.birthday}</span>
                   )}
-                  {s.message && (
+                  {/*                   {s.message && (
                     <span className={styles.temp}>{s.message}</span>
-                  )}
+                  )} */}
+                  {s.messages?.map(({ text, uuid }) => (
+                    <div key={uuid} className={styles.messageRow}>
+                      <span className={styles.temp}>{text}</span>
+
+                      <div className={styles.messageActions}>
+                        {/* ✏ EDIT */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setStudentIdForMark(s._id);
+                            setEditingMessage({ uuid, text });
+                          }}
+                          
+                        >
+                          ✏
+                        </button>
+
+                        {/* ❌ DELETE */}
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+
+                            await toastFetch(
+                              toast,
+                              "/api/groups/mark-for-student",
+                              {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                },
+                                body: JSON.stringify({
+                                  action: "delete",
+                                  studentId: s._id,
+                                  messageUuid: uuid,
+                                }),
+                              },
+                            );
+
+                            load();
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 {sub && (
@@ -399,7 +451,10 @@ export default function TeacherGroup() {
         {studentIdForMark && (
           <div
             className={styles.modal}
-            onClick={() => setStudentIdForMark(null)}
+            onClick={() => {
+              setStudentIdForMark(null);
+              setEditingMessage(null);
+            }}
           >
             <div
               className={styles.modalBox}
@@ -422,17 +477,21 @@ export default function TeacherGroup() {
                       Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                     body: JSON.stringify({
-                      message,
+                      action: editingMessage ? "edit" : "add",
                       studentId: studentIdForMark,
+                      text: message,
+                      messageUuid: editingMessage?.uuid,
                     }),
                   });
 
                   setStudentIdForMark(null);
+                  setEditingMessage(null);
                   load();
                 }}
               >
                 <input
                   name="message"
+                  defaultValue={editingMessage?.text || ""}
                   className={styles.noteInput}
                   placeholder="Введите заметку..."
                 />
@@ -441,7 +500,10 @@ export default function TeacherGroup() {
                   <button
                     type="button"
                     className={styles.cancelBtn}
-                    onClick={() => setStudentIdForMark(null)}
+                    onClick={() => {
+                      setStudentIdForMark(null);
+                      setEditingMessage(null);
+                    }}
                   >
                     Отмена
                   </button>

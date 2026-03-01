@@ -43,7 +43,8 @@ export default async function handler(
         _id: s._id,
         fullName: s.fullName,
         message: s.message,
-        lastPayment:s.lastPayment
+        lastPayment: s.lastPayment,
+        messages: s.messages,
       },
 
       present: a?.present ?? false,

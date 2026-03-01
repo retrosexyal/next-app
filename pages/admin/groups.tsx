@@ -5,6 +5,7 @@ import { useCheckAdmin } from "@/hooks/useCheckAdmin";
 import Head from "next/head";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { TEACHERS } from "@/helpers/helpers";
+import AdminNotebookButton from "@/components/AdminNotebookButton";
 
 interface Group {
   _id: string;
@@ -144,6 +145,7 @@ export default function AdminGroups() {
           <button onClick={create}>Создать</button>
         </div>
       </div>
+      <AdminNotebookButton />
     </>
   );
 }

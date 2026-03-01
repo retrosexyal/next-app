@@ -1,4 +1,24 @@
 import { Schema, Types, model, models } from "mongoose";
+import { randomUUID } from "crypto";
+
+const MessageSchema = new Schema(
+  {
+    uuid: {
+      type: String,
+      required: true,
+      default: () => randomUUID(),
+    },
+    text: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false },
+);
 
 export interface IStudent {
   fullName: string;
@@ -23,6 +43,10 @@ const GroupStudentSchema = new Schema(
     phone: { type: String },
     message: { type: String },
     birthday: { type: String },
+    messages: {
+      type: [MessageSchema],
+      default: [],
+    },
 
     // может быть null
     contract: { type: Schema.Types.ObjectId, ref: "Contract", default: null },

@@ -3,11 +3,12 @@ import styles from "./MonthReportTable.module.scss";
 
 type Props = {
   groupId: string;
+  isTeacher?: boolean;
 };
 
-export function MonthReportTable({ groupId }: Props) {
-  const [month, setMonth] = useState(
-    () => new Date().toISOString().slice(0, 7),
+export function MonthReportTable({ groupId, isTeacher }: Props) {
+  const [month, setMonth] = useState(() =>
+    new Date().toISOString().slice(0, 7),
   );
   const [data, setData] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
@@ -16,14 +17,17 @@ export function MonthReportTable({ groupId }: Props) {
     if (!groupId) return;
 
     setLoading(true);
-    fetch("/api/admin/groups/month-report", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    fetch(
+      isTeacher ? "/api/groups/month-report" : "/api/admin/groups/month-report",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ groupId, month }),
       },
-      body: JSON.stringify({ groupId, month }),
-    })
+    )
       .then((r) => r.json())
       .then(setData)
       .finally(() => setLoading(false));
@@ -32,13 +36,7 @@ export function MonthReportTable({ groupId }: Props) {
   if (loading) return <div>Загрузка…</div>;
   if (!data) return null;
 
-  const {
-    students,
-    dates,
-    matrix,
-    totalsByDate,
-    totalsByStudent,
-  } = data;
+  const { students, dates, matrix, totalsByDate, totalsByStudent } = data;
 
   return (
     <div className={styles.wrapper}>
@@ -54,7 +52,7 @@ export function MonthReportTable({ groupId }: Props) {
           <thead>
             <tr>
               <th>Ученик</th>
-              {dates.map((d: string) => (
+              {dates?.map((d: string) => (
                 <th key={d}>{new Date(d).getDate()}</th>
               ))}
               <th>Итого</th>
@@ -62,25 +60,26 @@ export function MonthReportTable({ groupId }: Props) {
           </thead>
 
           <tbody>
-            {students.map((s: any) => (
+            {students?.map((s: any) => (
               <tr key={s._id}>
                 <td className={styles.student}>{s.fullName}</td>
 
-                {dates.map((d: string) => {
+                {dates?.map((d: string) => {
                   const cell = matrix[s._id]?.[d];
-                  if (!cell)
-                    return <td key={d} className={styles.empty} />;
+                  if (!cell) return <td key={d} className={styles.empty} />;
 
                   return (
                     <td
                       key={d}
-                      className={
-                        cell.present
-                          ? styles.present
-                          : styles.absent
-                      }
+                      className={cell.present ? styles.present : styles.absent}
                     >
-                      {cell.amount > 0 ? cell.amount.toFixed(1) : ""}
+                      {isTeacher
+                        ? cell
+                          ? "✓"
+                          : ""
+                        : cell.amount > 0
+                          ? cell.amount.toFixed(1)
+                          : ""}
                     </td>
                   );
                 })}
@@ -95,7 +94,7 @@ export function MonthReportTable({ groupId }: Props) {
           <tfoot>
             <tr>
               <td>Итого</td>
-              {dates.map((d: string) => (
+              {dates?.map((d: string) => (
                 <td key={d} className={styles.total}>
                   {totalsByDate[d]?.toFixed(1) || "0"}
                 </td>

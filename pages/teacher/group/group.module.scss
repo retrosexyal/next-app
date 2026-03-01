@@ -316,3 +316,22 @@
     color: #ef4444;
   }
 }
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+
+  button {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    background: #e5e7eb;
+  }
+}
+
+.activeTab {
+  background: #2563eb !important;
+  color: white;
+}

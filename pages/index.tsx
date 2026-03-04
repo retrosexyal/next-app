@@ -7,6 +7,7 @@ import { Reviews } from "@/container/reviews";
 import { Contact } from "@/container/contact";
 import { VacanciesPreview } from "@/components/VacanciesPreview";
 import { YoutubeSection } from "@/components/YoutubeSection";
+import { StretchingPreview } from "@/components/StretchingPreview";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
         <Main />
         <About />
         <Ways />
+        <StretchingPreview />
         <Photo />
         <YoutubeSection />
         <Questions />

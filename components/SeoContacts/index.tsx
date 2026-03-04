@@ -7,9 +7,18 @@ import { FormSend } from "../form-send";
 type Props = {
   direction: string;
   age: string;
+  title?: string;
+  subtitle?: string;
+  isForOldForm?: boolean;
 };
 
-export const SeoContact = ({ direction, age }: Props) => {
+export const SeoContact = ({
+  direction,
+  age,
+  title,
+  subtitle,
+  isForOldForm,
+}: Props) => {
   const [showPhone, setShowPhone] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -34,13 +43,15 @@ export const SeoContact = ({ direction, age }: Props) => {
     >
       <div className="wrapper">
         <h2 id="contact-title" className={styles.title}>
-          Записаться на {direction} для детей в Могилёве
+          {title || `Записаться на ${direction} для детей в Могилёве`}
         </h2>
 
         <p className={styles.text}>
-          Школа-студия <strong>ЛиМи</strong> приглашает детей {age} на занятия
-          по направлению «{direction}». Мы поможем подобрать удобное расписание,
-          расскажем о формате занятий и ответим на все вопросы.
+          Школа-студия <strong>ЛиМи</strong> приглашает{" "}
+          {subtitle ||
+            `детей ${age} на занятия
+          по направлению «${direction}». Мы поможем подобрать удобное расписание,
+          расскажем о формате занятий и ответим на все вопросы.`}
         </p>
 
         <div className={styles.actions}>
@@ -69,11 +80,10 @@ export const SeoContact = ({ direction, age }: Props) => {
         </div>
         {isFormOpen && (
           <Popup onClick={() => setIsFormOpen(false)}>
-            <FormSend />
+            <FormSend isForOldForm={isForOldForm} />
           </Popup>
         )}
 
-        {/* schema.org */}
         <meta itemProp="name" content="Школа-студия ЛиМи" />
         <meta itemProp="addressLocality" content="Могилёв" />
         <meta itemProp="addressCountry" content="BY" />

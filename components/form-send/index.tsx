@@ -15,7 +15,7 @@ import styles from "./form.module.scss";
 import { IInfo } from "@/interface/iContact";
 import AuthService from "@/clientServices/AuthService";
 
-export const FormSend = () => {
+export const FormSend = ({ isForOldForm = false }) => {
   const [isSending, setIsSending] = useState(false);
   const [isFinish, setIsFinish] = useState("");
   const [info, setInfo] = useState<IInfo>({
@@ -39,15 +39,19 @@ export const FormSend = () => {
   useEffect(() => {
     if (FIOP && dateB && place && phone) {
       setIsDisabled(false);
+    } else if (FIOP && phone && isForOldForm) {
+      setIsDisabled(false);
     } else {
       setIsDisabled(true);
     }
-  }, [FIOP, dateB, place, phone]);
+  }, [FIOP, dateB, place, phone, isForOldForm]);
 
   const handleSubmit = async () => {
     setIsSending(true);
     try {
-      const res = await AuthService.registerForm(info);
+      const res = await AuthService.registerForm(
+        isForOldForm ? { ...info, place: "Дворец, расятжка" } : info,
+      );
       const loadingMessage = await res.data.message;
       if (loadingMessage === "письмо отправлено") {
         setIsSending(false);
@@ -82,31 +86,37 @@ export const FormSend = () => {
             <TextField
               required
               id="outlined-basic"
-              label="Ф.И.О. родителя"
+              label={isForOldForm ? "Ваше имя" : "Ф.И.О. родителя"}
               variant="outlined"
               value={info.FIOP}
               onChange={(e) => setInfo({ ...info, FIOP: e.target.value })}
             />
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">
-                Зал где Вы хотите заниматься
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={info.place}
-                label="Зал где вы занимаетесь"
-                onChange={(e) => setInfo({ ...info, place: e.target.value })}
-              >
-                <MenuItem value={"ФОК Орловского"}>ФОК Орловского</MenuItem>
-                <MenuItem value={"ФОК Златоустовкого"}>
-                  ФОК Златоустовкого
-                </MenuItem>
-                <MenuItem value={"Дворец гимнастики"}>
-                  Дворец гимнастики
-                </MenuItem>
-              </Select>
-            </FormControl>
+            {!isForOldForm && (
+              <>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">
+                    Зал где Вы хотите заниматься
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={info.place}
+                    label="Зал где вы занимаетесь"
+                    onChange={(e) =>
+                      setInfo({ ...info, place: e.target.value })
+                    }
+                  >
+                    <MenuItem value={"ФОК Орловского"}>ФОК Орловского</MenuItem>
+                    <MenuItem value={"ФОК Златоустовкого"}>
+                      ФОК Златоустовкого
+                    </MenuItem>
+                    <MenuItem value={"Дворец гимнастики"}>
+                      Дворец гимнастики
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </>
+            )}
             <TextField
               required
               id="outlined-basic"
@@ -115,13 +125,15 @@ export const FormSend = () => {
               value={info.phone}
               onChange={(e) => setInfo({ ...info, phone: e.target.value })}
             />
-            <TextField
-              id="outlined-basic"
-              label="Сколько лет ребёнку"
-              variant="outlined"
-              value={info.dateB}
-              onChange={(e) => setInfo({ ...info, dateB: e.target.value })}
-            />
+            {!isForOldForm && (
+              <TextField
+                id="outlined-basic"
+                label="Сколько лет ребёнку"
+                variant="outlined"
+                value={info.dateB}
+                onChange={(e) => setInfo({ ...info, dateB: e.target.value })}
+              />
+            )}
             <Button
               variant="outlined"
               disabled={isDisabled}

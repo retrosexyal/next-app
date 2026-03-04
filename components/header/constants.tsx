@@ -12,6 +12,10 @@ export const data = [
         text: "Гимнастика",
         href: "/gymnastic",
       },
+      {
+        text: "Стретчиг",
+        href: "/stretching",
+      },
     ],
   },
   { text: "Фото", id: "photo", href: "/" },

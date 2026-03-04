@@ -1,6 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const PAGES = ["/", "/dance", "/gymnastic", "/vacancies", "/privacy", "/terms"];
+const PAGES = [
+  "/",
+  "/dance",
+  "/gymnastic",
+  "/vacancies",
+  "/privacy",
+  "/terms",
+  "/stretching",
+];
 
 const EXCLUDED = [
   "/finishSignUp",

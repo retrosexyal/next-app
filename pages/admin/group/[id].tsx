@@ -366,6 +366,13 @@ export default function EditGroup() {
                           </div>
                         </span>
                       )}
+                      {r.student?.activeSubscription && (
+                        <div style={{ marginTop: 4, fontSize: 12 }}>
+                          Осталось:{" "}
+                          {r.student?.activeSubscription?.remainingLessons} по
+                          абонименту
+                        </div>
+                      )}
                     </div>
 
                     <button
@@ -566,23 +573,9 @@ export default function EditGroup() {
                 </div>
               )}
 
-              {/* Причина обязательна */}
-              <input
-                placeholder="Причина (обязательно)"
-                value={subReason}
-                onChange={(e) => setSubReason(e.target.value)}
-                style={{
-                  padding: 10,
-                  borderRadius: 10,
-                  border: "1px solid #ddd",
-                  marginTop: 12,
-                }}
-              />
-
-              {/* Добавить занятия */}
               <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
                 <input
-                  placeholder="+ занятий"
+                  placeholder="всего занятий или создать абонимент"
                   value={subAddCount}
                   onChange={(e) => setSubAddCount(e.target.value)}
                   style={{
@@ -595,18 +588,8 @@ export default function EditGroup() {
                 <button
                   onClick={async () => {
                     const count = Number(subAddCount);
-                    /* if (!Number.isFinite(count) || count === 0)
-                      return alert("Введите число"); */
-                    /*  if (!subReason.trim()) return alert("Укажите причину"); */
-
-                    // если нет subscriptionId — нужен способ получить/создать.
-                    // Я предполагаю, что editSubStudent.activeSubscription содержит _id.
                     const subscriptionId =
                       editSubStudent.activeSubscription?._id;
-                    if (!subscriptionId)
-                      return alert(
-                        "Нет subscriptionId. Нужно, чтобы сервер отдавал activeSubscription._id",
-                      );
 
                     await fetch("/api/subscriptions/add-lessons", {
                       method: "POST",
@@ -617,7 +600,7 @@ export default function EditGroup() {
                       body: JSON.stringify({
                         subscriptionId,
                         count,
-                        reason: subReason,
+                        studentId: editSubStudent._id,
                       }),
                     });
 
@@ -636,7 +619,6 @@ export default function EditGroup() {
                 </button>
               </div>
 
-              {/* Установить остаток */}
               <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
                 <input
                   placeholder="Сделать осталось = ..."

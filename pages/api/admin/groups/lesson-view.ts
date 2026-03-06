@@ -19,7 +19,15 @@ export default async function handler(
   const lesson = await Lesson.findById(lessonId);
   if (!lesson) return res.status(404).end();
 
-  const group = await Group.findById(lesson.group).populate("students");
+  /*   const group = await Group.findById(lesson.group).populate("students"); */
+
+  const group = await Group.findById(lesson.group).populate({
+    path: "students",
+    populate: {
+      path: "activeSubscription",
+      select: "totalLessons usedLessons expiresAt",
+    },
+  });
   if (!group) return res.status(404).end();
 
   // берём посещаемость С оплатами
@@ -36,6 +44,9 @@ export default async function handler(
 
   const rows = (group.students as any[]).map((s) => {
     const a = attendanceMap.get(String(s._id));
+    const sub = s.activeSubscription;
+    const totalLessons = sub?.totalLessons ?? 0;
+    const usedLessons = sub?.usedLessons ?? 0;
 
     return {
       _id: s._id,
@@ -45,6 +56,15 @@ export default async function handler(
         message: s.message,
         lastPayment: s.lastPayment,
         messages: s.messages,
+        activeSubscription: sub
+          ? {
+              _id: sub._id,
+              totalLessons,
+              usedLessons,
+              remainingLessons: totalLessons - usedLessons,
+              expiresAt: sub.expiresAt,
+            }
+          : null,
       },
 
       present: a?.present ?? false,

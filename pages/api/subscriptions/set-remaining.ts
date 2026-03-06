@@ -24,7 +24,7 @@ export default async function handler(
   const sub = await Subscription.findById(subscriptionId);
   if (!sub) return res.status(404).json("абонемент не найден");
 
-  sub.usedLessons = remaining;
+  sub.usedLessons = (sub.totalLessons || 8) - remaining;
   await sub.save();
 
   return res.json(sub);

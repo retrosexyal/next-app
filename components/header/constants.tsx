@@ -13,7 +13,7 @@ export const data = [
         href: "/gymnastic",
       },
       {
-        text: "Стретчиг",
+        text: "Стретчинг",
         href: "/stretching",
       },
     ],

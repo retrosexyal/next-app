@@ -65,9 +65,9 @@ export const Burger = () => {
       >
         {data.map(({ href, id, text, submenu }) => {
           if (submenu) {
-            return submenu.map((item) => (
-              <MenuItem onClick={handleClose} key={item.href}>
-                {isHomePage ? (
+            return submenu.map(({ href, text }) => (
+              <MenuItem onClick={handleClose} key={text}>
+                {isHomePage && href === "/" ? (
                   <ScrollLink
                     activeClass="active"
                     to={id}
@@ -76,10 +76,10 @@ export const Burger = () => {
                     offset={-70}
                     duration={500}
                   >
-                    {item.text}
+                    {text}
                   </ScrollLink>
                 ) : (
-                  <Link href={item.href}>{item.text}</Link>
+                  <Link href={href}>{text}</Link>
                 )}
               </MenuItem>
             ));

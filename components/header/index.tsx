@@ -41,7 +41,7 @@ const Header: React.FC = () => {
               {data.map(({ id, text, href, submenu }) => {
                 return (
                   <li key={`${id}${text}`} className={styles.list_item}>
-                    {isHomePage ? (
+                    {isHomePage && href === "/" ? (
                       <ScrollLink
                         activeClass="active"
                         to={id}

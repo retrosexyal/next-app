@@ -13,6 +13,7 @@ export const TEACHERS = [
   "alesia@limi.by",
   "admin@admin",
   "arina@limi.by",
+  "vlada@limi.by",
 ];
 
 export const checkAdmin = (req: NextApiRequest) => {

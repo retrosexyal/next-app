@@ -13,7 +13,7 @@ import styles from "./weddingDance.module.scss";
 const pageUrl = "https://www.limistudio.by/svadebnyy-tanec";
 const instagramUrl = "https://www.instagram.com/weddance_mog/";
 const phoneHref = "tel:+375291999231";
-const phoneText = "+375 29 199 23 31";
+const phoneText = "+375 29 199 92 31";
 
 const galleryImages = [
   {

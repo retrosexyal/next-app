@@ -8,6 +8,7 @@ const PAGES = [
   "/privacy",
   "/terms",
   "/stretching",
+  "/svadebnyy-tanec",
 ];
 
 const EXCLUDED = [

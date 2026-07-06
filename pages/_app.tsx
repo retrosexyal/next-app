@@ -30,8 +30,8 @@ export default function App({ Component, pageProps }: AppProps) {
       "@context": "https://schema.org",
       "@type": "Organization",
       name: "Школа-студия ЛиМи",
-      url: "https://limistudio.by",
-      logo: "https://limistudio.by/og/logo_colored.webp",
+      url: "https://www.limistudio.by",
+      logo: "https://www.limistudio.by/og/logo_colored.webp",
       sameAs: [
         "https://www.instagram.com/limistudio.by/",
         "https://m.vk.com/limistudio",
@@ -41,7 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       name: "Школа-студия ЛиМи",
-      image: "https://limistudio.by/og/logo_colored.webp",
+      image: "https://www.limistudio.by/og/logo_colored.webp",
       address: {
         "@type": "PostalAddress",
         addressLocality: "Могилёв",
@@ -49,7 +49,7 @@ export default function App({ Component, pageProps }: AppProps) {
       },
       telephone: "+375291999231",
       priceRange: "12 BYN",
-      url: "https://limistudio.by",
+      url: "https://www.limistudio.by",
     },
   ];
 
@@ -89,12 +89,12 @@ export default function App({ Component, pageProps }: AppProps) {
             />
             <meta
               property="og:url"
-              content="https://limistudio.by"
+              content="https://www.limistudio.by"
               key="og:url"
             />
             <meta
               property="og:image"
-              content="https://limistudio.by/og/logo_colored.webp"
+              content="https://www.limistudio.by/og/logo_colored.webp"
               key="og:image"
             />
             <meta property="og:image:width" content="1200" />
@@ -118,7 +118,7 @@ export default function App({ Component, pageProps }: AppProps) {
             />
             <meta
               name="twitter:image"
-              content="https://limistudio.by/og/logo_colored.webp"
+              content="https://www.limistudio.by/og/logo_colored.webp"
               key="twitter:image"
             />
             <script

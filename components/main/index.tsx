@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./main.module.scss";
 import { Button } from "@mui/material";
 import Popup from "../popup";
@@ -57,6 +58,11 @@ const Main = () => {
             Оставить заявку
           </Button>
         </div>
+
+        <nav className={styles.popularLinks} aria-label="Популярные направления">
+          <Link href="/dance">Танцы для детей</Link>
+          <Link href="/gymnastic">Гимнастика для детей</Link>
+        </nav>
       </div>
       {isFormOpen && (
         <Popup onClick={openForm}>

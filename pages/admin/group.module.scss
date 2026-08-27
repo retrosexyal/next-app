@@ -52,6 +52,11 @@
     font-size: 12px;
     opacity: 0.6;
   }
+
+  .error {
+    color: #b91c1c;
+    font-size: 14px;
+  }
 }
 
 .item {
@@ -261,6 +266,18 @@
   border-radius: 8px;
   border: 1px solid #ccc;
   margin-bottom: 6px;
+}
+
+.groupSettings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+
+  .ownerInput,
+  .saveOwner {
+    margin-bottom: 0;
+  }
 }
 
 .saveOwner {

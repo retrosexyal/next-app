@@ -27,7 +27,7 @@ export default async function handler(
   if (req.method !== "POST") return res.status(405).end();
 
   await connectDB();
-  const user = requireTeacher({ req, res });
+  const user = await requireTeacher({ req, res });
   if (!user) return;
 
   const { lessonId, items } = req.body as Body;

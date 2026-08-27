@@ -10,7 +10,7 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   await connectDB();
-  const user = requireTeacher({ req, res });
+  const user = await requireTeacher({ req, res });
   if (!user) return;
 
   const { groupId } = req.body;

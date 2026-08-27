@@ -5,16 +5,12 @@ import mongoose from "mongoose";
 import Group from "@/models/group-model";
 import { env } from "process";
 import { NextRequest } from "next/server";
+import Teacher from "@/models/teacher-model";
 
 export const ADMINS = ["admin@admin"];
 
-export const TEACHERS = [
-  "liza@limi.by",
-  "alesia@limi.by",
-  "admin@admin",
-  "arina@limi.by",
-  "vlada@limi.by",
-];
+// Администратор остаётся встроенным преподавателем. Остальные адреса хранятся в БД.
+export const TEACHERS = ["admin@admin"];
 
 export const checkAdmin = (req: NextApiRequest) => {
   const accessToken = req.headers["authorization"]?.split(" ")[1];
@@ -74,7 +70,7 @@ export const requireAdmin = ({
   return user;
 };
 
-export const requireTeacher = ({
+export const requireTeacher = async ({
   req,
   res,
 }: {
@@ -82,10 +78,16 @@ export const requireTeacher = ({
   res: NextApiResponse;
 }) => {
   const user = getUserFromReq(req);
-  if (
-    !user ||
-    (!TEACHERS.includes(user.email) && !ADMINS.includes(user.email))
-  ) {
+  if (!user) {
+    res.status(403).json("нет доступа");
+    return null;
+  }
+
+  if (TEACHERS.includes(user.email) || ADMINS.includes(user.email)) return user;
+
+  await connectDB();
+  const teacher = await Teacher.exists({ email: user.email.toLowerCase() });
+  if (!teacher) {
     res.status(403).json("нет доступа");
     return null;
   }

@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "POST") return res.status(405).end();
 
   await connectDB();
-  const user = requireTeacher({ req, res });
+  const user = await requireTeacher({ req, res });
   if (!user) return;
 
   const { groupId, from, to } = req.body || {};

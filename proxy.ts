@@ -14,7 +14,9 @@ export default function proxy(req: NextRequest) {
     try {
       if (
         (pathname.startsWith("/admin") && user.email !== "admin@admin") ||
-        (pathname.startsWith("/teacher") && !TEACHERS.includes(user.email))
+        (pathname.startsWith("/teacher") &&
+          !TEACHERS.includes(user.email) &&
+          !user.isTeacher)
       ) {
         return NextResponse.redirect(new URL("/", req.url));
       }

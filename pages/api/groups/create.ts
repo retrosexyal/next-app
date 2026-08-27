@@ -1,5 +1,6 @@
-import { connectDB, requireAdmin } from "@/helpers/helpers";
+import { connectDB, requireAdmin, TEACHERS } from "@/helpers/helpers";
 import Group from "@/models/group-model";
+import Teacher from "@/models/teacher-model";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -13,6 +14,10 @@ export default async function handler(
   if (!admin) return;
 
   const { title, ownerEmail } = req.body;
+
+  const isTeacher =
+    TEACHERS.includes(ownerEmail) || Boolean(await Teacher.exists({ email: ownerEmail }));
+  if (!isTeacher) return res.status(400).json("преподаватель не найден");
 
   const group = await Group.create({
     title,

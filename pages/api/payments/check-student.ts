@@ -6,7 +6,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const user = requireTeacher({ req, res });
+  const user = await requireTeacher({ req, res });
   if (!user) return;
 
   const { phone, fullName, studentId } = req.body;

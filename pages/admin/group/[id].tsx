@@ -20,6 +20,11 @@ interface Student {
   };
 }
 
+interface Teacher {
+  _id: string;
+  email: string;
+}
+
 export default function EditGroup() {
   const router = useRouter();
   const { id } = router.query;
@@ -33,6 +38,8 @@ export default function EditGroup() {
   const [expressQuery, setExpressQuery] = useState("");
 
   const [group, setGroup] = useState<any>(null);
+  const [groupTitle, setGroupTitle] = useState("");
+  const [teacherEmails, setTeacherEmails] = useState<string[]>(["admin@admin"]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [contracts, setContracts] = useState<any[]>([]);
@@ -54,7 +61,9 @@ export default function EditGroup() {
     const res = await fetch(`/api/groups/get-group?id=${id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
-    setGroup(await res.json());
+    const nextGroup = await res.json();
+    setGroup(nextGroup);
+    setGroupTitle(nextGroup.title || "");
   };
 
   const loadContracts = async () => {
@@ -64,6 +73,18 @@ export default function EditGroup() {
 
   useEffect(() => {
     loadContracts();
+    fetch("/api/admin/teachers", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((response) => response.json())
+      .then((teachers: Teacher[]) => {
+        if (Array.isArray(teachers)) {
+          setTeacherEmails([
+            "admin@admin",
+            ...teachers.map((teacher) => teacher.email),
+          ]);
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -159,32 +180,86 @@ export default function EditGroup() {
         </div>
 
         <h2>{group.title}</h2>
-        <input
-          className={styles.ownerInput}
-          value={group.ownerEmail}
-          onChange={(e) => setGroup({ ...group, ownerEmail: e.target.value })}
-          placeholder="email преподавателя"
-        />
+        <div className={styles.groupSettings}>
+          <input
+            className={styles.ownerInput}
+            value={groupTitle}
+            maxLength={100}
+            onChange={(e) => setGroupTitle(e.target.value)}
+            placeholder="Название группы"
+          />
+          <button
+            className={styles.saveOwner}
+            onClick={async () => {
+              try {
+                const updatedGroup = await toastFetch<any>(
+                  toast,
+                  "/api/admin/groups/rename",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({ groupId: id, title: groupTitle }),
+                    successMessage: "Группа переименована",
+                  },
+                );
+                setGroup(updatedGroup);
+                setGroupTitle(updatedGroup.title);
+              } catch {}
+            }}
+          >
+            Переименовать группу
+          </button>
 
-        <button
-          className={styles.saveOwner}
-          onClick={async () => {
-            await fetch("/api/admin/groups/change-owner", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-              body: JSON.stringify({
-                groupId: id,
-                ownerEmail: group.ownerEmail,
-              }),
-            });
-            alert("Преподаватель обновлён");
-          }}
-        >
-          Сменить преподавателя
-        </button>
+          <select
+            className={styles.ownerInput}
+            value={group.ownerEmail}
+            onChange={(e) => setGroup({ ...group, ownerEmail: e.target.value })}
+          >
+            {!teacherEmails.includes(group.ownerEmail) && (
+              <option value={group.ownerEmail} disabled>
+                {group.ownerEmail} — удалён из списка
+              </option>
+            )}
+            {teacherEmails.map((email) => (
+              <option key={email} value={email}>
+                {email}
+              </option>
+            ))}
+          </select>
+
+          <button
+            className={styles.saveOwner}
+            onClick={async () => {
+              try {
+                const updatedGroup = await toastFetch<any>(
+                  toast,
+                  "/api/admin/groups/change-owner",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({
+                      groupId: id,
+                      ownerEmail: group.ownerEmail,
+                    }),
+                    successMessage: "Преподаватель обновлён",
+                  },
+                );
+                setGroup((current: any) => ({
+                  ...current,
+                  ownerEmail: updatedGroup.ownerEmail,
+                }));
+              } catch {}
+            }}
+          >
+            Сменить преподавателя
+          </button>
+        </div>
 
         {/* ---------- СОСТАВ (без изменений) ---------- */}
         {mode === "students" && (
@@ -370,7 +445,7 @@ export default function EditGroup() {
                         <div style={{ marginTop: 4, fontSize: 12 }}>
                           Осталось:{" "}
                           {r.student?.activeSubscription?.remainingLessons} по
-                          абонименту
+                          абонементу
                         </div>
                       )}
                     </div>
@@ -575,7 +650,7 @@ export default function EditGroup() {
 
               <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
                 <input
-                  placeholder="всего занятий или создать абонимент"
+                  placeholder="всего занятий или создать абонемент"
                   value={subAddCount}
                   onChange={(e) => setSubAddCount(e.target.value)}
                   style={{

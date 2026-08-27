@@ -11,7 +11,7 @@ export default async function handler(
 ) {
   await connectDB();
 
-  const user = requireTeacher({ req, res });
+  const user = await requireTeacher({ req, res });
   if (!user) return;
 
   const { from, to } = req.query;

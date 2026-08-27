@@ -6,6 +6,8 @@ import UserDto from "@/dtos/user-dto";
 import { mailOptionsRegist, transporter } from "@/config/nodemailer";
 import { env } from "process";
 import messageModel from "@/models/message-model";
+import TeacherModel from "@/models/teacher-model";
+import { ADMIN_EMAIL } from "@/constants/constants";
 
 const URL = env.URL;
 
@@ -16,6 +18,13 @@ interface UserModel {
 }
 
 class UserService {
+  private async createUserDto(user: any) {
+    const isTeacher =
+      user.email === ADMIN_EMAIL ||
+      Boolean(await TeacherModel.exists({ email: user.email.toLowerCase() }));
+    return new UserDto(user, isTeacher);
+  }
+
   async registration(email: string, password: string, name: string) {
     const canditate = await UserModel.findOne({ email });
     if (canditate) {
@@ -33,7 +42,7 @@ class UserService {
       isActivated: false,
       status: "",
     });
-    const userDto = new UserDto(user);
+    const userDto = await this.createUserDto(user);
     const tokens = tokenService.generateToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     await transporter.sendMail({
@@ -157,7 +166,7 @@ class UserService {
     if (!isPassEquals) {
       throw new Error(`пароль не верен`);
     }
-    const userDto = new UserDto(user);
+    const userDto = await this.createUserDto(user);
     const tokens = tokenService.generateToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return {
@@ -178,7 +187,7 @@ class UserService {
     const newPass = await bcrypt.hash(newPassword, 7);
     user.password = newPass;
     await user.save();
-    const userDto = new UserDto(user);
+    const userDto = await this.createUserDto(user);
     const tokens = tokenService.generateToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return {
@@ -204,7 +213,10 @@ class UserService {
       throw new Error("ошибка обновления токена");
     }
     const user = await UserModel.findById(userData.id);
-    const userDto = new UserDto(user);
+    if (!user) {
+      throw new Error("ошибка обновления токена");
+    }
+    const userDto = await this.createUserDto(user);
     const tokens = tokenService.generateToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return {

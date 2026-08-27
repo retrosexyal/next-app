@@ -7,6 +7,8 @@ interface UserModel {
   id: string;
   isActivated: boolean;
   name: string;
+  status?: string;
+  isTeacher?: boolean;
 }
 
 const accessKey = env.ACCESS_TOKEN_KEY;

@@ -16,7 +16,7 @@ export default async function handler(
   if (req.method !== "GET") return res.status(405).end();
 
   await connectDB();
-  const user = requireTeacher({ req, res });
+  const user = await requireTeacher({ req, res });
   if (!user) return;
 
   const lessonId = req.query.lessonId as string;

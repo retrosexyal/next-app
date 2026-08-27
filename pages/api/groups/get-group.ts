@@ -16,7 +16,7 @@ export default async function handler(
   if (req.method !== "GET") return res.status(405).end();
 
   await connectDB();
-  const user = requireTeacher({ req, res });
+  const user = await requireTeacher({ req, res });
   if (!user) return;
 
   const { id } = req.query;
@@ -80,6 +80,12 @@ export default async function handler(
         lastPayment: last || null,
         todayAttendance: attendanceMap[String(s._id)] || null,
       };
+    }),
+  );
+
+  studentsWithLastPay.sort((a: any, b: any) =>
+    String(a.fullName || "").localeCompare(String(b.fullName || ""), "ru", {
+      sensitivity: "base",
     }),
   );
 

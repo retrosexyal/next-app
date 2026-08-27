@@ -12,11 +12,13 @@ export default class UserDto {
   isActivated;
   name;
   status;
-  constructor(model: UserModel) {
+  isTeacher;
+  constructor(model: UserModel, isTeacher = false) {
     this.email = model.email;
     this.id = model._id;
     this.isActivated = model.isActivated;
     this.name = model.name;
     this.status = model.status;
+    this.isTeacher = isTeacher;
   }
 }

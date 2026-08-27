@@ -15,8 +15,10 @@
 }
 
 .table {
+  --student-column-width: min(50vw, 220px);
   border-collapse: collapse;
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   font-size: 12px;
 }
 
@@ -33,14 +35,34 @@
   font-weight: 600;
 }
 
-.student {
+.studentColumn {
+  width: var(--student-column-width);
+  min-width: var(--student-column-width) !important;
+  max-width: var(--student-column-width);
+  overflow: hidden;
+}
+
+.studentText {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student,
+.table thead .studentColumn,
+.table tfoot .studentColumn {
   text-align: left;
   font-weight: 500;
-  white-space: nowrap;
   background: #f1f5f9;
   position: sticky;
   left: 0;
   z-index: 1;
+}
+
+.table thead .studentColumn {
+  z-index: 2;
 }
 
 .present {

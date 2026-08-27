@@ -81,6 +81,14 @@ export default async function handler(
     };
   });
 
+  rows.sort((a, b) =>
+    String(a.student.fullName || "").localeCompare(
+      String(b.student.fullName || ""),
+      "ru",
+      { sensitivity: "base" },
+    ),
+  );
+
   res.json({
     lesson: {
       _id: lesson._id,

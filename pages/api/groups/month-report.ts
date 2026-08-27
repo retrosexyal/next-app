@@ -12,7 +12,7 @@ export default async function handler(
   if (req.method !== "POST") return res.status(405).end();
 
   await connectDB();
-  const teacher = requireTeacher({ req, res });
+  const teacher = await requireTeacher({ req, res });
   if (!teacher) return;
 
   const { groupId, month } = req.body;
@@ -71,10 +71,16 @@ export default async function handler(
     }
   }
 
-  const students = group.students.map((s: any) => ({
-    _id: s._id,
-    fullName: s.fullName,
-  }));
+  const students = group.students
+    .map((s: any) => ({
+      _id: s._id,
+      fullName: s.fullName,
+    }))
+    .sort((a: any, b: any) =>
+      String(a.fullName || "").localeCompare(String(b.fullName || ""), "ru", {
+        sensitivity: "base",
+      }),
+    );
 
   return res.json({
     students,

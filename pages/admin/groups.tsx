@@ -4,7 +4,6 @@ import { useAppSelector } from "@/store";
 import { useCheckAdmin } from "@/hooks/useCheckAdmin";
 import Head from "next/head";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { TEACHERS } from "@/helpers/helpers";
 import AdminNotebookButton from "@/components/AdminNotebookButton";
 
 interface Group {
@@ -17,6 +16,7 @@ export default function AdminGroups() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [title, setTitle] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
+  const [teachers, setTeachers] = useState<string[]>(["admin@admin"]);
   const { email } = useAppSelector((state) => state.user.user);
 
   const load = async () => {
@@ -31,6 +31,15 @@ export default function AdminGroups() {
 
   useEffect(() => {
     load();
+    fetch("/api/admin/teachers", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((response) => response.json())
+      .then((items) => {
+        if (Array.isArray(items)) {
+          setTeachers(["admin@admin", ...items.map((item) => item.email)]);
+        }
+      });
   }, [email]);
 
   const create = async () => {
@@ -135,7 +144,7 @@ export default function AdminGroups() {
                 setOwnerEmail(value);
               }}
             >
-              {TEACHERS.map((teacher) => (
+              {teachers.map((teacher) => (
                 <MenuItem value={teacher} key={teacher}>
                   {teacher}
                 </MenuItem>

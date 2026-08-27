@@ -11,6 +11,7 @@ const initialState: UserState = {
     isActivated: false,
     id: "",
     status: "",
+    isTeacher: false,
   },
 };
 

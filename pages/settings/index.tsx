@@ -14,7 +14,6 @@ import { ContractInfo } from "@/components/contract-info";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "@/theme";
 import Button from "@/components/button";
-import { TEACHERS } from "@/helpers/helpers";
 import { useRouter } from "next/router";
 import Head from "next/head";
 
@@ -37,7 +36,9 @@ const EMPTY_DATA = {
 };
 
 const Settings = () => {
-  const { isActivated, email, id } = useAppSelector((state) => state.user.user);
+  const { isActivated, email, id, isTeacher } = useAppSelector(
+    (state) => state.user.user,
+  );
   const router = useRouter();
   const [data, setData] = useState<IContract[]>([EMPTY_DATA]);
   const [message, setMessage] = useState("");
@@ -97,10 +98,10 @@ const Settings = () => {
   };
 
   useEffect(() => {
-    if (TEACHERS.includes(email) && email !== "admin@admin") {
+    if (isTeacher && email !== "admin@admin") {
       router.push("/teacher/groups");
     }
-  }, [email, router]);
+  }, [email, isTeacher, router]);
 
   return (
     <>
@@ -114,6 +115,9 @@ const Settings = () => {
             <>
               <Link className={styles.link} href="/admin/groups">
                 Все группы
+              </Link>
+              <Link className={styles.link} href="/admin/teachers">
+                Преподаватели
               </Link>
               <Link className={styles.link} href="/teacher/groups">
                 Мои группы

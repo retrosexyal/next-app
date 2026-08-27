@@ -51,7 +51,9 @@ export function MonthReportTable({ groupId, isTeacher }: Props) {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Ученик</th>
+              <th className={styles.studentColumn}>
+                <span className={styles.studentText}>Ученик</span>
+              </th>
               {dates?.map((d: string) => (
                 <th key={d}>{new Date(d).getDate()}</th>
               ))}
@@ -62,7 +64,11 @@ export function MonthReportTable({ groupId, isTeacher }: Props) {
           <tbody>
             {students?.map((s: any) => (
               <tr key={s._id}>
-                <td className={styles.student}>{s.fullName}</td>
+                <td className={`${styles.student} ${styles.studentColumn}`}>
+                  <span className={styles.studentText} title={s.fullName}>
+                    {s.fullName}
+                  </span>
+                </td>
 
                 {dates?.map((d: string) => {
                   const cell = matrix[s._id]?.[d];
@@ -93,7 +99,9 @@ export function MonthReportTable({ groupId, isTeacher }: Props) {
 
           <tfoot>
             <tr>
-              <td>Итого</td>
+              <td className={styles.studentColumn}>
+                <span className={styles.studentText}>Итого</span>
+              </td>
               {dates?.map((d: string) => (
                 <td key={d} className={styles.total}>
                   {totalsByDate[d]?.toFixed(1) || "0"}

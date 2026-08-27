@@ -86,10 +86,16 @@ export default async function handler(
       (totalsByStudent[studentId] || 0) + amount;
   }
 
-  const students = group.students.map((s: any) => ({
-    _id: s._id,
-    fullName: s.fullName,
-  }));
+  const students = group.students
+    .map((s: any) => ({
+      _id: s._id,
+      fullName: s.fullName,
+    }))
+    .sort((a: any, b: any) =>
+      String(a.fullName || "").localeCompare(String(b.fullName || ""), "ru", {
+        sensitivity: "base",
+      }),
+    );
 
   return res.json({
     students,

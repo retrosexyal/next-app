@@ -40,7 +40,7 @@ export default function VacanciesPage() {
             description:
               "Проведение занятий по хореографии/гимнастики для детей от 3 до 14 лет.",
             datePosted: "2026-01-20",
-            validThrough: "2026-12-31",
+            validThrough: "2027-12-31",
             employmentType: ["PART_TIME", "FULL_TIME"],
             hiringOrganization: {
               "@type": "Organization",

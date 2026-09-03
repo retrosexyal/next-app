@@ -17,7 +17,26 @@ interface UserModel {
   isActivated: boolean;
 }
 
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 class UserService {
+  private async findUserByEmail(email: string) {
+    const trimmedEmail = email.trim();
+    const exactUser = await UserModel.findOne({ email: trimmedEmail });
+
+    if (exactUser) return exactUser;
+
+    return UserModel.findOne({
+      email: {
+        $regex: `^${escapeRegExp(trimmedEmail)}$`,
+        $options: "i",
+      },
+    });
+  }
+
   private async createUserDto(user: any) {
     const isTeacher =
       user.email === ADMIN_EMAIL ||
@@ -26,16 +45,19 @@ class UserService {
   }
 
   async registration(email: string, password: string, name: string) {
-    const canditate = await UserModel.findOne({ email });
+    const normalizedEmail = normalizeEmail(email);
+    const canditate = await this.findUserByEmail(normalizedEmail);
     if (canditate) {
-      throw new Error(`пользователь с почтовым ящиком ${email} существует`);
+      throw new Error(
+        `пользователь с почтовым ящиком ${normalizedEmail} существует`
+      );
     }
     const hashPassword = await bcrypt.hash(password, 7);
 
     const activationLink = v4();
 
     const user = await UserModel.create({
-      email,
+      email: normalizedEmail,
       password: hashPassword,
       activationLink,
       name,
@@ -46,7 +68,7 @@ class UserService {
     const tokens = tokenService.generateToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     await transporter.sendMail({
-      ...mailOptionsRegist(email),
+      ...mailOptionsRegist(normalizedEmail),
       subject: "Активация аккаунта ЛиМи",
       text: "_",
       html: `<h1> для активации пройдите по <a href='${URL}api/activate/${activationLink}'>ссылке</a></h2>`,
@@ -57,13 +79,13 @@ class UserService {
     };
   }
   async forgotPassword(email: string) {
-    const user = await UserModel.findOne({ email });
+    const user = await this.findUserByEmail(email);
     if (!user) {
       throw new Error(`пользователь с почтовым ящиком ${email} не существует`);
     }
 
     await transporter.sendMail({
-      ...mailOptionsRegist(email),
+      ...mailOptionsRegist(user.email),
       subject: "Восстановление пароля",
       text: "Вы запросили восстановление пароля. Проверьте письмо в HTML-формате.",
       html: `
@@ -158,7 +180,7 @@ class UserService {
   }
 
   async login(email: string, password: string) {
-    const user = await UserModel.findOne({ email });
+    const user = await this.findUserByEmail(email);
     if (!user) {
       throw new Error(`пользователь с почтовым ящиком ${email} не существует`);
     }
@@ -176,7 +198,7 @@ class UserService {
   }
 
   async changePass(email: string, password: string, newPassword: string) {
-    const user = await UserModel.findOne({ email });
+    const user = await this.findUserByEmail(email);
     if (!user) {
       throw new Error(`пользователь с почтовым ящиком ${email} не существует`);
     }

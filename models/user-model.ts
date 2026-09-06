@@ -6,6 +6,7 @@ const UserSchema = new Schema({
   name: { type: String, required: true },
   isActivated: { type: Boolean, default: false },
   activationLink: { type: String },
+  activationEmailNextAllowedAt: { type: Date },
   status: { type: String },
 });
 

@@ -8,6 +8,7 @@ import { env } from "process";
 import messageModel from "@/models/message-model";
 import TeacherModel from "@/models/teacher-model";
 import { ADMIN_EMAIL } from "@/constants/constants";
+import { activationCooldownMs, sendActivationEmail } from "./activation-service";
 
 const URL = env.URL;
 
@@ -62,16 +63,15 @@ class UserService {
       activationLink,
       name,
       isActivated: false,
+      activationEmailNextAllowedAt: new Date(Date.now() + activationCooldownMs()),
       status: "",
     });
     const userDto = await this.createUserDto(user);
     const tokens = tokenService.generateToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
-    await transporter.sendMail({
-      ...mailOptionsRegist(normalizedEmail),
-      subject: "Активация аккаунта ЛиМи",
-      text: "_",
-      html: `<h1> для активации пройдите по <a href='${URL}api/activate/${activationLink}'>ссылке</a></h2>`,
+    // The account already exists; allow signing in and retrying if SMTP fails.
+    await sendActivationEmail(user).catch(() => {
+      console.error("Initial activation email delivery failed");
     });
     return {
       ...tokens,
@@ -230,7 +230,7 @@ class UserService {
     const userData = tokenService.validateRefreshToken(
       refreshToken
     ) as UserModel;
-    const tokenFromDb = tokenService.findToken(refreshToken);
+    const tokenFromDb = await tokenService.findToken(refreshToken);
     if (!userData || !tokenFromDb) {
       throw new Error("ошибка обновления токена");
     }

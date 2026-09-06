@@ -1,0 +1,27 @@
+.notice { display: flex; flex-direction: column; gap: 18px; width: 100%; min-width: 0; text-align: center; }
+.email_card {
+  padding: 14px 12px;
+  border: 1px solid #e7ecf5;
+  border-radius: 12px;
+  background: #f7f9fd;
+  span { display: block; color: #697386; font-size: 12px; line-height: 1.5; }
+  strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.5; font-weight: 600; color: #29364c; overflow-wrap: anywhere; }
+}
+.instructions { margin: 0; color: #626e80; font-size: 14px; line-height: 1.65; }
+.primary.primary {
+  min-height: 48px; padding: 12px; border-radius: 12px; background: #4069d8; color: #fff;
+  font-family: inherit; font-size: 15px; font-weight: 600; text-transform: none;
+  &:hover { background: #345ac0; }
+  &:disabled { background: #e9eef9; color: #7685a6; }
+}
+.resend {
+  display: flex; flex-direction: column; align-items: center;
+  p { margin: 0 0 2px; color: #697386; font-size: 12px; line-height: 1.5; }
+}
+.secondary.secondary {
+  min-height: 40px; padding: 6px 12px; color: #4069d8; font: inherit; font-size: 14px;
+  font-weight: 500; text-transform: none; border-radius: 8px;
+  &:disabled { color: #8a94a6; }
+}
+.timer { color: #697386; font-size: 12px; line-height: 1.5; b { font-weight: 600; font-variant-numeric: tabular-nums; } }
+.status { margin: 0; padding: 12px; border-radius: 10px; background: #f0f4fc; color: #384968; font-size: 13px; line-height: 1.5; }

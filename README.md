@@ -36,3 +36,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+# Activation email
+
+`ACTIVATION_RESEND_MINUTES` sets the minimum interval between activation emails
+(default: 5 minutes, minimum: 1). The MongoDB user document stores the next allowed
+delivery time, including the initial registration email. An atomic update claims
+each resend; SMTP failures keep the cooldown because delivery can be uncertain.
+`URL` must contain the public application origin used in email links.
+
+Run activation regression checks with `node scripts/test-activation.cjs`.

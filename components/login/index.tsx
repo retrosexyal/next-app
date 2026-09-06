@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styles from "./login.module.scss";
-import Button from "../button";
 import AuthService from "@/clientServices/AuthService";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/store";
@@ -11,10 +10,15 @@ import {
   IconButton,
   InputAdornment,
   TextField,
+  Dialog,
+  Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useRouter } from "next/router";
+import ActivationNotice from "@/components/activation-notice";
+import MarkEmailUnreadOutlinedIcon from "@mui/icons-material/MarkEmailUnreadOutlined";
+import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
 
 interface IProps {
   handleLogin: (event?: React.MouseEvent) => void;
@@ -31,8 +35,8 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState("");
   const [isShow, setIsShow] = useState(false);
-  const [isValidPass, setIsValidPass] = useState(false);
-  const [isValidCheckPass, setIsValidCheckPass] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [confirmationTouched, setConfirmationTouched] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const { user: userApp } = useAppSelector((state) => state.user);
@@ -40,12 +44,8 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   const dispatch = useAppDispatch();
 
   const { email, password, name } = auth;
-
-  const handleLog = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).getAttribute("data-id") === "close") {
-      handleLogin(e);
-    }
-  };
+  const passwordError = isShow && passwordTouched && password.length < 8;
+  const confirmationError = confirmationTouched && checkPass !== password;
 
   const sendLogin = () => {
     setIsLoading(true);
@@ -58,12 +58,14 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
           setIsLoading(false);
           const userData = res.data.user;
           dispatch(setUserApp(userData));
-          handleLogin();
-          router.push("/settings");
+          if (userData.isActivated) {
+            handleLogin();
+            router.push("/settings");
+          }
         }
       })
       .catch((err) => {
-        if (err.response.status === 404) {
+        if (err.response?.status === 404) {
           setIsLoading(false);
           alert("пользователь отсутствует либо неверный пароль");
         }
@@ -75,6 +77,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
     if (token) {
       AuthService.refresh()
         .then(({ data }) => {
+          localStorage.setItem("token", data.accessToken);
           setUser(data.user.name);
           setIsLoading(false);
           const userData = data.user;
@@ -93,19 +96,9 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
   };
   const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAuth({ ...auth, password: e.target.value });
-    if (password.length < 7) {
-      setIsValidPass(false);
-    } else {
-      setIsValidPass(true);
-    }
   };
   const handleCheckPass = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCheckPass(e.target.value);
-    if (password === checkPass) {
-      setIsValidCheckPass(true);
-    } else {
-      setIsValidCheckPass(false);
-    }
   };
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAuth({ ...auth, name: e.target.value });
@@ -117,11 +110,19 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
     setAuth({ name: "", email: "", password: "" });
   };
   const handleRegistr = () => {
-    setIsShow(true);
-    if (email && password && name && password === checkPass) {
+    if (!isShow) {
+      setIsShow(true);
+      setPasswordTouched(false);
+      setConfirmationTouched(false);
+      return;
+    }
+    setPasswordTouched(true);
+    setConfirmationTouched(true);
+    if (email && password.length >= 8 && name && password === checkPass) {
       setIsLoading(true);
       AuthService.registration(email, password, name)
         .then(({ data }) => {
+          localStorage.setItem("token", data.accessToken);
           setUser(data.user.name);
           setIsLoading(false);
           setIsShow(false);
@@ -143,34 +144,22 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
     }
   };
 
-  const handlePassBlur = () => {
-    if (password.length < 8) {
-      setIsValidPass(false);
-    } else {
-      setIsValidPass(true);
-    }
-  };
-  const handleCheckPassBlur = () => {
-    if (password === checkPass) {
-      setIsValidCheckPass(true);
-    } else {
-      setIsValidCheckPass(false);
-    }
-  };
-
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   return (
-    <div className={styles.wrapper} onClick={handleLog} data-id="close">
-      <div className={styles.content}>
+    <Dialog open onClose={() => handleLogin()} aria-labelledby="auth-dialog-title"
+      maxWidth={false} PaperProps={{ className: styles.content }}
+      BackdropProps={{ sx: { backgroundColor: "rgba(24, 30, 43, 0.48)", backdropFilter: "blur(5px)" } }}>
         <IconButton
-          aria-label="close"
+          aria-label="Закрыть окно"
           data-id="close"
           onClick={handleLogin}
           sx={{
             position: "absolute",
-            right: 8,
-            top: 8,
+            right: 12,
+            top: 12,
+            width: 40,
+            height: 40,
             color: (theme) => theme.palette.grey[500],
           }}
         >
@@ -179,7 +168,11 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
         {isLoading && <h2>Загрузка...</h2>}
         {user && (
           <>
-            <h2>{`Добро пожаловать ${user}`}</h2>
+            <header className={styles.heading}>
+              <div className={styles.icon}>{userApp.isActivated ? <PersonOutlineRoundedIcon /> : <MarkEmailUnreadOutlinedIcon />}</div>
+              <h2 id="auth-dialog-title">{userApp.isActivated ? `С возвращением, ${user}!` : "Подтвердите почту"}</h2>
+              <p>{userApp.isActivated ? "Всё готово для перехода в личный кабинет." : `${user}, остался один шаг до личного кабинета.`}</p>
+            </header>
             {userApp.isActivated && (
               <Link
                 className={styles.link}
@@ -190,13 +183,10 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
               </Link>
             )}
             {!userApp.isActivated && (
-              <div>
-                Необходимо активировать учетную запись, посетите почтовый ящик{" "}
-                <span style={{ fontWeight: 800 }}>{userApp.email}</span> и
-                пройдите по ссылке
-              </div>
+              <ActivationNotice email={userApp.email} onActivated={handleLogin} />
             )}
-            <Button text="выйти из учётной записи" onClick={handleLogout} />
+            <footer className={styles.account_actions}>
+            <button type="button" className={styles.logout} onClick={handleLogout}>Выйти из аккаунта</button>
             <Link
               href="/password/change"
               className={styles.link_forgot_pass}
@@ -204,15 +194,27 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
             >
               Сменить пароль
             </Link>
+            </footer>
           </>
         )}
 
         {!isLoading && !user && (
           <>
+            <header className={styles.heading}>
+              <h2 id="auth-dialog-title">{isShow ? "Создать аккаунт" : "Рады вас видеть"}</h2>
+              <p>{isShow ? "Зарегистрируйтесь, чтобы продолжить." : "Войдите в личный кабинет ЛиМи."}</p>
+            </header>
             <TextField
+              className={styles.field}
+              InputLabelProps={{ shrink: true }}
               required
-              label="Адрес электронной почты"
-              defaultValue=""
+              id="auth-email"
+              name="email"
+              autoComplete="email"
+              placeholder="name@example.com"
+              inputProps={{ inputMode: "email", autoCapitalize: "none", spellCheck: false }}
+              label="Электронная почта"
+
               type="email"
               value={email}
               onChange={handleEmail}
@@ -220,21 +222,29 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
             />
 
             <TextField
-              error={!isValidPass}
+              className={styles.field}
+              InputLabelProps={{ shrink: true }}
+              error={passwordError}
               required
-              label="введите пароль"
-              defaultValue=""
+              id="auth-password"
+              name="password"
+              autoComplete={isShow ? "new-password" : "current-password"}
+              placeholder={isShow ? "Минимум 8 символов" : "Введите пароль"}
+              label="Пароль"
+
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={handlePassword}
               sx={{ width: "100%", maxWidth: "400px" }}
-              onBlur={handlePassBlur}
-              helperText={!isValidPass ? "Минимум 8 символов" : ""}
+              onBlur={() => setPasswordTouched(true)}
+              helperText={passwordError ? "Используйте не менее 8 символов" : ""}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      aria-label="toggle password visibility"
+                      aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+                      aria-pressed={showPassword}
+                      onMouseDown={(event) => event.preventDefault()}
                       onClick={handleClickShowPassword}
                       edge="end"
                     >
@@ -248,21 +258,29 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
             {isShow && (
               <>
                 <TextField
+              className={styles.field}
+              InputLabelProps={{ shrink: true }}
                   sx={{ width: "100%", maxWidth: "400px" }}
-                  error={!isValidCheckPass}
+                  error={confirmationError}
                   required
-                  label="повторите пароль"
-                  defaultValue=""
+                  id="auth-password-confirm"
+                  name="passwordConfirmation"
+                  autoComplete="new-password"
+                  placeholder="Введите пароль ещё раз"
+                  label="Повторите пароль"
+
                   type={showPassword ? "text" : "password"}
                   value={checkPass}
                   onChange={handleCheckPass}
-                  onBlur={handleCheckPassBlur}
-                  helperText={!isValidCheckPass ? "Пароли не совпадают" : ""}
+                  onBlur={() => setConfirmationTouched(true)}
+                  helperText={confirmationError ? "Пароли не совпадают" : ""}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
-                          aria-label="toggle password visibility"
+                          aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+                      aria-pressed={showPassword}
+                      onMouseDown={(event) => event.preventDefault()}
                           onClick={handleClickShowPassword}
                           edge="end"
                         >
@@ -273,10 +291,16 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
                   }}
                 />
                 <TextField
+              className={styles.field}
+              InputLabelProps={{ shrink: true }}
                   sx={{ width: "100%", maxWidth: "400px" }}
                   required
-                  label="Введите имя"
-                  defaultValue=""
+                  id="auth-name"
+                  name="name"
+                  autoComplete="given-name"
+                  placeholder="Как к вам обращаться"
+                  label="Ваше имя"
+
                   type="text"
                   value={name}
                   onChange={handleName}
@@ -284,8 +308,9 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
               </>
             )}
             <div className={styles.btn_container}>
-              {!isShow && <Button text="Войти" onClick={sendLogin} />}
-              <Button text="Зарегистироваться" onClick={handleRegistr} />
+              {!isShow && <Button className={styles.primary} variant="contained" disableElevation onClick={sendLogin}>Войти</Button>}
+              <Button className={isShow ? styles.primary : styles.secondary} variant={isShow ? "contained" : "outlined"} disableElevation onClick={handleRegistr}>Создать аккаунт</Button>
+              {isShow && <Button className={styles.secondary} onClick={() => setIsShow(false)}>Уже есть аккаунт? Войти</Button>}
               <Link
                 href="/password"
                 className={styles.link_forgot_pass}
@@ -303,7 +328,6 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
             </div>
           </>
         )}
-      </div>
       {isLoading && (
         <Backdrop
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -312,7 +336,7 @@ const Login: React.FC<IProps> = ({ handleLogin }) => {
           <CircularProgress color="inherit" />
         </Backdrop>
       )}
-    </div>
+    </Dialog>
   );
 };
 export default Login;

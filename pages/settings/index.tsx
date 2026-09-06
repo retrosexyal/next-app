@@ -16,6 +16,7 @@ import { theme } from "@/theme";
 import Button from "@/components/button";
 import { useRouter } from "next/router";
 import Head from "next/head";
+export { settingsAccess as getServerSideProps } from "@/helpers/settings-access";
 
 const EMPTY_DATA = {
   _id: "",
@@ -43,7 +44,8 @@ const Settings = () => {
   const [data, setData] = useState<IContract[]>([EMPTY_DATA]);
   const [message, setMessage] = useState("");
   const dispatch = useAppDispatch();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [accessChecked, setAccessChecked] = useState(false);
   useEffect(() => {
     fetch("/version.json", { cache: "no-store" })
       .then((r) => r.json())
@@ -66,11 +68,15 @@ const Settings = () => {
     AuthService.refresh()
       .then(({ data }) => {
         const userData = data.user;
+        localStorage.setItem("token", data.accessToken);
         dispatch(setUser(userData));
-      })
-      .then(() => {
-        if (id) {
-          ContractService.getContract(id, true)
+        if (!userData.isActivated) {
+          router.replace("/activation");
+          return;
+        }
+        setAccessChecked(true);
+        if (userData.id) {
+          ContractService.getContract(userData.id, true)
             .then(({ data }) => {
               const isEmptyData = Array.isArray(data) && data.length === 0;
               setData(isEmptyData ? [EMPTY_DATA] : data);
@@ -84,12 +90,14 @@ const Settings = () => {
         }
       })
       .catch((err) => {
+        setAccessChecked(false);
+        router.replace("/");
         console.log(err);
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, [dispatch, id]);
+  }, [dispatch, router]);
 
   const isNotAdmin = email !== "admin@admin";
 
@@ -98,10 +106,12 @@ const Settings = () => {
   };
 
   useEffect(() => {
-    if (isTeacher && email !== "admin@admin") {
+    if (accessChecked && isActivated && isTeacher && email !== "admin@admin") {
       router.push("/teacher/groups");
     }
-  }, [email, isTeacher, router]);
+  }, [accessChecked, isActivated, email, isTeacher, router]);
+
+  if (!accessChecked || !isActivated) return <Loader />;
 
   return (
     <>

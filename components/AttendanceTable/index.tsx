@@ -93,7 +93,9 @@ export function AttendanceTable() {
               <tr key={student.id}>
                 <td data-label="Ученик">{student.fullName}</td>
                 <td data-label="Посещаемость">
-                  <span className={styles.percentage}>
+                  <span
+                    className={`${styles.percentage} ${student.percentage >= 50 ? styles.good : student.percentage > 20 ? styles.middle : styles.bad}`}
+                  >
                     {student.percentage}%
                   </span>
                   <span className={styles.count}>
@@ -146,7 +148,7 @@ export function AttendanceTable() {
                   <div className={styles.lesson} key={lesson.id}>
                     <div>
                       <strong>{formatDate(lesson.date)}</strong>
-                      <span>{lesson.groupTitle}</span>
+                      {/* <span>{lesson.groupTitle}</span> */}
                     </div>
                     <span
                       className={

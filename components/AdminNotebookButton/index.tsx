@@ -5,6 +5,7 @@ import styles from "./AdminNotebookButton.module.scss";
 import { useToast } from "@/hooks/useToast";
 import { Toast } from "@/components/Toast";
 import { toastFetch } from "@/utils/toastFetch";
+import { useRouter } from "next/router";
 
 interface Note {
   uuid: string;
@@ -14,6 +15,7 @@ interface Note {
 
 export default function AdminNotebookButton() {
   const toast = useToast();
+  const router = useRouter();
 
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
@@ -79,8 +81,24 @@ export default function AdminNotebookButton() {
 
   return (
     <>
+      <button
+        type="button"
+        className={styles.backFab}
+        onClick={() => router.back()}
+        aria-label="Вернуться на предыдущую страницу"
+        title="Назад"
+      >
+        ←
+      </button>
+
       {/* FLOAT BUTTON */}
-      <button className={styles.fab} onClick={() => setOpen(true)}>
+      <button
+        type="button"
+        className={styles.fab}
+        onClick={() => setOpen(true)}
+        aria-label="Открыть блокнот администратора"
+        title="Блокнот администратора"
+      >
         +
       </button>
 

@@ -16,6 +16,7 @@ import { theme } from "@/theme";
 import Button from "@/components/button";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { AttendanceTable } from "@/components/AttendanceTable";
 export { settingsAccess as getServerSideProps } from "@/helpers/settings-access";
 
 const EMPTY_DATA = {
@@ -138,6 +139,7 @@ const Settings = () => {
               <Students />
             </>
           )}
+          {isNotAdmin && <AttendanceTable />}
           <div className={styles.flex_col}>
             {isNotAdmin &&
               data?.map((contract, ind) => {
@@ -201,6 +203,7 @@ const Settings = () => {
                 return null;
               })}
           </div>
+
           {message && (
             <div>
               <h2 style={{ textAlign: "center" }}>

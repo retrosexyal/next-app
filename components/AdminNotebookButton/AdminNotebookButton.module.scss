@@ -1,7 +1,7 @@
-.fab {
+.fab,
+.backFab {
   position: fixed;
   bottom: 24px;
-  right: 24px;
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -12,6 +12,19 @@
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
   z-index: 1000;
+}
+
+.fab {
+  right: 24px;
+}
+
+.backFab {
+  right: 92px;
+}
+
+.fab:hover,
+.backFab:hover {
+  background: #333;
 }
 
 .overlay {

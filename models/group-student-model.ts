@@ -35,6 +35,7 @@ export interface IStudent {
   paymentsSyncedAt?: Date;
   message?: string;
   birthday?: string;
+  groupJoinedAt?: Map<string, Date>;
 }
 
 const GroupStudentSchema = new Schema(
@@ -60,6 +61,14 @@ const GroupStudentSchema = new Schema(
       externalId: String,
     },
     paymentsSyncedAt: Date,
+
+    // Дата вступления нужна отдельно для каждой группы: ученик может состоять
+    // сразу в нескольких группах или быть добавлен повторно после удаления.
+    groupJoinedAt: {
+      type: Map,
+      of: Date,
+      default: {},
+    },
 
     activeSubscription: {
       type: Schema.Types.ObjectId,

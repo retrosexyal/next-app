@@ -6,6 +6,7 @@ import {
   connectDB,
   requireGroupAccess,
   requireTeacher,
+  startOfMoscowDay,
 } from "@/helpers/helpers";
 import { Types } from "mongoose";
 
@@ -60,6 +61,12 @@ export default async function handler(
   if (!exists) {
     group.students.push(student._id);
     await group.save();
+
+    await Student.findByIdAndUpdate(student._id, {
+      $set: {
+        [`groupJoinedAt.${String(group._id)}`]: startOfMoscowDay(),
+      },
+    });
   }
 
   res.json(student);

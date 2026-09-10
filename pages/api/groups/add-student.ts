@@ -1,4 +1,8 @@
-import { connectDB, requireTeacher } from "@/helpers/helpers";
+import {
+  connectDB,
+  requireTeacher,
+  startOfMoscowDay,
+} from "@/helpers/helpers";
 import { NextApiRequest, NextApiResponse } from "next";
 import Student from "@/models/group-student-model";
 import Group from "@/models/group-model";
@@ -19,6 +23,9 @@ export default async function handler(
     fullName,
     phone,
     isTemp: true,
+    groupJoinedAt: {
+      [String(groupId)]: startOfMoscowDay(),
+    },
   });
 
   await Group.findByIdAndUpdate(groupId, {

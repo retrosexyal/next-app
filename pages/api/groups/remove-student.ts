@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Group from "@/models/group-model";
+import Student from "@/models/group-student-model";
 import { connectDB, requireAdmin } from "@/helpers/helpers";
 
 export default async function handler(
@@ -16,6 +17,10 @@ export default async function handler(
 
   await Group.findByIdAndUpdate(groupId, {
     $pull: { students: studentId },
+  });
+
+  await Student.findByIdAndUpdate(studentId, {
+    $unset: { [`groupJoinedAt.${String(groupId)}`]: "" },
   });
 
   res.json({ ok: true });

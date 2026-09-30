@@ -48,6 +48,8 @@ export default function EditGroup() {
 
   const [lessons, setLessons] = useState<any[]>([]);
   const [lessonId, setLessonId] = useState<string>("");
+  const [lessonDate, setLessonDate] = useState<string>("");
+  const [isCreatingLesson, setIsCreatingLesson] = useState(false);
 
   const [rows, setRows] = useState<any[]>([]);
   const [payHistory, setPayHistory] = useState<any[] | null>(null);
@@ -91,18 +93,37 @@ export default function EditGroup() {
     if (id) load();
   }, [id]);
 
+  useEffect(() => {
+    const now = new Date();
+    const localDate = new Date(
+      now.getTime() - now.getTimezoneOffset() * 60 * 1000,
+    );
+    setLessonDate(localDate.toISOString().slice(0, 10));
+  }, []);
+
   // --- журнал ---
+  const loadLessons = async (preferredLessonId?: string) => {
+    if (!id) return;
+
+    const response = await fetch(`/api/admin/groups/lessons?groupId=${id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    const nextLessons = await response.json();
+    setLessons(nextLessons);
+
+    if (preferredLessonId) {
+      setLessonId(preferredLessonId);
+    } else if (nextLessons[0]) {
+      setLessonId(nextLessons[0]._id);
+    } else {
+      setLessonId("");
+      setRows([]);
+    }
+  };
+
   useEffect(() => {
     if (mode !== "journal" || !id) return;
-
-    fetch(`/api/admin/groups/lessons?groupId=${id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
-      .then((r) => r.json())
-      .then((d) => {
-        setLessons(d);
-        if (d[0]) setLessonId(d[0]._id);
-      });
+    loadLessons();
   }, [mode, id]);
 
   const openPayModal = async (studentId: string, lessonId: string) => {
@@ -112,14 +133,20 @@ export default function EditGroup() {
     });
   };
 
+  const loadLessonRows = async (selectedLessonId: string) => {
+    const response = await fetch(
+      `/api/admin/groups/lesson-view?lessonId=${selectedLessonId}`,
+      {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      },
+    );
+    const data = await response.json();
+    setRows(data.rows);
+  };
+
   useEffect(() => {
     if (!lessonId || mode !== "journal") return;
-
-    fetch(`/api/admin/groups/lesson-view?lessonId=${lessonId}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
-      .then((r) => r.json())
-      .then((data) => setRows(data.rows));
+    loadLessonRows(lessonId);
   }, [lessonId, mode]);
 
   const filtered = contracts.filter((c) =>
@@ -387,11 +414,65 @@ export default function EditGroup() {
         {/* ---------- ЖУРНАЛ (как teacher) ---------- */}
         {mode === "journal" && (
           <>
+            <div className={styles.createLesson}>
+              <label htmlFor="lesson-date">Дата занятия</label>
+              <div className={styles.createLessonControls}>
+                <input
+                  id="lesson-date"
+                  type="date"
+                  value={lessonDate}
+                  max={new Date().toLocaleDateString("en-CA")}
+                  onChange={(e) => setLessonDate(e.target.value)}
+                />
+                <button
+                  type="button"
+                  disabled={!lessonDate || isCreatingLesson}
+                  onClick={async () => {
+                    if (!lessonDate || !id) return;
+                    setIsCreatingLesson(true);
+
+                    try {
+                      const result = await toastFetch<{
+                        lesson: { _id: string };
+                        created: boolean;
+                      }>(toast, "/api/admin/groups/create-lesson", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                        body: JSON.stringify({ groupId: id, date: lessonDate }),
+                        loadingMessage: "Создаём занятие...",
+                        silent: true,
+                      });
+
+                      await loadLessons(result.lesson._id);
+                      toast.success(
+                        result.created
+                          ? "Занятие создано — можно отмечать присутствие"
+                          : "Занятие на эту дату уже было создано",
+                      );
+                    } catch {
+                    } finally {
+                      setIsCreatingLesson(false);
+                    }
+                  }}
+                >
+                  {isCreatingLesson ? "Создаём..." : "+ Создать занятие"}
+                </button>
+              </div>
+            </div>
+
             <select
               className={styles.lessonSelect}
               value={lessonId}
               onChange={(e) => setLessonId(e.target.value)}
             >
+              {!lessons.length && (
+                <option value="" disabled>
+                  Занятий пока нет
+                </option>
+              )}
               {lessons.map((l) => (
                 <option key={l._id} value={l._id}>
                   {new Date(l.date).toLocaleDateString()}
@@ -771,6 +852,7 @@ export default function EditGroup() {
                   }),
                   successMessage: "Оплата сохранена",
                 });
+                await loadLessonRows(payModal.lessonId);
                 setPayModal(null);
                 load();
               }}
@@ -793,6 +875,7 @@ export default function EditGroup() {
                   }),
                   successMessage: "Абонемент применён",
                 });
+                await loadLessonRows(payModal.lessonId);
                 setPayModal(null);
                 load();
               }}
@@ -815,6 +898,7 @@ export default function EditGroup() {
                   }),
                   successMessage: "Оплата сохранена",
                 });
+                await loadLessonRows(payModal.lessonId);
                 setPayModal(null);
                 load();
               }}
@@ -838,6 +922,7 @@ export default function EditGroup() {
                   successMessage: "Присутствие отменено",
                 });
 
+                await loadLessonRows(payModal.lessonId);
                 setPayModal(null);
                 load();
               }}

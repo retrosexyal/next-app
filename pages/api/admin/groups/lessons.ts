@@ -10,8 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { groupId } = req.query;
 
   const lessons = await Lesson.find({ group: groupId })
-    .sort({ date: -1 })
-    .limit(30);
+    .sort({ date: -1 });
 
   res.json(lessons);
 }

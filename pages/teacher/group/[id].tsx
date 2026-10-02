@@ -45,6 +45,7 @@ export default function TeacherGroup() {
   const [payModal, setPayModal] = useState<{
     studentId: string;
     lessonId: string;
+    date: string;
   } | null>(null);
   const [studentIdForMark, setStudentIdForMark] = useState<string | null>(null);
   const [editingMessage, setEditingMessage] = useState<{
@@ -53,7 +54,10 @@ export default function TeacherGroup() {
   } | null>(null);
   const [mode, setMode] = useState<"today" | "month">("today");
 
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const syncRunning = useRef(false);
+  const pendingRef = useRef<any[]>([]);
+  const queueKey = useRef("");
+  const cachedLessonDate = useRef("");
 
   /* ---------- ONLINE / OFFLINE ---------- */
 
@@ -93,17 +97,85 @@ export default function TeacherGroup() {
       }
     });
 
+    for (const action of pendingRef.current) {
+      if (action.date === new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10)) {
+        map[action.studentId] = action.mode !== "remove";
+      }
+    }
     setAttendance(map);
   };
 
   useEffect(() => {
+    setLessonId(null);
+    cachedLessonDate.current = "";
     if (id) load();
   }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    try {
+      const token = localStorage.getItem("token") || "";
+      const userId = JSON.parse(atob(token.split(".")[1])).id;
+      if (!userId) return;
+      queueKey.current = `attendance-queue:${userId}:${id}`;
+      const saved = JSON.parse(localStorage.getItem(queueKey.current) || "[]");
+      pendingRef.current = Array.isArray(saved) ? saved : [];
+      setOfflineQueue([...pendingRef.current]);
+    } catch { toast.error("Не удалось загрузить несинхронизированные отметки"); }
+  }, [id]);
+
+  const persistQueue = (next: any[]) => {
+    if (!queueKey.current) throw new Error("Не удалось определить очередь текущего пользователя");
+    localStorage.setItem(queueKey.current, JSON.stringify(next));
+    pendingRef.current = next;
+    setOfflineQueue([...next]);
+  };
+
+  const flushQueue = async () => {
+    if (syncRunning.current || !navigator.onLine) return;
+    syncRunning.current = true;
+    try {
+      while (pendingRef.current.length && navigator.onLine) {
+        const action = pendingRef.current[0];
+        const currentUserId = JSON.parse(atob((localStorage.getItem("token") || "").split(".")[1])).id;
+        if (queueKey.current !== `attendance-queue:${currentUserId}:${id}`) {
+          throw new Error("Сменился пользователь. Отметки сохранены для исходной учётной записи.");
+        }
+        const headers = { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` };
+        let lid = action.lessonId;
+        if (!lid) {
+          const response = await fetch("/api/lessons/create", { method: "POST", headers, body: JSON.stringify({ groupId: id, date: action.date }) });
+          if (!response.ok) throw new Error("Не удалось создать урок для синхронизации");
+          lid = (await response.json())._id;
+        }
+        const response = await fetch(action.mode === "remove" ? "/api/attendance/remove" : "/api/attendance/set-payment", {
+          method: "POST", headers, body: JSON.stringify({ lessonId: lid, studentId: action.studentId, mode: action.mode }),
+        });
+        if (!response.ok) throw new Error("Отметка не синхронизирована. Она сохранена на устройстве.");
+        persistQueue(pendingRef.current.filter((entry) => entry.uuid !== action.uuid));
+      }
+      if (!pendingRef.current.length) await load();
+    } catch (error: any) {
+      toast.error(error.message || "Отметки сохранены на устройстве. Повторите синхронизацию.");
+    } finally { syncRunning.current = false; }
+  };
+
+  const saveMark = async (mode: "single" | "subscription" | "relative" | "remove") => {
+    if (!payModal) return;
+    try {
+      persistQueue([...pendingRef.current, { ...payModal, mode, uuid: crypto.randomUUID() }]);
+      setAttendance((current) => ({ ...current, [payModal.studentId]: mode !== "remove" }));
+      setPayModal(null);
+      toast.success("Отметка сохранена на устройстве");
+      await flushQueue();
+    } catch { toast.error("Не удалось сохранить отметку на устройстве"); }
+  };
 
   /* ---------- ENSURE LESSON ---------- */
 
   const ensureLesson = async () => {
-    if (lessonId) return lessonId;
+    const today = new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10);
+    if (lessonId && cachedLessonDate.current === today) return lessonId;
 
     const data = await toastFetch<any>(toast, "/api/lessons/create", {
       method: "POST",
@@ -117,27 +189,15 @@ export default function TeacherGroup() {
     });
 
     setLessonId(data._id);
+    cachedLessonDate.current = today;
     return data._id;
   };
 
   /* ---------- OFFLINE SYNC ---------- */
 
   useEffect(() => {
-    if (online && offlineQueue.length) {
-      offlineQueue.forEach((p) =>
-        toastFetch(toast, "/api/attendance/set", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify(p),
-          silent: true,
-        }),
-      );
-      setOfflineQueue([]);
-    }
-  }, [online]);
+    if (online && offlineQueue.length) void flushQueue();
+  }, [online, offlineQueue.length]);
 
   /* ---------- PAYMENTS SYNC ---------- */
 
@@ -169,10 +229,12 @@ export default function TeacherGroup() {
   /* ---------- UI ---------- */
 
   const openPayModal = async (studentId: string) => {
-    const lid = await ensureLesson();
+    const date = new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10);
+    const lid = navigator.onLine ? await ensureLesson() : (cachedLessonDate.current === date ? lessonId || "" : "");
     setPayModal({
       studentId,
       lessonId: lid,
+      date,
     });
   };
 
@@ -213,6 +275,7 @@ export default function TeacherGroup() {
               <div className={styles.offline}>Офлайн — сохраняем локально</div>
             )}
 
+            {offlineQueue.length > 0 && <div role="status">Ожидают синхронизации: {offlineQueue.length} <button onClick={() => flushQueue()} disabled={!online}>Повторить</button></div>}
             <ul className={styles.list}>
               {group.students.map((s: Student) => {
                 const sub = s.activeSubscription;
@@ -374,92 +437,32 @@ export default function TeacherGroup() {
               onClick={(e) => e.stopPropagation()}
             >
               <h3>Выберите оплату</h3>
+              {(group.students.find((student: any) => student._id === payModal.studentId)?.activeSubscription ||
+                group.students.find((student: any) => student._id === payModal.studentId)?.todayAttendance?.consumed) && (
+                <p>У ученика есть абонемент. Выбор другой оплаты заменит оплату урока, но не вернёт списанное занятие.</p>
+              )}
 
               <button
-                onClick={async () => {
-                  await toastFetch(toast, "/api/attendance/set-payment", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                    body: JSON.stringify({
-                      lessonId: payModal.lessonId,
-                      studentId: payModal.studentId,
-                      mode: "single",
-                    }),
-                    successMessage: "Оплата сохранена",
-                  });
-                  setPayModal(null);
-                  load();
-                }}
+                onClick={() => saveMark("single")}
               >
                 Разовое — 12₽
               </button>
 
               <button
-                onClick={async () => {
-                  await toastFetch(toast, "/api/attendance/set-payment", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                    body: JSON.stringify({
-                      lessonId: payModal.lessonId,
-                      studentId: payModal.studentId,
-                      mode: "subscription",
-                    }),
-                    successMessage: "Абонемент применён",
-                  });
-                  setPayModal(null);
-                  load();
-                }}
+                onClick={() => saveMark("subscription")}
               >
                 Абонемент — 84₽
               </button>
 
               <button
-                onClick={async () => {
-                  await toastFetch(toast, "/api/attendance/set-payment", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                    body: JSON.stringify({
-                      lessonId: payModal.lessonId,
-                      studentId: payModal.studentId,
-                      mode: "relative",
-                    }),
-                    successMessage: "Оплата сохранена",
-                  });
-                  setPayModal(null);
-                  load();
-                }}
+                onClick={() => saveMark("relative")}
               >
                 Родственник — 9₽
               </button>
 
               <button
                 style={{ marginTop: 12, color: "red" }}
-                onClick={async () => {
-                  await toastFetch(toast, "/api/attendance/remove", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                    body: JSON.stringify({
-                      lessonId: payModal.lessonId,
-                      studentId: payModal.studentId,
-                    }),
-                    successMessage: "Присутствие отменено",
-                  });
-
-                  setPayModal(null);
-                  load();
-                }}
+                onClick={() => saveMark("remove")}
               >
                 Отменить присутствие
               </button>

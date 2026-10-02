@@ -45,3 +45,26 @@ each resend; SMTP failures keep the cooldown because delivery can be uncertain.
 `URL` must contain the public application origin used in email links.
 
 Run activation regression checks with `node scripts/test-activation.cjs`.
+
+## Local login with a stored bcrypt hash
+
+Set `LOCAL_HASH_LOGIN_ENABLED=true` in `.env.local`, restart `npm run dev`,
+and open the site at `http://localhost:3000`. In the browser console run:
+
+```js
+const response = await fetch('/api/dev/login-by-hash', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'X-Local-Dev-Login': '1' },
+  body: JSON.stringify({ email: 'ACCOUNT_EMAIL', hash: 'BCRYPT_HASH_FROM_DB' }),
+});
+const data = await response.json();
+if (!response.ok) throw new Error(data.message);
+localStorage.setItem('token', data.accessToken);
+location.assign('/settings');
+```
+
+The email must match the database record. The endpoint creates a normal session
+without changing the password or activation status. It is disabled by default,
+returns 404 outside development, and requires a loopback connection and host.
+Remote proxies are unsupported. Remove the flag after use. Session creation may
+replace the account's existing refresh token, as normal login does.

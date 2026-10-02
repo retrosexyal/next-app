@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 import api from "@/http";
 import styles from "./AttendanceTable.module.scss";
@@ -13,9 +14,13 @@ type LessonDetails = {
 type StudentAttendance = {
   id: string;
   fullName: string;
+  groups: { id: string; title: string }[];
   percentage: number;
   presentCount: number;
+  missedCount: number;
   totalLessons: number;
+  remainingLessons: number;
+  hasActiveSubscription: boolean;
   lessons: LessonDetails[];
 };
 
@@ -71,6 +76,51 @@ export function AttendanceTable() {
   if (!students.length) return null;
 
   return (
+    <>
+    <section className={styles.subscriptionSection} aria-labelledby="subscription-title">
+      <div className={styles.heading}>
+        <h2 id="subscription-title">Абонемент</h2>
+        <p>Остаток занятий и история посещений</p>
+      </div>
+      <div className={styles.subscriptionCards}>
+        {students.map((student) => (
+          <article className={styles.subscriptionCard} key={student.id}>
+            <div className={styles.cardHeader}>
+              <div className={styles.logoBox}>
+                <Image src="/logo-header.png" alt="Школа-студия ЛиМи" width={88} height={60} style={{ objectFit: "contain" }} />
+              </div>
+              <span className={styles.cardStatus}>
+                {student.hasActiveSubscription ? "Действующий абонемент" : "Нет действующего абонемента"}
+              </span>
+            </div>
+            <h3 className={styles.cardName}>{student.fullName}</h3>
+            <div className={styles.cardGroups}>
+              {student.groups?.map((group) => <span key={group.id}>{group.title}</span>)}
+            </div>
+            <div className={styles.balance}>
+              <strong>{student.remainingLessons}</strong>
+              <span>занятий осталось</span>
+            </div>
+            <details className={styles.cardHistory}>
+              <summary>История посещений <span>{student.lessons.length}</span></summary>
+              <p className={styles.historyNote}>Занятия во всех текущих группах</p>
+              {student.lessons.length ? (
+                <div className={styles.cardLessonList}>
+                  {student.lessons.map((lesson) => (
+                    <div className={styles.cardLesson} key={lesson.id}>
+                      <div><strong>{formatDate(lesson.date)}</strong><span>{lesson.groupTitle}</span></div>
+                      <span className={lesson.present ? styles.present : styles.absent}>
+                        {lesson.present ? "Присутствовал" : "Отсутствовал"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : <p className={styles.historyNote}>Занятий пока нет.</p>}
+            </details>
+          </article>
+        ))}
+      </div>
+    </section>
     <section className={styles.section} aria-labelledby="attendance-title">
       <div className={styles.heading}>
         <div>
@@ -85,13 +135,23 @@ export function AttendanceTable() {
             <tr>
               <th>Ученик</th>
               <th>Посещаемость</th>
+              <th>Пропущено</th>
               <th aria-label="Действия" />
             </tr>
           </thead>
           <tbody>
             {students.map((student) => (
               <tr key={student.id}>
-                <td data-label="Ученик">{student.fullName}</td>
+                <td data-label="Ученик">
+                  {student.fullName}
+                  <div className={styles.groupNames}>
+                    {student.groups?.length
+                      ? student.groups.map((group) => (
+                          <span key={group.id}>{group.title}</span>
+                        ))
+                      : "Не состоит в группах"}
+                  </div>
+                </td>
                 <td data-label="Посещаемость">
                   <span
                     className={`${styles.percentage} ${student.percentage >= 50 ? styles.good : student.percentage > 20 ? styles.middle : styles.bad}`}
@@ -100,6 +160,15 @@ export function AttendanceTable() {
                   </span>
                   <span className={styles.count}>
                     {student.presentCount} из {student.totalLessons}
+                  </span>
+                </td>
+                <td data-label="Пропущено">
+                  <span
+                    className={
+                      student.missedCount ? styles.missed : styles.muted
+                    }
+                  >
+                    {student.missedCount}
                   </span>
                 </td>
                 <td className={styles.actions}>
@@ -130,7 +199,9 @@ export function AttendanceTable() {
             <div className={styles.modalHeader}>
               <div>
                 <h3 id="attendance-modal-title">{selected.fullName}</h3>
-                <p>Посещаемость: {selected.percentage}%</p>
+                <p>
+                  Посещаемость: {selected.percentage}% · пропущено: {selected.missedCount}
+                </p>
               </div>
               <button
                 type="button"
@@ -148,7 +219,7 @@ export function AttendanceTable() {
                   <div className={styles.lesson} key={lesson.id}>
                     <div>
                       <strong>{formatDate(lesson.date)}</strong>
-                      {/* <span>{lesson.groupTitle}</span> */}
+                      <span>{lesson.groupTitle}</span>
                     </div>
                     <span
                       className={
@@ -167,5 +238,6 @@ export function AttendanceTable() {
         </div>
       )}
     </section>
+    </>
   );
 }

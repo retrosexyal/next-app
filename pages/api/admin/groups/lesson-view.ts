@@ -4,6 +4,7 @@ import Attendance from "@/models/attendance-model";
 import Lesson from "@/models/lesson-model";
 import Group from "@/models/group-model";
 import "@/models/group-student-model";
+import "@/models/subscription-model";
 
 export default async function handler(
   req: NextApiRequest,
@@ -39,10 +40,12 @@ export default async function handler(
     .lean();
 
   const attendanceMap = new Map(
-    attendances.map((a: any) => [String(a.student._id), a]),
+    attendances
+      .filter((a: any) => a.student)
+      .map((a: any) => [String(a.student._id), a]),
   );
 
-  const rows = (group.students as any[]).map((s) => {
+  const rows = (group.students as any[]).filter(Boolean).map((s) => {
     const a = attendanceMap.get(String(s._id));
     const sub = s.activeSubscription;
     const totalLessons = sub?.totalLessons ?? 0;
@@ -71,7 +74,7 @@ export default async function handler(
       source: a?.source ?? "free",
 
       // ✅ ВОТ ГЛАВНОЕ
-      payment: a?.payment || {
+      payment: (a?.present && a?.payment) || {
         type: "free",
         amount: 0,
         date: lesson.date,

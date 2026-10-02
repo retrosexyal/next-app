@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { connectDB, requireAdmin } from "@/helpers/helpers";
 import Subscription from "@/models/subscription-model";
 import Student from "@/models/group-student-model";
+import { canRetireSubscription } from "@/services/subscription-policy";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
   await connectDB();
@@ -22,12 +23,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!sub && student.activeSubscription) {
         // Повтор запроса создания после потери ответа не создаёт второй абонемент.
         sub = await Subscription.findById(student.activeSubscription).session(session);
-        if (sub && sub.usedLessons < sub.totalLessons) { result = sub; return; }
+        if (sub && !canRetireSubscription(sub)) { result = sub; return; }
         sub = null;
       }
       if (!sub) {
         if (Number(count) === 0) throw new Error("Для нового абонемента нужно хотя бы одно занятие");
-        [sub] = await Subscription.create([{ student: student._id, totalLessons: Number(count), usedLessons: 0 }], { session });
+        [sub] = await Subscription.create([{ student: student._id, totalLessons: Number(count), usedLessons: 0, autoMissCompensation: true }], { session });
         student.activeSubscription = sub._id;
       } else {
         if (String(student.activeSubscription) !== String(sub._id)) throw new Error("Абонемент уже завершён. Создайте новый.");

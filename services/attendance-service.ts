@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Attendance from "@/models/attendance-model";
 import Subscription from "@/models/subscription-model";
 import Student from "@/models/group-student-model";
+import { canRetireSubscription, consumeSubscriptionLesson } from "@/services/subscription-policy";
 export type PaymentMode = "single" | "relative" | "subscription";
 
 // Списание хранится независимо от присутствия и выбранной оплаты.
@@ -23,15 +24,16 @@ export async function saveAttendancePayment(lesson: any, studentId: string, mode
         let sub = student.activeSubscription
           ? await Subscription.findOne({ _id: student.activeSubscription, student: studentId }).session(session)
           : null;
-        if (!sub || sub.usedLessons >= sub.totalLessons) {
-          [sub] = await Subscription.create([{ student: studentId, totalLessons: 8, usedLessons: 0 }], { session });
+        let coverage = sub ? await consumeSubscriptionLesson(sub, lesson, session) : null;
+        if (!coverage) {
+          [sub] = await Subscription.create([{ student: studentId, totalLessons: 8, usedLessons: 0, autoMissCompensation: true }], { session });
           student.activeSubscription = sub._id;
+          coverage = await consumeSubscriptionLesson(sub, lesson, session);
         }
-        sub.usedLessons += 1;
-        await sub.save({ session });
         attendance.chargedSubscription = sub._id;
-        attendance.consumed = true;
-        if (sub.usedLessons >= sub.totalLessons) student.activeSubscription = null;
+        attendance.consumed = coverage === "charged";
+        attendance.subscriptionCompensation = coverage === "compensation";
+        if (canRetireSubscription(sub)) student.activeSubscription = null;
         await student.save({ session });
       }
       attendance.present = true;

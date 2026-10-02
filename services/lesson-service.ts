@@ -3,6 +3,7 @@ import Lesson from "@/models/lesson-model";
 import GroupStudent from "@/models/group-student-model";
 import Subscription from "@/models/subscription-model";
 import Attendance from "@/models/attendance-model";
+import { canRetireSubscription, consumeSubscriptionLesson } from "@/services/subscription-policy";
 
 // Дата урока хранится как календарный день в UTC; «сегодня» — по Минску.
 export function studioToday() {
@@ -26,19 +27,25 @@ export async function createGroupLesson(group: any, date: Date) {
           .select("activeSubscription").session(session);
         for (const student of students) {
           if (!student.activeSubscription) continue;
-          const sub = await Subscription.findOneAndUpdate({
+          const sub = await Subscription.findOne({
             _id: student.activeSubscription,
             student: student._id,
-            $expr: { $lt: ["$usedLessons", "$totalLessons"] },
-          }, { $inc: { usedLessons: 1 } }, { new: true, session });
+          }).session(session);
           if (!sub) continue;
+          const coverage = await consumeSubscriptionLesson(sub, lesson, session);
+          if (!coverage) {
+            await GroupStudent.updateOne({ _id: student._id, activeSubscription: sub._id },
+              { $set: { activeSubscription: null } }, { session });
+            continue;
+          }
           await Attendance.create([{
             lesson: lesson._id, student: student._id,
-            present: false, source: "subscription", consumed: true,
+            present: false, source: "subscription", consumed: coverage === "charged",
+            subscriptionCompensation: coverage === "compensation",
             chargedSubscription: sub._id,
             payment: { paymentId: sub._id, type: "subscription", amount: 84, date },
           }], { session });
-          if (sub.usedLessons >= sub.totalLessons) {
+          if (canRetireSubscription(sub)) {
             await GroupStudent.updateOne({ _id: student._id, activeSubscription: sub._id },
               { $set: { activeSubscription: null } }, { session });
           }

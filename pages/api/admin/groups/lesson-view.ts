@@ -26,7 +26,7 @@ export default async function handler(
     path: "students",
     populate: {
       path: "activeSubscription",
-      select: "totalLessons usedLessons expiresAt",
+      select: "totalLessons usedLessons expiresAt autoMissCompensation compensationLesson compensatedMissedLesson",
     },
   });
   if (!group) return res.status(404).end();
@@ -66,6 +66,9 @@ export default async function handler(
               usedLessons,
               remainingLessons: totalLessons - usedLessons,
               expiresAt: sub.expiresAt,
+              autoMissCompensation: sub.autoMissCompensation,
+              compensationLesson: sub.compensationLesson,
+              compensatedMissedLesson: sub.compensatedMissedLesson,
             }
           : null,
       },
@@ -81,6 +84,7 @@ export default async function handler(
       },
 
       consumed: a?.consumed ?? false,
+      subscriptionCompensation: a?.subscriptionCompensation ?? false,
     };
   });
 

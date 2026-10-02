@@ -1,11 +1,11 @@
 // pages/api/payments/sync-group.ts
 import { NextApiRequest, NextApiResponse } from "next";
-import { connectDB, requireTeacher } from "@/helpers/helpers";
+import { connectDB, requireTeacher, requireGroupAccess } from "@/helpers/helpers";
 import Group from "@/models/group-model";
 import GroupStudent from "@/models/group-student-model";
 import Payment from "@/models/payment-model";
 import Subscription from "@/models/subscription-model";
-import { Types } from "mongoose";
+import mongoose from "mongoose";
 
 const normDigits = (v: string) => (v || "").replace(/\D/g, "");
 const phoneSuffix7 = (v: string) => normDigits(v).slice(-7);
@@ -52,6 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const group = await Group.findById(groupId).populate("students");
   if (!group) return res.status(404).end();
+  if (!await requireGroupAccess(String(group._id), user, res)) return;
 
   // 1) тянем платежи из express-прокси
   const r = await fetch(
@@ -70,7 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     : data?.Payments || data?.Items || [];
 
   // 2) строим быстрые индексы студентов группы
-  const students = (group.students as any[]) || [];
+  const students = ((group.students as any[]) || []).filter(Boolean);
 
   const byPhone = new Map<string, any>(); // suffix7 -> student
   const byName = new Map<string, any>();  // "surname|name" -> student
@@ -86,162 +87,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (surname && name) byName.set(nameKey, s);
   }
 
-  // 3) заранее вытаскиваем уже существующие externalId
-  const externalIds = payments
-    .map((p) => String(p.PaymentNo || "").trim())
-    .filter(Boolean);
-
-  const existing = await Payment.find({ externalId: { $in: externalIds } })
-    .select({ externalId: 1 })
-    .lean();
-
-  const existingSet = new Set(existing.map((x) => String(x.externalId)));
-
-  // 4) подготавливаем новые платежи + агрегаты для обновлений
-  const newPaymentDocs: any[] = [];
-
-  // lastPaymentCandidates: studentId -> {amount,date,type,externalId}
-  const lastPaymentCandidates = new Map<
-    string,
-    { amount: number; date: Date; type: "single" | "subscription"; externalId: string }
-  >();
-
-  // subscriptionAdds: studentId -> totalLessonsToAdd (например +8 за каждый абонементный платеж)
-  const subscriptionAdds = new Map<string, number>();
-
-  for (const p of payments) {
-    const externalId = String(p.PaymentNo || "").trim();
+  // Каждая новая оплата и её начисление фиксируются вместе. Старые платежи
+  // не переобрабатываются: это не миграция существующих остатков.
+  for (const payment of payments) {
+    const externalId = String(payment.PaymentNo || "").trim();
     if (!externalId) continue;
-    if (existingSet.has(externalId)) continue;
-
-    const accKey = phoneSuffix7(p.AccountNo || "");
-    const studentByPhone = accKey ? byPhone.get(accKey) : null;
-
-    const surname = (p.Surname || "").toLowerCase().trim();
-    const name = (p.FirstName || "").toLowerCase().trim();
-    const nameKey = `${surname}|${name}`;
-    const studentByName = surname && name ? byName.get(nameKey) : null;
-
-    const student = studentByPhone || studentByName;
+    const student = byPhone.get(phoneSuffix7(payment.AccountNo || "")) ||
+      byName.get(`${(payment.Surname || "").toLowerCase().trim()}|${(payment.FirstName || "").toLowerCase().trim()}`);
     if (!student) continue;
-
-    const amount = parseAmount(p.Amount);
+    const amount = parseAmount(payment.Amount);
+    const date = parseExpressDate(payment.Created);
     const isSub = isSubscriptionPayment(amount);
-
-    const date = parseExpressDate(p.Created);
-
-    newPaymentDocs.push({
-      student: new Types.ObjectId(student._id),
-      externalId,
-      type: isSub ? "subscription" : "single",
-      lessonsCount: isSub ? 7 : 1,
-      amount,
-      date,
-    });
-
-    // candidate for lastPayment (берём самый новый по дате)
-    const sid = String(student._id);
-    const prev = lastPaymentCandidates.get(sid);
-    if (!prev || prev.date < date) {
-      lastPaymentCandidates.set(sid, {
-        amount,
-        date,
-        type: isSub ? "subscription" : "single",
-        externalId,
-      });
-    }
-
-    // subscription adds
-    if (isSub) {
-      subscriptionAdds.set(sid, (subscriptionAdds.get(sid) || 0) + 8);
-    }
-  }
-
-  // 5) сохраняем новые платежи
-  if (newPaymentDocs.length) {
+    const session = await mongoose.startSession();
     try {
-      await Payment.insertMany(newPaymentDocs, { ordered: false });
-    } catch (e) {
-      // если где-то гонка по unique externalId — insertMany может ругнуться на часть,
-      // но остальные вставит при ordered:false
-      console.error("Payment.insertMany error:", e);
-    }
+      await session.withTransaction(async () => {
+        if (await Payment.exists({ externalId }).session(session)) return;
+        const currentStudent = await GroupStudent.findById(student._id).session(session);
+        if (!currentStudent) throw new Error("Ученик не найден");
+        await Payment.create([{
+          student: student._id, externalId, type: isSub ? "subscription" : "single",
+          lessonsCount: isSub ? 8 : 1, amount, date,
+        }], { session });
+        if (isSub) {
+          let sub = currentStudent.activeSubscription
+            ? await Subscription.findOne({ _id: currentStudent.activeSubscription, student: student._id }).session(session)
+            : null;
+          if (sub && sub.usedLessons < sub.totalLessons) {
+            sub.totalLessons += 8;
+            await sub.save({ session });
+          } else {
+            [sub] = await Subscription.create([{ student: student._id, totalLessons: 8, usedLessons: 0 }], { session });
+            currentStudent.activeSubscription = sub._id;
+          }
+        }
+        if (!currentStudent.lastPayment?.date || new Date(currentStudent.lastPayment.date) < date) {
+          currentStudent.lastPayment = {
+            amount, date, type: isSub ? "subscription" : "single", externalId,
+          };
+        }
+        currentStudent.paymentsSyncedAt = new Date();
+        await currentStudent.save({ session });
+      });
+    } catch (error: any) {
+      // Проигравший конкурентный запрос ничего не начисляет.
+      if (error?.code !== 11000 || !await Payment.exists({ externalId })) {
+        console.error("payment sync error:", error);
+        return res.status(500).json({ message: "Синхронизация прервана. Повторите запрос: обработанные оплаты не начислятся повторно." });
+      }
+    } finally { await session.endSession(); }
   }
-
-  // 6) обновляем lastPayment (только если новее)
-  if (lastPaymentCandidates.size) {
-    const ops = Array.from(lastPaymentCandidates.entries()).map(([studentId, lp]) => ({
-      updateOne: {
-        filter: {
-          _id: new Types.ObjectId(studentId),
-          $or: [
-            { "lastPayment.date": { $exists: false } },
-            { "lastPayment.date": { $lt: lp.date } },
-          ],
-        },
-        update: {
-          $set: {
-            lastPayment: {
-              amount: lp.amount,
-              date: lp.date,
-              type: lp.type,
-              externalId: lp.externalId,
-            },
-            paymentsSyncedAt: new Date(),
-          },
-        },
-      },
-    }));
-
-    await GroupStudent.bulkWrite(ops, { ordered: false });
-  } else {
-    // хотя бы отметим время синка студентам группы
-    await GroupStudent.updateMany(
-      { _id: { $in: students.map((s) => s._id) } },
-      { $set: { paymentsSyncedAt: new Date() } },
-    );
-  }
-
-  // 7) абонементы: upsert + inc totalLessons
-  const subStudentIds = Array.from(subscriptionAdds.keys());
-  if (subStudentIds.length) {
-    const subOps = subStudentIds.map((sid) => ({
-      updateOne: {
-        filter: { student: new Types.ObjectId(sid) },
-        update: {
-          $inc: { totalLessons: subscriptionAdds.get(sid)! },
-          $setOnInsert: {
-            student: new Types.ObjectId(sid),
-            usedLessons: 0,
-            // expiresAt: можно добавить если нужно
-          },
-        },
-        upsert: true,
-      },
-    }));
-
-    await Subscription.bulkWrite(subOps, { ordered: false });
-
-    // 8) проставляем activeSubscription студентам (после upsert знаем _id только через find)
-    const subs = await Subscription.find({
-      student: { $in: subStudentIds.map((id) => new Types.ObjectId(id)) },
-    })
-      .select({ _id: 1, student: 1 })
-      .lean();
-
-    const setSubOps = subs.map((s) => ({
-      updateOne: {
-        filter: { _id: s.student },
-        update: { $set: { activeSubscription: s._id } },
-      },
-    }));
-
-    await GroupStudent.bulkWrite(setSubOps, { ordered: false });
-  }
-
-  // 9) отдаём студентов группы с подпиской
-  const result = await GroupStudent.find({ _id: { $in: students.map((s) => s._id) } })
-    .populate("activeSubscription");
-
-  return res.json(result);
+  return res.json(await GroupStudent.find({ _id: { $in: students.map((student) => student._id) } }).populate("activeSubscription"));
 }

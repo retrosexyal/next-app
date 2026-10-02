@@ -509,7 +509,7 @@ export default function EditGroup() {
                           <span key={uuid}>{text}</span>
                         ),
                       )}
-                      {r.student?.lastPayment.amount && (
+                      {r.student?.lastPayment?.amount && (
                         <span>
                           <div className={`${styles.lastPayErip}`}>
                             оплата:
@@ -747,7 +747,7 @@ export default function EditGroup() {
                     const subscriptionId =
                       editSubStudent.activeSubscription?._id;
 
-                    await fetch("/api/subscriptions/add-lessons", {
+                    await toastFetch(toast, "/api/subscriptions/add-lessons", {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",
@@ -797,7 +797,8 @@ export default function EditGroup() {
                         "Нет subscriptionId. Нужно, чтобы сервер отдавал activeSubscription._id",
                       );
 
-                    await fetch("/api/subscriptions/set-remaining", {
+                    if (!subRemaining.trim()) return toast.error("Введите остаток занятий");
+                    await toastFetch(toast, "/api/subscriptions/set-remaining", {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",
@@ -836,6 +837,10 @@ export default function EditGroup() {
         <div className={styles.modal} onClick={() => setPayModal(null)}>
           <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
             <h3>Выберите оплату</h3>
+            {(rows.find((row) => row.student?._id === payModal.studentId)?.student?.activeSubscription ||
+              rows.find((row) => row.student?._id === payModal.studentId)?.consumed) && (
+              <p>У ученика есть абонемент. Выбор другой оплаты заменит оплату урока, но не вернёт списанное занятие.</p>
+            )}
 
             <button
               onClick={async () => {

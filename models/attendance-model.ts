@@ -13,6 +13,7 @@ export interface IAttendance {
 
   // списано ли занятие
   consumed: boolean;
+  chargedSubscription?: Types.ObjectId;
 
   // было ли возвращено занятие
   refunded?: boolean;
@@ -56,6 +57,7 @@ const AttendanceSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    chargedSubscription: { type: Schema.Types.ObjectId, ref: "Subscription" },
 
     refunded: {
       type: Boolean,

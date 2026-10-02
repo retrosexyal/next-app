@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import mongoose from "mongoose";
 
-import { connectDB, requireAdmin, startOfMoscowDay } from "@/helpers/helpers";
+import { connectDB, requireAdmin } from "@/helpers/helpers";
 import Group from "@/models/group-model";
 import Lesson from "@/models/lesson-model";
+import { createGroupLesson, studioToday } from "@/services/lesson-service";
 
 type Body = {
   groupId?: string;
@@ -56,13 +57,13 @@ export default async function handler(
     return res.status(400).json({ message: "Некорректная дата занятия" });
   }
 
-  if (date > startOfMoscowDay()) {
+  if (date > studioToday()) {
     return res
       .status(400)
       .json({ message: "Нельзя создать занятие на будущую дату" });
   }
 
-  const group = await Group.findById(groupId).select("_id");
+  const group = await Group.findById(groupId).select("_id students");
   if (!group) {
     return res.status(404).json({ message: "Группа не найдена" });
   }
@@ -73,8 +74,8 @@ export default async function handler(
   }
 
   try {
-    const lesson = await Lesson.create({ group: group._id, date });
-    return res.status(201).json({ lesson, created: true });
+    const result = await createGroupLesson(group, date);
+    return res.status(result.created ? 201 : 200).json(result);
   } catch (error: any) {
     // Параллельные запросы защищены уникальным индексом Lesson.
     if (error?.code === 11000) {

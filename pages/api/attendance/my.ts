@@ -5,6 +5,7 @@ import Contract from "@/models/contract-model";
 import Group from "@/models/group-model";
 import Student from "@/models/group-student-model";
 import Lesson from "@/models/lesson-model";
+import "@/models/subscription-model";
 import { connectDB, getUserFromReq } from "@/helpers/helpers";
 
 type LessonDetails = {
@@ -12,6 +13,11 @@ type LessonDetails = {
   date: string;
   groupTitle: string;
   present: boolean;
+};
+
+type PopulatedSubscription = {
+  totalLessons?: number;
+  usedLessons?: number;
 };
 
 const startOfUtcDay = (value: Date) =>
@@ -71,7 +77,13 @@ export default async function handler(
   const students = await Student.find({
     contract: { $in: contracts.map((contract) => contract._id) },
   })
-    .select("_id fullName contract groupJoinedAt createdAt")
+    .select(
+      "_id fullName contract groupJoinedAt createdAt activeSubscription",
+    )
+    .populate({
+      path: "activeSubscription",
+      select: "totalLessons usedLessons",
+    })
     .lean();
 
   if (!students.length) return res.status(200).json({ students: [] });
@@ -79,6 +91,7 @@ export default async function handler(
   const studentIds = students.map((student) => student._id);
   const groups = await Group.find({ students: { $in: studentIds } })
     .select("_id title students")
+    .sort({ _id: 1 })
     .lean();
 
   const groupIds = groups.map((group) => group._id);
@@ -105,9 +118,6 @@ export default async function handler(
     attendances
       .filter((attendance) => attendance.present)
       .map((attendance) => `${attendance.student}:${attendance.lesson}`),
-  );
-  const groupById = new Map(
-    groups.map((group) => [String(group._id), group]),
   );
   const lessonById = new Map(
     lessons.map((lesson) => [String(lesson._id), lesson]),
@@ -153,20 +163,42 @@ export default async function handler(
         .map((lesson) => ({
           id: String(lesson._id),
           date: lesson.date.toISOString(),
-          groupTitle:
-            groupById.get(String(lesson.group))?.title || "Группа",
+          groupTitle: `Группа ${
+            studentGroups.findIndex(
+              (group) => String(group._id) === String(lesson.group),
+            ) + 1
+          }`,
           present: presentKeys.has(`${studentId}:${lesson._id}`),
         }));
       const presentCount = details.filter((lesson) => lesson.present).length;
+      const missedCount = details.length - presentCount;
+      const subscription = student.activeSubscription as
+        | PopulatedSubscription
+        | null
+        | undefined;
+      const remainingLessons = subscription
+        ? Math.max(
+            0,
+            Number(subscription.totalLessons || 0) -
+              Number(subscription.usedLessons || 0),
+          )
+        : 0;
 
       return {
         id: studentId,
         fullName: student.fullName,
+        groups: studentGroups.map((group, index) => ({
+          id: String(group._id),
+          title: `Группа ${index + 1}`,
+        })),
         percentage: details.length
           ? Math.round((presentCount / details.length) * 100)
           : 0,
         presentCount,
+        missedCount,
         totalLessons: details.length,
+        remainingLessons,
+        hasActiveSubscription: Boolean(subscription && remainingLessons > 0),
         lessons: details,
       };
     })

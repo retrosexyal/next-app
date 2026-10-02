@@ -1,21 +1,7 @@
-import { connectDB, requireTeacher } from "@/helpers/helpers";
-import Subscription from "@/models/subscription-model";
-import { NextApiRequest, NextApiResponse } from "next";
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  await connectDB();
-  const user = await requireTeacher({ req, res });
-  if (!user) return;
-
-  const { studentId } = req.body;
-  const sub = await Subscription.findOne({ student: studentId });
-  if (!sub) return res.status(404).json("нет абонемента");
-
-  sub.totalLessons += 1;
-  await sub.save();
-
-  res.json(sub);
+import type { NextApiRequest, NextApiResponse } from "next";
+import { requireAdmin } from "@/helpers/helpers";
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") return res.status(405).end();
+  if (!requireAdmin({ req, res })) return;
+  return res.status(409).json({ message: "Измените остаток или создайте новый абонемент в админском журнале." });
 }

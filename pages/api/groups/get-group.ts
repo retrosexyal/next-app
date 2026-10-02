@@ -56,6 +56,7 @@ export default async function handler(
       attendanceMap[String(a.student)] = {
         present: a.present,
         source: a.source,
+        consumed: a.consumed,
       };
     });
   }
@@ -69,7 +70,13 @@ export default async function handler(
   }; */
 
   const studentsWithLastPay = await Promise.all(
-    group.students.map(async (s: any) => {
+    group.students.filter(Boolean).map(async (s: any) => {
+      const activeSubscription = s.activeSubscription;
+      const isExhausted =
+        activeSubscription &&
+        Number(activeSubscription.usedLessons || 0) >=
+          Number(activeSubscription.totalLessons || 0);
+
       const last = await Payment.findOne({ student: s._id })
         .sort({ date: -1 })
         .select("amount date type")
@@ -77,6 +84,7 @@ export default async function handler(
 
       return {
         ...s.toObject(),
+        activeSubscription: isExhausted ? null : activeSubscription,
         lastPayment: last || null,
         todayAttendance: attendanceMap[String(s._id)] || null,
       };

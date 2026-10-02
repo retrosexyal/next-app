@@ -116,7 +116,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sub.totalLessons += 8;
             await sub.save({ session });
           } else {
-            [sub] = await Subscription.create([{ student: student._id, totalLessons: 8, usedLessons: 0 }], { session });
+            [sub] = await Subscription.create([{ student: student._id, totalLessons: 8, usedLessons: 0, autoMissCompensation: true }], { session });
             currentStudent.activeSubscription = sub._id;
           }
         }

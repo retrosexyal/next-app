@@ -13,6 +13,7 @@ interface Student {
   fullName: string;
   isTemp: boolean;
   phone: string;
+  todayAttendance?: { subscriptionCompensation?: boolean } | null;
   activeSubscription?: {
     totalLessons: number;
     usedLessons: number;
@@ -310,6 +311,11 @@ export default function TeacherGroup() {
                           <span className={styles.temp}>без договора</span>
                         )}
                       </div>
+                      {s.todayAttendance?.subscriptionCompensation && (
+                        <div style={{ marginTop: 4, fontSize: 12 }}>
+                          Компенсация пропуска — без списания
+                        </div>
+                      )}
 
                       {s.lastPayment && (
                         <div className={`${styles.lastPay} ${payClass}`}>

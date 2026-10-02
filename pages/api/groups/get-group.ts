@@ -8,6 +8,7 @@ import Attendance from "@/models/attendance-model";
 import Subscription from "@/models/subscription-model";
 import "@/models/subscription-model";
 import Payment from "@/models/payment-model";
+import { canRetireSubscription } from "@/services/subscription-policy";
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,7 +27,7 @@ export default async function handler(
     path: "students",
     populate: {
       path: "activeSubscription",
-      select: "_id totalLessons usedLessons",
+      select: "_id totalLessons usedLessons autoMissCompensation compensationLesson compensatedMissedLesson",
     },
   });
 
@@ -57,6 +58,7 @@ export default async function handler(
         present: a.present,
         source: a.source,
         consumed: a.consumed,
+        subscriptionCompensation: a.subscriptionCompensation,
       };
     });
   }
@@ -74,8 +76,7 @@ export default async function handler(
       const activeSubscription = s.activeSubscription;
       const isExhausted =
         activeSubscription &&
-        Number(activeSubscription.usedLessons || 0) >=
-          Number(activeSubscription.totalLessons || 0);
+        canRetireSubscription(activeSubscription);
 
       const last = await Payment.findOne({ student: s._id })
         .sort({ date: -1 })

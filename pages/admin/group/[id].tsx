@@ -496,6 +496,11 @@ export default function EditGroup() {
                   >
                     <div className={styles.left}>
                       <div className={styles.name}>{r.student?.fullName}</div>
+                      {r.subscriptionCompensation && (
+                        <div style={{ marginTop: 4, fontSize: 12 }}>
+                          Компенсация пропуска — без списания
+                        </div>
+                      )}
 
                       {r.payment && r.payment.type !== "free" && (
                         <div className={styles.lastPay}>
@@ -719,6 +724,15 @@ export default function EditGroup() {
                       <div>
                         Осталось: <b>{left}</b>
                       </div>
+                      {sub.autoMissCompensation && (
+                        <div>
+                          {sub.compensationLesson
+                            ? "Компенсация одного пропуска использована"
+                            : left === 0
+                              ? "Ожидается проверка последнего пропуска при следующем уроке"
+                              : "Доступна компенсация одного пропуска"}
+                        </div>
+                      )}
                     </div>
                   );
                 })()

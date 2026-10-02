@@ -1,5 +1,6 @@
 import GroupStudent from "@/models/group-student-model";
 import Subscription from "@/models/subscription-model";
+import { canRetireSubscription } from "@/services/subscription-policy";
 
 export async function getActiveSubscription(studentId: string) {
   const student = await GroupStudent.findById(studentId).select(
@@ -20,10 +21,7 @@ export async function getActiveSubscription(studentId: string) {
     return { student, subscription: null };
   }
 
-  if (
-    Number(subscription.usedLessons || 0) >=
-    Number(subscription.totalLessons || 0)
-  ) {
+  if (canRetireSubscription(subscription)) {
     await retireSubscriptionIfExhausted(subscription);
     return { student, subscription: null };
   }
@@ -38,7 +36,7 @@ export async function retireSubscriptionIfExhausted(subscription: any) {
       Number(subscription.usedLessons || 0),
   );
 
-  if (remaining > 0) return false;
+  if (remaining > 0 || !canRetireSubscription(subscription)) return false;
 
   await GroupStudent.updateOne(
     {

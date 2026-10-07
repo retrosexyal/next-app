@@ -362,6 +362,7 @@ export default function TeacherGroup() {
                                     },
                                     body: JSON.stringify({
                                       action: "delete",
+                                      groupId: id,
                                       studentId: s._id,
                                       messageUuid: uuid,
                                     }),
@@ -510,6 +511,7 @@ export default function TeacherGroup() {
                     },
                     body: JSON.stringify({
                       action: editingMessage ? "edit" : "add",
+                      groupId: id,
                       studentId: studentIdForMark,
                       text: message,
                       messageUuid: editingMessage?.uuid,

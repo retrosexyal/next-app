@@ -13,6 +13,7 @@ interface Student {
   _id: string;
   fullName: string;
   isTemp: boolean;
+  messages?: { uuid: string; text: string }[];
   lastPayment?: {
     amount: number;
     date: string;
@@ -54,6 +55,9 @@ export default function EditGroup() {
   const [rows, setRows] = useState<any[]>([]);
   const [payHistory, setPayHistory] = useState<any[] | null>(null);
   const [editSubStudent, setEditSubStudent] = useState<any | null>(null);
+  const [noteStudent, setNoteStudent] = useState<Student | null>(null);
+  const [noteText, setNoteText] = useState("");
+  const [isSavingNote, setIsSavingNote] = useState(false);
   const [subAddCount, setSubAddCount] = useState<string>("8");
   const [subRemaining, setSubRemaining] = useState<string>("");
   const [subReason, setSubReason] = useState<string>("");
@@ -373,6 +377,9 @@ export default function EditGroup() {
                     {s.isTemp && (
                       <div className={styles.email}>без договора</div>
                     )}
+                    {s.messages?.map(({ uuid, text }) => (
+                      <div key={uuid} className={styles.studentNote}>{text}</div>
+                    ))}
                   </div>
 
                   <button
@@ -404,6 +411,18 @@ export default function EditGroup() {
                     }}
                   >
                     ⚙️
+                  </button>
+                  <button
+                    type="button"
+                    title="Добавить заметку"
+                    aria-label={`Добавить заметку для ${s.fullName}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setNoteText("");
+                      setNoteStudent(s);
+                    }}
+                  >
+                    📝
                   </button>
                 </li>
               ))}
@@ -511,7 +530,7 @@ export default function EditGroup() {
                       {r.student.message && <span>{r.student.message}</span>}
                       {r.student.messages?.map(
                         ({ uuid, text }: { uuid: string; text: string }) => (
-                          <span key={uuid}>{text}</span>
+                          <span key={uuid} className={styles.studentNote}>{text}</span>
                         ),
                       )}
                       {r.student?.lastPayment?.amount && (
@@ -552,6 +571,18 @@ export default function EditGroup() {
                       }}
                     >
                       ₽
+                    </button>
+                    <button
+                      type="button"
+                      title="Добавить заметку"
+                      aria-label={`Добавить заметку для ${r.student.fullName}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setNoteText("");
+                        setNoteStudent(r.student);
+                      }}
+                    >
+                      📝
                     </button>
 
                     {/* {r.consumed && !r.refunded && (
@@ -625,6 +656,87 @@ export default function EditGroup() {
         {mode === "month" && <MonthReportTable groupId={id as string} />}
 
         {/* ---------- МОДАЛКА ---------- */}
+        {noteStudent && (
+          <div
+            className={styles.modal}
+            onClick={() => { if (!isSavingNote) setNoteStudent(null); }}
+          >
+            <div
+              className={styles.modalBox}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="student-note-title"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 id="student-note-title">Заметка — {noteStudent.fullName}</h3>
+              <form
+                className={styles.noteForm}
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!noteText.trim() || isSavingNote) return;
+                  setIsSavingNote(true);
+                  try {
+                    const messages = await toastFetch<{ uuid: string; text: string }[]>(
+                      toast,
+                      "/api/groups/mark-for-student",
+                      {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                        body: JSON.stringify({
+                          action: "add",
+                          groupId: id,
+                          studentId: noteStudent._id,
+                          text: noteText.trim(),
+                        }),
+                        successMessage: "Заметка сохранена",
+                      },
+                    );
+                    setGroup((current: any) => ({
+                      ...current,
+                      students: current.students.map((student: Student) =>
+                        student._id === noteStudent._id ? { ...student, messages } : student,
+                      ),
+                    }));
+                    setRows((current) => current.map((row) =>
+                      row.student._id === noteStudent._id
+                        ? { ...row, student: { ...row.student, messages } }
+                        : row,
+                    ));
+                    setNoteStudent(null);
+                    setNoteText("");
+                  } catch {
+                    // toastFetch shows the error; keep the draft for another attempt.
+                  } finally {
+                    setIsSavingNote(false);
+                  }
+                }}
+              >
+                <label htmlFor="student-note-text">Текст заметки</label>
+                <textarea
+                  id="student-note-text"
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Введите заметку..."
+                  rows={4}
+                  autoFocus
+                  required
+                  disabled={isSavingNote}
+                />
+                <div className={styles.noteButtons}>
+                  <button type="button" disabled={isSavingNote} onClick={() => setNoteStudent(null)}>
+                    Отмена
+                  </button>
+                  <button type="submit" disabled={isSavingNote || !noteText.trim()}>
+                    {isSavingNote ? "Сохраняем..." : "Сохранить"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
         {payHistory && (
           <div className={styles.modal} onClick={() => setPayHistory(null)}>
             <div

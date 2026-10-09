@@ -1,56 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import style from "./footer.module.scss";
 import { Svg } from "@/components/UI/svg";
 import Link from "next/link";
-import Image from "next/image";
 
-const Image1 = "/imgs/1.png";
 
 export const Footer = () => {
-  const [currentImg, setCurrentImg] = useState<string | null>(null);
-  const handleOpenImg = (src: string) => () => {
-    setCurrentImg(src);
-  };
-
   return (
-    <div className={style.wrapper}>
-      {currentImg && (
-        <div
-          className={style.img_wrapper}
-          style={{
-            position: "fixed",
-            width: "100dvw",
-            height: "100dvh",
-            background: "rgba(0,0,0,0.5)",
-            top: 0,
-            left: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onClick={() => {
-            setCurrentImg(null);
-          }}
-        >
-          <Image
-            src={currentImg}
-            alt="sertificat"
-            style={{ objectFit: "contain" }}
-            width={1200}
-            height={700}
-          />
+    <footer className={style.wrapper}>
+      <div className={style.documentsBar}>
+        <div>
+          <strong>Официальные документы ЛиМи</strong>
+          <p>Государственная регистрация и аккредитация студии</p>
         </div>
-      )}
-        <div className={style.certWrapper}>
-    <Image
-      src={Image1}
-      alt="sertificat"
-      width={180}
-      height={180}
-      onClick={handleOpenImg(Image1)}
-    />
-  </div>
-
+        <Link href="/documents">Посмотреть документы <span aria-hidden="true">↗</span></Link>
+      </div>
   {/* ОСНОВНОЙ ФУТЕР */}
   <div className={style.mainFooter}>
     <div className={style.container}>
@@ -88,6 +51,6 @@ export const Footer = () => {
     <span>•</span>
     <Link href="/privacy">Политика конфиденциальности</Link>
   </div>
-    </div>
+    </footer>
   );
 };

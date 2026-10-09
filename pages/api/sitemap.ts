@@ -7,6 +7,7 @@ const PAGES = [
   "/vacancies",
   "/privacy",
   "/terms",
+  "/documents",
   "/stretching",
   "/svadebnyy-tanec",
 ];

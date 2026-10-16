@@ -58,9 +58,67 @@ export default function EditGroup() {
   const [noteStudent, setNoteStudent] = useState<Student | null>(null);
   const [noteText, setNoteText] = useState("");
   const [isSavingNote, setIsSavingNote] = useState(false);
+  const [deletingNote, setDeletingNote] = useState<string | null>(null);
   const [subAddCount, setSubAddCount] = useState<string>("8");
   const [subRemaining, setSubRemaining] = useState<string>("");
   const [subReason, setSubReason] = useState<string>("");
+
+  const updateStudentMessages = (studentId: string, messages: NonNullable<Student["messages"]>) => {
+    setGroup((current: any) => ({
+      ...current,
+      students: current.students.map((student: Student) =>
+        student._id === studentId ? { ...student, messages } : student,
+      ),
+    }));
+    setRows((current) => current.map((row) =>
+      row.student._id === studentId
+        ? { ...row, student: { ...row.student, messages } }
+        : row,
+    ));
+  };
+
+  const deleteNote = async (student: Student, messageUuid: string) => {
+    if (deletingNote || isSavingNote || !confirm(`Удалить заметку для ${student.fullName}?`)) return;
+    setDeletingNote(messageUuid);
+    try {
+      const messages = await toastFetch<NonNullable<Student["messages"]>>(
+        toast,
+        "/api/groups/mark-for-student",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ action: "delete", groupId: id, studentId: student._id, messageUuid }),
+          successMessage: "Заметка удалена",
+        },
+      );
+      updateStudentMessages(student._id, messages);
+    } catch {
+      // toastFetch shows the error; leave the note available for another attempt.
+    } finally {
+      setDeletingNote(null);
+    }
+  };
+
+  const renderStudentNotes = (student: Student) => student.messages?.map(({ uuid, text }) => (
+    <div key={uuid} className={styles.studentNote}>
+      <span>{text}</span>
+      <button
+        type="button"
+        className={styles.deleteNote}
+        aria-label={`Удалить заметку «${text}» для ${student.fullName}`}
+        disabled={!!deletingNote || isSavingNote}
+        onClick={(e) => {
+          e.stopPropagation();
+          void deleteNote(student, uuid);
+        }}
+      >
+        {deletingNote === uuid ? "Удаляем..." : "Удалить"}
+      </button>
+    </div>
+  ));
 
   const load = async () => {
     if (!id) return;
@@ -377,9 +435,7 @@ export default function EditGroup() {
                     {s.isTemp && (
                       <div className={styles.email}>без договора</div>
                     )}
-                    {s.messages?.map(({ uuid, text }) => (
-                      <div key={uuid} className={styles.studentNote}>{text}</div>
-                    ))}
+                    {renderStudentNotes(s)}
                   </div>
 
                   <button
@@ -528,11 +584,7 @@ export default function EditGroup() {
                         </div>
                       )}
                       {r.student.message && <span>{r.student.message}</span>}
-                      {r.student.messages?.map(
-                        ({ uuid, text }: { uuid: string; text: string }) => (
-                          <span key={uuid} className={styles.studentNote}>{text}</span>
-                        ),
-                      )}
+                      {renderStudentNotes(r.student)}
                       {r.student?.lastPayment?.amount && (
                         <span>
                           <div className={`${styles.lastPayErip}`}>
@@ -673,7 +725,7 @@ export default function EditGroup() {
                 className={styles.noteForm}
                 onSubmit={async (e) => {
                   e.preventDefault();
-                  if (!noteText.trim() || isSavingNote) return;
+                  if (!noteText.trim() || isSavingNote || deletingNote) return;
                   setIsSavingNote(true);
                   try {
                     const messages = await toastFetch<{ uuid: string; text: string }[]>(
@@ -694,17 +746,7 @@ export default function EditGroup() {
                         successMessage: "Заметка сохранена",
                       },
                     );
-                    setGroup((current: any) => ({
-                      ...current,
-                      students: current.students.map((student: Student) =>
-                        student._id === noteStudent._id ? { ...student, messages } : student,
-                      ),
-                    }));
-                    setRows((current) => current.map((row) =>
-                      row.student._id === noteStudent._id
-                        ? { ...row, student: { ...row.student, messages } }
-                        : row,
-                    ));
+                    updateStudentMessages(noteStudent._id, messages);
                     setNoteStudent(null);
                     setNoteText("");
                   } catch {
@@ -729,7 +771,7 @@ export default function EditGroup() {
                   <button type="button" disabled={isSavingNote} onClick={() => setNoteStudent(null)}>
                     Отмена
                   </button>
-                  <button type="submit" disabled={isSavingNote || !noteText.trim()}>
+                  <button type="submit" disabled={isSavingNote || !!deletingNote || !noteText.trim()}>
                     {isSavingNote ? "Сохраняем..." : "Сохранить"}
                   </button>
                 </div>

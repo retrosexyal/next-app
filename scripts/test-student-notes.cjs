@@ -66,11 +66,25 @@ async function main() {
   assert.equal(saves, savedBeforeDenials);
   assert.equal((await call({ action: 'delete', messageUuid: 'note-uuid' })).code, 200);
   assert.equal(student.messages.length, 0);
+  // Administrators can delete both their own notes and notes created by teachers.
+  for (const author of ['admin@admin', group.ownerEmail]) {
+    identity = { email: author };
+    assert.equal((await call({ action: 'add', text: `Заметка ${author}` })).code, 200);
+    student.messages[0].uuid = 'delete-by-admin';
+    student.messages.push({ uuid: 'keep', text: 'Оставить другую заметку' });
+    identity = { email: 'admin@admin' };
+    const result = await call({ action: 'delete', messageUuid: 'delete-by-admin' });
+    assert.equal(result.code, 200);
+    assert.equal(result.data.length, 1);
+    assert.equal(result.data[0].uuid, 'keep');
+    assert.equal(student.messages[0].text, 'Оставить другую заметку');
+    student.messages = [];
+  }
   identity = null;
   assert.equal((await call({ action: 'add', text: 'Текст' })).code, 403);
   identity = { email: 'student@example.com' };
   assert.equal((await call({ action: 'add', text: 'Текст' })).code, 403);
-  console.log('PASS: administrator creates a shared note, group teacher edits and deletes it; unrelated teachers, students, invalid requests and empty notes are rejected.');
+  console.log('PASS: administrator creates shared notes and deletes own/teacher notes without deleting other notes; group teacher edits and deletes; unrelated teachers, students, invalid requests and empty notes are rejected.');
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; });

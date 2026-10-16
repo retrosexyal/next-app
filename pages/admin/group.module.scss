@@ -280,10 +280,28 @@
 }
 
 .studentNote {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   margin-top: 4px;
   font-size: 13px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.container .deleteNote {
+  flex-shrink: 0;
+  padding: 3px 6px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
 }
 
 .noteForm {

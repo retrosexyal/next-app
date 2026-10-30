@@ -8,6 +8,7 @@ import { Toast } from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import { toastFetch } from "@/utils/toastFetch";
 import AdminNotebookButton from "@/components/AdminNotebookButton";
+import DeletedStudentNotes from "@/components/DeletedStudentNotes";
 
 interface Student {
   _id: string;
@@ -56,6 +57,7 @@ export default function EditGroup() {
   const [payHistory, setPayHistory] = useState<any[] | null>(null);
   const [editSubStudent, setEditSubStudent] = useState<any | null>(null);
   const [noteStudent, setNoteStudent] = useState<Student | null>(null);
+  const [historyStudent, setHistoryStudent] = useState<Student | null>(null);
   const [noteText, setNoteText] = useState("");
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [deletingNote, setDeletingNote] = useState<string | null>(null);
@@ -102,7 +104,11 @@ export default function EditGroup() {
     }
   };
 
-  const renderStudentNotes = (student: Student) => student.messages?.map(({ uuid, text }) => (
+  const renderStudentNotes = (student: Student) => <>
+    <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryStudent(student); }}>
+      История пометок
+    </button>
+    {student.messages?.map(({ uuid, text }) => (
     <div key={uuid} className={styles.studentNote}>
       <span>{text}</span>
       <button
@@ -118,7 +124,7 @@ export default function EditGroup() {
         {deletingNote === uuid ? "Удаляем..." : "Удалить"}
       </button>
     </div>
-  ));
+  ))}</>;
 
   const load = async () => {
     if (!id) return;
@@ -708,6 +714,9 @@ export default function EditGroup() {
         {mode === "month" && <MonthReportTable groupId={id as string} />}
 
         {/* ---------- МОДАЛКА ---------- */}
+        {historyStudent && typeof id === "string" && <DeletedStudentNotes
+          groupId={id} student={historyStudent} onClose={() => setHistoryStudent(null)}
+        />}
         {noteStudent && (
           <div
             className={styles.modal}

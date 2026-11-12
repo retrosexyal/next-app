@@ -52,6 +52,7 @@ export default function EditGroup() {
   const [lessonId, setLessonId] = useState<string>("");
   const [lessonDate, setLessonDate] = useState<string>("");
   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
+  const [isDeletingLesson, setIsDeletingLesson] = useState(false);
 
   const [rows, setRows] = useState<any[]>([]);
   const [payHistory, setPayHistory] = useState<any[] | null>(null);
@@ -507,7 +508,7 @@ export default function EditGroup() {
                 />
                 <button
                   type="button"
-                  disabled={!lessonDate || isCreatingLesson}
+                  disabled={!lessonDate || isCreatingLesson || isDeletingLesson}
                   onClick={async () => {
                     if (!lessonDate || !id) return;
                     setIsCreatingLesson(true);
@@ -547,6 +548,7 @@ export default function EditGroup() {
             <select
               className={styles.lessonSelect}
               value={lessonId}
+              disabled={isDeletingLesson}
               onChange={(e) => setLessonId(e.target.value)}
             >
               {!lessons.length && (
@@ -561,6 +563,41 @@ export default function EditGroup() {
               ))}
             </select>
 
+            <button
+              type="button"
+              className={styles.delete}
+              disabled={!lessonId || isDeletingLesson || isCreatingLesson}
+              onClick={async () => {
+                const selected = lessons.find((lesson) => lesson._id === lessonId);
+                if (!selected || isDeletingLesson || !confirm(
+                  `Удалить занятие за ${new Date(selected.date).toLocaleDateString("ru-RU")}? Все отметки посещаемости и оплаты этого занятия будут удалены, списанные занятия возвращены в абонементы. Отменить удаление нельзя.`,
+                )) return;
+                setIsDeletingLesson(true);
+                try {
+                  const result = await toastFetch<{ refundedLessons: number }>(toast, "/api/admin/groups/delete-lesson", {
+                    method: "DELETE",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({ lessonId, groupId: id }),
+                    loadingMessage: "Удаляем занятие и возвращаем списания...",
+                  });
+                  setRows([]);
+                  setPayModal(null);
+                  await loadLessons();
+                  await load();
+                  toast.success(`Занятие удалено. Возвращено занятий: ${result.refundedLessons}`);
+                } catch {
+                  // Ошибку показывает toastFetch.
+                } finally {
+                  setIsDeletingLesson(false);
+                }
+              }}
+            >
+              {isDeletingLesson ? "Удаляем..." : "Удалить занятие"}
+            </button>
+
             <ul className={styles.list}>
               {rows.map((r) => {
                 const paymentDate = r.payment?.date
@@ -573,7 +610,7 @@ export default function EditGroup() {
                     className={`${styles.item} ${
                       r.present ? styles.present : ""
                     }`}
-                    onClick={() => openPayModal(r._id, lessonId)}
+                    onClick={() => !isDeletingLesson && openPayModal(r._id, lessonId)}
                   >
                     <div className={styles.left}>
                       <div className={styles.name}>{r.student?.fullName}</div>

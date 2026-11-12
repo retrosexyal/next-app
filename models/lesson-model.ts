@@ -9,6 +9,7 @@ const LessonSchema = new Schema(
   {
     group: { type: Schema.Types.ObjectId, ref: "Group" },
     date: { type: Date, required: true },
+    attendanceRevision: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

@@ -45,6 +45,7 @@ Subscription.findOneAndUpdate = async (filter) => {
   return sub;
 };
 const Lesson = {
+  updateOne: async () => ({ matchedCount: 1 }),
   findById: (id) => query(lessons.get(id)),
   findOne: ({ group, date }) => query([...lessons.values()].find((lesson) => lesson.group === group && lesson.date.getTime() === date.getTime())),
   create: async ([value]) => {

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { connectDB, requireTeacher, requireGroupAccess } from "@/helpers/helpers";
 import Lesson from "@/models/lesson-model";
 import Attendance from "@/models/attendance-model";
+import mongoose from "mongoose";
 // Повторная синхронизация меняет только присутствие, без списаний.
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
@@ -18,11 +19,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!group) return;
   const members = new Set(group.students.map((id: unknown) => String(id)));
   if (items.some((item) => !members.has(item.studentId))) return res.status(400).json({ message: "Ученик не состоит в группе" });
-  for (const item of items) {
+  const session = await mongoose.startSession();
+  try {
+    await session.withTransaction(async () => {
+      const locked = await Lesson.updateOne({ _id: lesson._id }, { $inc: { attendanceRevision: 1 } }, { session });
+      if (!locked.matchedCount) throw new Error("Занятие удалено. Обновите журнал.");
+      for (const item of items) {
     await Attendance.updateOne({ lesson: lesson._id, student: item.studentId }, {
       $set: { present: item.present },
       $setOnInsert: { source: "free", consumed: false, refunded: false },
-    }, { upsert: true });
-  }
+    }, { upsert: true, session });
+      }
+    });
+  } catch {
+    return res.status(409).json({ message: "Не удалось сохранить отметки. Обновите журнал." });
+  } finally { await session.endSession(); }
   return res.json(await Attendance.find({ lesson: lesson._id }).populate("student"));
 }

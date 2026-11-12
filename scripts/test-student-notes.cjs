@@ -24,7 +24,7 @@ async function main() {
   const group = { ownerEmail: 'teacher@example.com', students: [studentId] };
   let identity = { email: 'admin@admin' };
   let saves = 0;
-  const student = { messages: [], async save() { saves++; } };
+  const student = { messages: [], deletedMessages: [], async save() { saves++; } };
   const helpers = load('helpers/helpers.ts', {
     '@/services/token-service': { tokenService: { validateAccessToken: () => identity } },
     '@/models/group-model': { findById: async id => id === groupId ? group : null },
@@ -34,7 +34,7 @@ async function main() {
   });
   const handler = load('pages/api/groups/mark-for-student.ts', {
     '@/helpers/helpers': helpers,
-    '@/models/group-student-model': { findById: async id => id === studentId ? student : null },
+    '@/models/group-student-model': { findById: id => ({ select: async () => id === studentId ? student : null }) },
     mongoose: { isValidObjectId: value => typeof value === 'string' && /^[a-f0-9]{24}$/i.test(value) },
   }).default;
   async function call(body, method = 'POST') {
@@ -66,6 +66,12 @@ async function main() {
   assert.equal(saves, savedBeforeDenials);
   assert.equal((await call({ action: 'delete', messageUuid: 'note-uuid' })).code, 200);
   assert.equal(student.messages.length, 0);
+  assert.equal(student.deletedMessages.length, 1);
+  assert.equal(student.deletedMessages[0].text, 'Исправлено преподавателем');
+  assert.equal(student.deletedMessages[0].deletedBy, group.ownerEmail);
+  assert.ok(student.deletedMessages[0].deletedAt instanceof Date);
+  await call({ action: 'delete', messageUuid: 'note-uuid' });
+  assert.equal(student.deletedMessages.length, 1);
   // Administrators can delete both their own notes and notes created by teachers.
   for (const author of ['admin@admin', group.ownerEmail]) {
     identity = { email: author };
@@ -80,6 +86,27 @@ async function main() {
     assert.equal(student.messages[0].text, 'Оставить другую заметку');
     student.messages = [];
   }
+  identity = null;
+  const historyHandler = load('pages/api/admin/groups/deleted-notes.ts', {
+    '@/helpers/helpers': helpers,
+    '@/models/group-student-model': { findById: id => ({ select: async () => id === studentId ? student : null }) },
+    mongoose: { isValidObjectId: value => typeof value === 'string' && /^[a-f0-9]{24}$/i.test(value) },
+  }).default;
+  async function history(query = { groupId, studentId }) {
+    const res = { code: 200, status(code) { this.code = code; return this; }, json(data) { this.data = data; return this; }, end() {} };
+    await historyHandler({ method: 'GET', headers: { authorization: 'Bearer mock' }, query }, res);
+    return res;
+  }
+  assert.equal((await history()).code, 403);
+  identity = { email: group.ownerEmail };
+  assert.equal((await history()).code, 403);
+  identity = { email: 'admin@admin' };
+  const archived = await history();
+  assert.equal(archived.code, 200);
+  assert.equal(archived.data.length, 3);
+  assert.ok(archived.data.some(note => note.text === 'Исправлено преподавателем'));
+  assert.equal((await history({ groupId, studentId: '333333333333333333333333' })).code, 403);
+  assert.equal((await history({ groupId: 'invalid', studentId })).code, 400);
   identity = null;
   assert.equal((await call({ action: 'add', text: 'Текст' })).code, 403);
   identity = { email: 'student@example.com' };

@@ -35,7 +35,7 @@ export default async function handler(
     return res.status(403).json({ message: "Ученик не состоит в группе" });
   }
 
-  const student = await Student.findById(studentId);
+  const student = await Student.findById(studentId).select("+deletedMessages");
   if (!student) {
     return res.status(404).json("Student not found");
   }
@@ -56,6 +56,16 @@ export default async function handler(
 
     // ❌ DELETE
     if (action === "delete") {
+      const message = student.messages.find((m: any) => m.uuid === messageUuid);
+      if (message) {
+        student.deletedMessages.push({
+          uuid: message.uuid,
+          text: message.text,
+          createdAt: message.createdAt,
+          deletedAt: new Date(),
+          deletedBy: user.email,
+        });
+      }
       student.messages = student.messages.filter(
         (m: any) => m.uuid !== messageUuid,
       );

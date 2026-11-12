@@ -48,6 +48,18 @@ const GroupStudentSchema = new Schema(
       type: [MessageSchema],
       default: [],
     },
+    // Архив удалённых пометок не возвращается в обычных списках студентов.
+    deletedMessages: {
+      type: [new Schema({
+        uuid: { type: String, required: true },
+        text: { type: String, required: true },
+        createdAt: Date,
+        deletedAt: { type: Date, required: true },
+        deletedBy: String,
+      }, { _id: false })],
+      default: [],
+      select: false,
+    },
 
     // может быть null
     contract: { type: Schema.Types.ObjectId, ref: "Contract", default: null },

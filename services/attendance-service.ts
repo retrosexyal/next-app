@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Attendance from "@/models/attendance-model";
 import Subscription from "@/models/subscription-model";
 import Student from "@/models/group-student-model";
+import Lesson from "@/models/lesson-model";
 import { canRetireSubscription, consumeSubscriptionLesson } from "@/services/subscription-policy";
 export type PaymentMode = "single" | "relative" | "subscription";
 
@@ -10,6 +11,8 @@ export async function saveAttendancePayment(lesson: any, studentId: string, mode
   const session = await mongoose.startSession();
   try {
     await session.withTransaction(async () => {
+      const locked = await Lesson.updateOne({ _id: lesson._id }, { $inc: { attendanceRevision: 1 } }, { session });
+      if (!locked.matchedCount) throw new Error("Занятие удалено. Обновите журнал.");
       let attendance = await Attendance.findOne({ lesson: lesson._id, student: studentId }).session(session);
       if (!attendance) {
         [attendance] = await Attendance.create([{ lesson: lesson._id, student: studentId }], { session });

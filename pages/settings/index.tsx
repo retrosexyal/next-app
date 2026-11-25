@@ -130,6 +130,9 @@ const Settings = () => {
               <Link className={styles.link} href="/admin/teachers">
                 Преподаватели
               </Link>
+              <Link className={styles.link} href="/admin/students">
+                Студенты
+              </Link>
               <Link className={styles.link} href="/teacher/groups">
                 Мои группы
               </Link>

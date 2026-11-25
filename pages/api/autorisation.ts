@@ -30,7 +30,7 @@ export default async function handler(
       })
     ); */
 
-    /* return res.json(userData); */
+    /* return res.json({ accessToken: userData.accessToken, user: userData.user }); */
     return res.json({ message: "dsds" });
     res.statusCode = 200;
     const csrfToken = generateCsrfToken();

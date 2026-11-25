@@ -25,12 +25,12 @@ export default async function handler(
       })
     );
     console.log("refresh");
-    return res.status(200).json(userData);
+    return res.status(200).json({ accessToken: userData.accessToken, user: userData.user });
   } catch (error) {
     console.log(error);
     if ((error as Error).message === "ошибка обновления токена") {
-      res.statusCode = 404;
-      res.json({ message: "пользователь не найден" });
+      res.statusCode = 401;
+      res.json({ message: "Сессия истекла. Войдите снова." });
     } else {
       res.statusCode = 500;
       res.json({ message: "Internal Server Error" });

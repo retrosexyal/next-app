@@ -28,7 +28,7 @@ export default async function handler(
         httpOnly: true,
       })
     );
-    return res.status(200).json(userData);
+    return res.status(200).json({ accessToken: userData.accessToken, user: userData.user });
   } catch (error) {
     console.error(error);
     res.statusCode = 400;

@@ -41,6 +41,7 @@ export interface IStudent {
 const GroupStudentSchema = new Schema(
   {
     fullName: { type: String, required: true },
+    hiddenFromAdminStudents: { type: Boolean, default: false },
     phone: { type: String },
     message: { type: String },
     birthday: { type: String },

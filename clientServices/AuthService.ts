@@ -1,5 +1,5 @@
 import { AuthResponce } from "@/clientModels/responce/AuthResponce";
-import api from "@/http";
+import api, { refreshSession } from "@/http";
 import { IInfo } from "@/interface/iContact";
 import { AxiosResponse } from "axios";
 export default class AuthService {
@@ -43,7 +43,7 @@ export default class AuthService {
     return api.get("/api/getstudent");
   }
   static async refresh() {
-    return api.get<AuthResponce>("/api/refresh");
+    return refreshSession();
   }
   static async addStudent(
     name: string,

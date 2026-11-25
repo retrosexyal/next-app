@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./MonthReportTable.module.scss";
+import Calendar from "@/components/AttendanceTable/Calendar";
+import { Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
 
 type Props = {
   groupId: string;
@@ -12,11 +14,15 @@ export function MonthReportTable({ groupId, isTeacher }: Props) {
   );
   const [data, setData] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<any | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!groupId) return;
-
+    let active = true;
     setLoading(true);
+    setError("");
+    setSelected(null);
     fetch(
       isTeacher ? "/api/groups/month-report" : "/api/admin/groups/month-report",
       {
@@ -28,12 +34,15 @@ export function MonthReportTable({ groupId, isTeacher }: Props) {
         body: JSON.stringify({ groupId, month }),
       },
     )
-      .then((r) => r.json())
-      .then(setData)
-      .finally(() => setLoading(false));
-  }, [groupId, month]);
+      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(value => { if (active) setData(value); })
+      .catch(() => { if (active) setError("Не удалось загрузить отчёт"); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [groupId, month, isTeacher]);
 
   if (loading) return <div>Загрузка…</div>;
+  if (error) return <p role="alert">{error}</p>;
   if (!data) return null;
 
   const { students, dates, matrix, totalsByDate, totalsByStudent } = data;
@@ -46,6 +55,7 @@ export function MonthReportTable({ groupId, isTeacher }: Props) {
         onChange={(e) => setMonth(e.target.value)}
         className={styles.monthInput}
       />
+      <p className={styles.periodNote}>% — с 1 сентября до сегодня в этой группе. Ниже 40% выделено красным. Нажмите на имя, чтобы открыть календарь.</p>
 
       <div className={styles.tableWrap}>
         <table className={styles.table}>
@@ -65,9 +75,10 @@ export function MonthReportTable({ groupId, isTeacher }: Props) {
             {students?.map((s: any) => (
               <tr key={s._id}>
                 <td className={`${styles.student} ${styles.studentColumn}`}>
-                  <span className={styles.studentText} title={s.fullName}>
-                    {s.fullName}
-                  </span>
+                  <button className={`${styles.studentButton} ${data.attendanceOverview?.[s._id]?.lowAttendance ? styles.lowAttendance : ""}`} title={s.fullName} onClick={() => setSelected(s)}>
+                    <span className={styles.studentText}>{s.fullName}</span>
+                    <strong className={styles.attendancePercent}>{data.attendanceOverview?.[s._id]?.percentage == null ? "—" : `${data.attendanceOverview[s._id].percentage}%`}</strong>
+                  </button>
                 </td>
 
                 {dates?.map((d: string) => {
@@ -116,6 +127,10 @@ export function MonthReportTable({ groupId, isTeacher }: Props) {
           </tfoot>
         </table>
       </div>
+      {selected && <Dialog open onClose={() => setSelected(null)} fullWidth maxWidth="md" scroll="paper">
+        <DialogTitle><div className={styles.calendarHeading}><span>{selected.fullName}</span><Button onClick={() => setSelected(null)}>Закрыть</Button></div></DialogTitle>
+        <DialogContent><Calendar lessons={data.attendanceOverview?.[selected._id]?.lessons || []} /></DialogContent>
+      </Dialog>}
     </div>
   );
 }

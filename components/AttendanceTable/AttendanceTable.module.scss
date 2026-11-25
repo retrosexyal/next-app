@@ -387,3 +387,7 @@
     flex-direction: column;
   }
 }
+.modal { display: flex; flex-direction: column; box-sizing: border-box; }
+.modalHeader { flex-shrink: 0; }
+.calendarBody { overflow-y: auto; min-height: 0; padding: 20px; }
+@media(max-width: 600px) { .backdrop { padding: 12px; } .calendarBody { padding: 12px; } .modalHeader { padding: 16px; } }

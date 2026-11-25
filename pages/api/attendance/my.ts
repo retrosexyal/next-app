@@ -20,40 +20,6 @@ type PopulatedSubscription = {
   usedLessons?: number;
 };
 
-const startOfUtcDay = (value: Date) =>
-  new Date(
-    Date.UTC(
-      value.getUTCFullYear(),
-      value.getUTCMonth(),
-      value.getUTCDate(),
-    ),
-  );
-
-const getJoinedAt = (
-  student: any,
-  groupId: string,
-  firstJournalDate?: Date,
-) => {
-  const joinedDates = student.groupJoinedAt;
-  const savedDate =
-    joinedDates instanceof Map
-      ? joinedDates.get(groupId)
-      : joinedDates?.[groupId];
-
-  // У старых учеников поле ещё отсутствует. Их createdAt — наиболее точная
-  // доступная граница, потому что историческая дата вступления не сохранялась.
-  if (savedDate) return new Date(savedDate);
-
-  // В старом журнале запись создавалась для каждого ученика, включая
-  // отсутствовавших. Поэтому первая такая запись точнее даты карточки.
-  if (firstJournalDate) return firstJournalDate;
-
-  const createdAt = new Date(student.createdAt);
-  return Number.isNaN(createdAt.getTime())
-    ? new Date(0)
-    : startOfUtcDay(createdAt);
-};
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -94,11 +60,14 @@ export default async function handler(
     .sort({ _id: 1 })
     .lean();
 
+  const today = new Date(new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10));
+  const schoolYear = today.getUTCFullYear() - (today.getUTCMonth() < 8 ? 1 : 0);
+  const periodStart = new Date(Date.UTC(schoolYear, 8, 1));
   const groupIds = groups.map((group) => group._id);
   const lessons = groupIds.length
     ? await Lesson.find({
         group: { $in: groupIds },
-        date: { $lte: new Date() },
+        date: { $gte: periodStart, $lte: today },
       })
         .select("_id group date")
         .sort({ date: -1 })
@@ -110,55 +79,24 @@ export default async function handler(
         lesson: { $in: lessons.map((lesson) => lesson._id) },
         student: { $in: studentIds },
       })
-        .select("lesson student present")
+        .select("lesson student present refunded")
         .lean()
     : [];
 
   const presentKeys = new Set(
     attendances
-      .filter((attendance) => attendance.present)
+      .filter((attendance) => attendance.present && !attendance.refunded)
       .map((attendance) => `${attendance.student}:${attendance.lesson}`),
   );
-  const lessonById = new Map(
-    lessons.map((lesson) => [String(lesson._id), lesson]),
-  );
-  const firstJournalDateByMembership = new Map<string, Date>();
-
-  attendances.forEach((attendance) => {
-    const lesson = lessonById.get(String(attendance.lesson));
-    if (!lesson) return;
-
-    const key = `${attendance.student}:${lesson.group}`;
-    const current = firstJournalDateByMembership.get(key);
-    if (!current || lesson.date < current) {
-      firstJournalDateByMembership.set(key, lesson.date);
-    }
-  });
-
   const result = students
     .map((student) => {
       const studentId = String(student._id);
       const studentGroups = groups.filter((group) =>
         group.students.some((id: unknown) => String(id) === studentId),
       );
-      const joinedAtByGroup = new Map(
-        studentGroups.map((group) => {
-          const groupId = String(group._id);
-          return [
-            groupId,
-            getJoinedAt(
-              student,
-              groupId,
-              firstJournalDateByMembership.get(`${studentId}:${groupId}`),
-            ),
-          ] as const;
-        }),
-      );
-
       const details: LessonDetails[] = lessons
         .filter((lesson) => {
-          const joinedAt = joinedAtByGroup.get(String(lesson.group));
-          return Boolean(joinedAt && lesson.date >= joinedAt);
+          return studentGroups.some(group => String(group._id) === String(lesson.group));
         })
         .map((lesson) => ({
           id: String(lesson._id),
@@ -208,5 +146,6 @@ export default async function handler(
       }),
     );
 
-  return res.status(200).json({ students: result });
+  return res.status(200).json({ students: result, periodStart: periodStart.toISOString().slice(0, 10) });
 }
+

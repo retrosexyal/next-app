@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Calendar from "./Calendar";
 
 import api from "@/http";
 import styles from "./AttendanceTable.module.scss";
@@ -125,7 +126,7 @@ export function AttendanceTable() {
       <div className={styles.heading}>
         <div>
           <h2 id="attendance-title">Посещаемость</h2>
-          <p>По всем проведённым занятиям в текущих группах</p>
+          <p>С 1 сентября текущего учебного года до сегодняшнего дня по всем проведённым занятиям.</p>
         </div>
       </div>
 
@@ -213,27 +214,7 @@ export function AttendanceTable() {
               </button>
             </div>
 
-            {selected.lessons.length ? (
-              <div className={styles.lessonList}>
-                {selected.lessons.map((lesson) => (
-                  <div className={styles.lesson} key={lesson.id}>
-                    <div>
-                      <strong>{formatDate(lesson.date)}</strong>
-                      <span>{lesson.groupTitle}</span>
-                    </div>
-                    <span
-                      className={
-                        lesson.present ? styles.present : styles.absent
-                      }
-                    >
-                      {lesson.present ? "Присутствовал" : "Отсутствовал"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className={styles.noLessons}>Проведённых занятий пока нет.</p>
-            )}
+            <div className={styles.calendarBody}><Calendar lessons={selected.lessons} /></div>
           </div>
         </div>
       )}
@@ -241,3 +222,5 @@ export function AttendanceTable() {
     </>
   );
 }
+
+

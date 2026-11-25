@@ -1,3 +1,4 @@
+import { groupAttendanceOverview } from "@/services/group-attendance-overview";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { connectDB, requireTeacher } from "@/helpers/helpers";
 import Group from "@/models/group-model";
@@ -82,7 +83,9 @@ export default async function handler(
       }),
     );
 
+  const attendanceOverview = await groupAttendanceOverview(group);
   return res.json({
+    attendanceOverview,
     students,
     dates,
     matrix,
@@ -90,3 +93,4 @@ export default async function handler(
     totalsByStudent,
   });
 }
+
